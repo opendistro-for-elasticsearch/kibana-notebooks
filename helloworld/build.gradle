@@ -1,0 +1,17 @@
+apply plugin: 'elasticsearch.esplugin'
+
+ext {
+    projectSubstitutions = [:]
+    licenseFile = rootProject.file('LICENSE.txt')
+    noticeFile = rootProject.file('NOTICE.txt')
+}
+test {
+    enabled = false
+}
+licenseHeaders.enabled = false
+
+esplugin {
+  name 'helloworld'
+  description 'Hello world plugin'
+  classname 'org.openes.helloWorld.HelloWorldPlugin'
+}

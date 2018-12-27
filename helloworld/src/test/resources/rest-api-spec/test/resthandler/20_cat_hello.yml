@@ -1,0 +1,26 @@
+---
+"Help":
+  - do:
+      cat.hello:
+        help: true
+
+  - match:
+      $body: |
+               /^  test    .+   \n
+               $/
+
+---
+"Default message":
+  - do:
+      cat.hello:
+        v: false
+
+  - match: {$body: "Hello World\n" }
+
+---
+"Custom message":
+  - do:
+      cat.hello:
+        message: Hello from REST API test
+
+  - match: {$body: "Hello from REST API test\n" }

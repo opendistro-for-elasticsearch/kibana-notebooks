@@ -1,0 +1,29 @@
+{
+  "cat.hello": {
+    "documentation": "",
+    "methods": ["GET"],
+    "url": {
+      "path": "/_cat/hello",
+      "paths": ["/_cat/hello"],
+      "parts": {},
+      "params": {
+        "help": {
+          "type": "boolean",
+          "description": "Return help information",
+          "default": false
+        },
+        "v": {
+          "type": "boolean",
+          "description": "Verbose mode. Display column headers",
+          "default": true
+        },
+        "message": {
+          "type": "string",
+          "description": "A simple message that will be printed out in the response",
+          "default": "Hello World!"
+        }
+      }
+    },
+    "body": null
+  }
+}
