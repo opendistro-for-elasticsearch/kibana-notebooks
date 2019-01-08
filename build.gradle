@@ -37,6 +37,13 @@ plugins {
 subprojects {
     group = "org.openes.plugin"
     version = "${version}"
+    boolean snapshot = "true".equals(System.getProperty("build.snapshot", "true"));
+    if (snapshot) {
+        // we update the version property to reflect if we are building a snapshot or a release build
+        // we write this back out below to load it in the Build.java which will be shown in rest main action
+        // to indicate this being a snapshot build or a release build.
+        version += "-SNAPSHOT"
+    }
     project.ext.localPublishPath = "${rootProject.buildDir}"
 
 }
