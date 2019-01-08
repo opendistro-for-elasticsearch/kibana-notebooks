@@ -9,6 +9,7 @@ Sample plugins for Elasticsearch. Currently includes helloworld plugin.
 1. Launch Intellij IDEA, Choose Import Project and select the `settings.gradle` file in the root of this package. 
 1. Launch all gradle tasks from Intellij with the command line option '-Dcompiler.java=11'
 1. To build from command line set `JAVA_HOME` to point to a JDK 10 and set up paths for both JAVA8_HOME and JAVA11_HOME before running `./gradlew`
+1. Till we go public, ensure that you have environment variables set up to read from S3 bucket. The team has permissions to read the S3 bucket for openes account. In IDE, you can set up `RunConfigurations` with the right environment variables.
 
 ## Build
 
@@ -26,11 +27,12 @@ However to build the `helloworld` plugin subproject we also use the Elastic buil
 1. ` ./gradlew :helloworld:integTest --tests="**.test execute foo" -Dcompiler.java=11` runs a single integ test class or method
  (remember to quote the test method name if it contains spaces).
 1. `./gradlew build --es.version=6.5.5-SNAPSHOT -Dcompiler.java=11` builds and tests all subprojects against a particular es version.
+1. Add `publishArtifact=true` for publishing artifacts.
 
 ## Publish artifacts
-1. `./gradlew publish` publishes the build artifacts to local file system
+1. `./gradlew publish -Dcompiler.java=11` publishes the build artifacts to local file system. The default local path containing the published artifacts is `${rootProject.buildDir}\local-test-repo`
 1. `./gradlew publish -DlocalPublish=false '-Dorg.gradle.jvmargs=--add-modules java.xml.bind' -Dcompiler.java=11` publishes the build artifacts to snapshot repo in S3.
-1. ./gradlew publish -DlocalPublish=false '-Dorg.gradle.jvmargs=--add-modules java.xml.bind' -Dcompiler.java=11 -Dbuild.snapshot=false` publishes the build artifacts to release repo in S3.
+1. `./gradlew publish -DlocalPublish=false '-Dorg.gradle.jvmargs=--add-modules java.xml.bind' -Dcompiler.java=11 -Dbuild.snapshot=false` publishes the build artifacts to release repo in S3.
 
 
 
