@@ -14,4 +14,6 @@ esplugin {
   name 'helloworld'
   description 'Hello world plugin'
   classname 'org.openes.helloWorld.HelloWorldPlugin'
+    publishArtifact true
 }
+
