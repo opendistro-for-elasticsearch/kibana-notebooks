@@ -44,8 +44,6 @@ subprojects {
         // to indicate this being a snapshot build or a release build.
         version += "-SNAPSHOT"
     }
-    project.ext.localPublishPath = "${rootProject.buildDir}"
-
 }
 
 test {
