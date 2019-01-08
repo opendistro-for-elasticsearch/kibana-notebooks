@@ -7,7 +7,8 @@ Sample plugins for Elasticsearch. Currently includes helloworld plugin.
 
 1. Checkout this package from version control. 
 1. Launch Intellij IDEA, Choose Import Project and select the `settings.gradle` file in the root of this package. 
-1. To build from command line set `JAVA_HOME` to point to a JDK 11 before running `./gradlew`
+1. Launch all gradle tasks from Intellij with the command line option '-Dcompiler.java=11'
+1. To build from command line set `JAVA_HOME` to point to a JDK 10 and set up paths for both JAVA8_HOME and JAVA11_HOME before running `./gradlew`
 
 ## Build
 
@@ -19,14 +20,18 @@ However to build the `helloworld` plugin subproject we also use the Elastic buil
   
 ### Building from command line
 
-1. `./gradlew build` builds and tests all subprojects
-1. `./gradlew :helloworld:run` launches a single node cluster with the monitoring plugin installed
-1. `./gradlew :helloworld:integTest` launches a single node cluster with the monitoring plugin installed and runs all integ tests
-1. ` ./gradlew :helloworld:integTest --tests="**.test execute foo"` runs a single integ test class or method
+1. `./gradlew build -Dcompiler.java=11` builds and tests all subprojects. Creates a zip in build/distribution.
+1. `./gradlew :helloworld:run -Dcompiler.java=11` launches a single node cluster with the monitoring plugin installed
+1. `./gradlew :helloworld:integTest -Dcompiler.java=11` launches a single node cluster with the monitoring plugin installed and runs all integ tests
+1. ` ./gradlew :helloworld:integTest --tests="**.test execute foo" -Dcompiler.java=11` runs a single integ test class or method
  (remember to quote the test method name if it contains spaces).
-1. `./gradlew build --es.version=6.5.4-SNAPSHOT` builds and tests all subprojects against a particular es version.
+1. `./gradlew build --es.version=6.5.5-SNAPSHOT -Dcompiler.java=11` builds and tests all subprojects against a particular es version.
 
 ## Publish artifacts
+1. `./gradlew publish` publishes the build artifacts to local file system
+1. `./gradlew publish -DlocalPublish=false '-Dorg.gradle.jvmargs=--add-modules java.xml.bind' -Dcompiler.java=11` publishes the build artifacts to snapshot repo in S3.
+1. ./gradlew publish -DlocalPublish=false '-Dorg.gradle.jvmargs=--add-modules java.xml.bind' -Dcompiler.java=11 -Dbuild.snapshot=false` publishes the build artifacts to release repo in S3.
+
 
 
 
