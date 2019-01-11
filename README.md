@@ -6,7 +6,7 @@ Sample plugins for Elasticsearch. Currently includes helloworld plugin.
 
 1. Checkout this package from version control. 
 1. Launch Intellij IDEA, Choose Import Project and select the `settings.gradle` file in the root of this package. 
-1. Launch all gradle tasks from Intellij with the command line option '-Dcompiler.java=11'
+1. Launch all gradle tasks from Intellij with the command line option '-Dcompiler.java=11'.
 1. To build from command line set `JAVA_HOME` to point to a JDK 10 and set up paths for both JAVA8_HOME and JAVA11_HOME before running `./gradlew`
 1. Till we go public, ensure that you have environment variables set up to read from S3 bucket. The team has permissions to read the S3 bucket for openes account. In IDE, you can set up `RunConfigurations` with the right environment variables.
 
