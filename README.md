@@ -34,3 +34,4 @@ However to build the `helloworld` plugin subproject we also use the Elastic buil
 1. `./gradlew publish -DlocalPublish=false '-Dorg.gradle.jvmargs=--add-modules java.xml.bind' -Dcompiler.java=11 -Dbuild.snapshot=false` publishes the build artifacts to release repo in S3.
 testing
 testing
+testing
