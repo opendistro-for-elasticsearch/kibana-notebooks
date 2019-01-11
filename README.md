@@ -2,7 +2,6 @@
 
 Sample plugins for Elasticsearch. Currently includes helloworld plugin. 
 
-
 ## Setup
 
 1. Checkout this package from version control. 
