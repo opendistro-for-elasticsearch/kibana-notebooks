@@ -33,9 +33,3 @@ However to build the `helloworld` plugin subproject we also use the Elastic buil
 1. `./gradlew publish -Dcompiler.java=11` publishes the build artifacts to local file system. The default local path containing the published artifacts is `${rootProject.buildDir}\local-test-repo`
 1. `./gradlew publish -DlocalPublish=false '-Dorg.gradle.jvmargs=--add-modules java.xml.bind' -Dcompiler.java=11` publishes the build artifacts to snapshot repo in S3.
 1. `./gradlew publish -DlocalPublish=false '-Dorg.gradle.jvmargs=--add-modules java.xml.bind' -Dcompiler.java=11 -Dbuild.snapshot=false` publishes the build artifacts to release repo in S3.
-
-
-
-
-
- 
