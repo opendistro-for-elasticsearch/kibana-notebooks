@@ -26,8 +26,9 @@ However to build the `helloworld` plugin subproject we also use the Elastic buil
 1. `./gradlew :helloworld:integTest -Dcompiler.java=11` launches a single node cluster with the monitoring plugin installed and runs all integ tests
 1. ` ./gradlew :helloworld:integTest --tests="**.test execute foo" -Dcompiler.java=11` runs a single integ test class or method
  (remember to quote the test method name if it contains spaces).
-1. `./gradlew build --es.version=6.5.5-SNAPSHOT -Dcompiler.java=11` builds and tests all subprojects against a particular es version.
+1. `./gradlew build -Des.version=6.5.5-SNAPSHOT -Dcompiler.java=11` builds and tests all subprojects against a particular es version.
 1. Add `publishArtifact=true` for publishing artifacts.
+1. `./gradlew build -Dcompiler.java=11 -Dbuild.Snapshot=false` builds release versions for helloWorld
 
 ## Publish artifacts
 1. `./gradlew publish -Dcompiler.java=11` publishes the build artifacts to local file system. The default local path containing the published artifacts is `${rootProject.buildDir}\local-test-repo`

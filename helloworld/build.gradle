@@ -11,9 +11,9 @@ test {
 licenseHeaders.enabled = false
 
 esplugin {
-  name 'helloworld'
+  name 'helloworld123'
   description 'Hello world plugin'
   classname 'org.openes.helloWorld.HelloWorldPlugin'
-    publishArtifact true
+  publishArtifact true
 }
 
