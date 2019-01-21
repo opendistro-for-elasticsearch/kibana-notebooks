@@ -3,3 +3,10 @@
 
 # Ignore Gradle build output directory
 build
+
+#Intellij files
+.idea/
+*.iml
+
+#Ignore Elastic plugin test execution times log
+.local-*-execution-times.log
