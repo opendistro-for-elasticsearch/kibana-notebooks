@@ -9,17 +9,11 @@ buildscript {
         //TODO: modify the order of evaluation, once we have artifacts in mavenCentral.
         maven {
            name = "internal-snapshots"
-            url = "s3://snapshots.opendistro.amazonaws.com/maven"
-            authentication {
-               awsIm(AwsImAuthentication) // load from EC2 role or env var
-            }
+            url = "https://d1mbdmiycff3en.cloudfront.net/maven"
         }
         maven {
            name = "internal-releases"
-           url = "s3://artifacts.opendistro.amazonaws.com/maven"
-           authentication {
-               awsIm(AwsImAuthentication) // load from EC2 role or env var
-            }
+           url = "https://d3g5vo6xdbdb9a.cloudfront.net/maven"
         }
         mavenCentral()
     } 
