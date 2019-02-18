@@ -1,0 +1,54 @@
+apply plugin: 'elasticsearch.esplugin'
+apply plugin: "nebula.ospackage"
+
+ext {
+    projectSubstitutions = [:]
+    licenseFile = rootProject.file('LICENSE.txt')
+    noticeFile = rootProject.file('NOTICE.txt')
+}
+test {
+    enabled = false
+}
+licenseHeaders.enabled = false
+
+esplugin {
+  name 'helloworld123'
+  description 'Hello world plugin'
+  classname 'org.openes.helloWorld.HelloWorldPlugin'
+}
+
+ospackage {
+    packageName = "opendistro-elasticsearch-plugin-${name}"
+    release = isSnapshot ? "0.1" : '1'
+    version = "${project.version}" - "-SNAPSHOT"
+
+    into '/usr/share/opendistro/elasticsearch/plugins'
+    from (zipTree(bundlePlugin.outputs.files.getSingleFile())) {
+        into esplugin.name
+    }
+
+    user 'root'
+    permissionGroup 'root'
+    fileMode 0644
+    dirMode 0755
+
+    requires('opendistro-elasticsearch', versions.opendistro, EQUAL)
+    arch = 'NOARCH'
+    packager = 'Amazon'
+    vendor = 'Amazon'
+    os = 'LINUX'
+    prefix '/usr'
+    
+    license 'ASL-2.0'
+    maintainer 'OpenDistro for Elasticsearch Team <opendistro@amazon.com>'
+    url 'https://opendistro.github.io/elasticsearch/downloads'
+    summary '''
+    Sample plugin for OpenDistro for Elasticsearch.
+    Reference documentation can be found at https://opendistro.github.io/elasticsearch/docs.
+    '''.stripIndent().replace('\n', ' ').trim()
+}
+
+buildRpm {
+    archiveName "${packageName}-${version}.rpm"
+    dependsOn 'assemble'
+}

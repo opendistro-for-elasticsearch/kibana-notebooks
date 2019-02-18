@@ -1,3 +1,5 @@
+import org.elasticsearch.gradle.VersionProperties
+
 buildscript {
 
     ext {
@@ -5,7 +7,7 @@ buildscript {
     }
     // This isn't applying from repositories.gradle so repeating it here
     repositories {
-
+        mavenCentral()
         //TODO: modify the order of evaluation, once we have artifacts in mavenCentral.
         maven {
            name = "internal-snapshots"
@@ -15,32 +17,31 @@ buildscript {
            name = "internal-releases"
            url = "https://d3g5vo6xdbdb9a.cloudfront.net/maven"
         }
-        mavenCentral()
     } 
 
     dependencies {
-        classpath "com.amazonaws.opendistro.elasticsearch.gradle:build-tools:${es_version}"
+        classpath "com.amazon.opendistroforelasticsearch.gradle:build-tools:${es_version}"
     }
 }
 
 plugins {
-    // Apply the java-library plugin to add support for Java Library
-    id 'java-library'
+    id 'nebula.ospackage' version "5.3.0" apply false
 }
+
+apply plugin: 'base'
+
+ext {
+    isSnapshot = "true" == System.getProperty("build.snapshot", "true")
+    versions = VersionProperties.versions
+}
+
+// Increment the final digit when there's a new plugin version for the same opendistro version
+// Reset the final digit to 0 when upgrading to a new opendistro version
+version = "${versions.opendistro}.0" + (isSnapshot ? "-SNAPSHOT" : "")
 
 subprojects {
-    group = "com.amazonaws.opendistro.elasticsearch.plugin"
-    version = "${version}"
-    boolean snapshot = "true".equals(System.getProperty("build.snapshot", "true"));
-    if (snapshot) {
-        // we update the version property to reflect if we are building a snapshot or a release build
-        // we write this back out below to load it in the Build.java which will be shown in rest main action
-        // to indicate this being a snapshot build or a release build.
-        version += "-SNAPSHOT"
-    }
+    group = "com.amazon.opendistroforelasticsearch.plugin"
+    version = "${rootProject.version}"
 }
 
-test {
-    enabled = false
-}
 
