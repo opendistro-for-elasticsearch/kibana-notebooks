@@ -53,12 +53,12 @@ KS - Kibana Service
       2. Once received the cookie, it will be used by KPB till the end of the KS lifetime i.e. Once KS is restarted we’ll retrieve a new cookie and ZB also restart with KS
    5. The interpreter settings are updated in ZB by KPB via KS APIs for elasticsearch & JDBC(ODFE-SQL)
    6. Also, the Storage adapter configs are updated in ZB by KPF via KS as a form for elasticsearch & JDBC
-   7. **Notes: **
+   7. **Notes:**
       1. Dummy user should be later replaced with config info from Access Control module
       2. Access control should be inherited from User details from KS [Open distro Access control API](https://opendistro.github.io/for-elasticsearch-docs/docs/security-access-control/api/#access-control-for-the-api)
       3. Elastic Interpreter settings can be inherited from KS
       4. End points to these interpreters are needed to be specified before usage
-2. **Kibana Plugin Backend **
+2. **Kibana Plugin Backend**
    1. A Node Backend server for routing calls of ZB to KPF (and vice versa)
    2. Router Modules:
       1. InitConnector - Initiates with a cookie collection via dummy user and uses it for further communication
@@ -70,16 +70,16 @@ KS - Kibana Service
    3. Uses default [Hapi server](https://hapi.dev/) provided in KPB
       1. Uses [Wreck](https://hapi.dev/module/wreck/) plugin for HTTP client utilities.
 3. **Kibana Plugin Frontend**
-   1. **~~Approach 1 - Use ~~**[**~~Zeppelin-web~~**](https://github.com/apache/zeppelin/tree/master/zeppelin-web)**~~ UI components ~~ : Not considered further as their direction was moving towards [Angular Framework](https://angular.io/)**
+   1. ~~**Approach 1 - Use[Zeppelin-web](https://github.com/apache/zeppelin/tree/master/zeppelin-web) UI components**~~ : **Not considered further as their direction was moving towards [Angular Framework](https://angular.io/)**
       1. Check for reusable elements that can be used from Zeppelin-web Repo (mainly written in angular js)
-   2. **~~Approach 2 - Use Open source Zeppelin UI repos ~~ : Not considered further as implementation was partial and development was on a halt**
+   2. **~~Approach 2 - Use Open source Zeppelin UI repos~~ : Not considered further as implementation was partial and development was on a halt**
       1. https://github.com/gogumaa/zeppelin-web
    3. **Approach 3 - Build UI in react with open source js components**
       1. A React Service, inherits elements from [Elastic UI](https://elastic.github.io/eui/#/) elements & [Nteract.io components](https://components.nteract.io/)
       2. Visualizations support with [Plotly](https://plotly.com/javascript/), [Vega](https://vega.github.io/vega/) & [Elastic UI Charts](https://elastic.github.io/eui/#/elastic-charts/creating-charts)
       3. Import Visualizations from Kibana via KS APIs
    4. Here’s a sample wireframe
-   5. [Image: image]
+   5. ![Kibana Notebooks UI](images/UI.png)
 
 ### 3.2 APIs provided by Zeppelin Server
 
