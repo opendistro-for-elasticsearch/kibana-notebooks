@@ -79,7 +79,7 @@ KS - Kibana Service
       2. Visualizations support with [Plotly](https://plotly.com/javascript/), [Vega](https://vega.github.io/vega/) & [Elastic UI Charts](https://elastic.github.io/eui/#/elastic-charts/creating-charts)
       3. Import Visualizations from Kibana via KS APIs
    4. Here’s a sample wireframe
-   5. ![Kibana Notebooks UI](images/UI.png)
+      ![Kibana Notebooks UI](images/UI.png)
 
 ### 3.2 APIs provided by Zeppelin Server
 
