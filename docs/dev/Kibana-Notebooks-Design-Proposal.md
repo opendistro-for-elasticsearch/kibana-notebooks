@@ -114,7 +114,7 @@ Dashboards offer a solution for a few selected use cases, and are a great tool i
   - **Embedding Saved Visualizations**
     ![Viz](images/vizembed_ss.png)
   - **Multi-Timeline Support**
-    ![Multi-Timeline Support](images/multi-timeline_ss.png)
+    ![Multi-Timeline Support](images/Multi-timeline_ss.png)
 
 - **Zeppelin Backend Adaptor**
 
