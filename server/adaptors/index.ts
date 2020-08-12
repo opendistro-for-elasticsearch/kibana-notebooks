@@ -13,11 +13,18 @@
  * permissions and limitations under the License.
  */
 
-import { NoteRouter } from './noteRouter';
-import { ParaRouter } from './paraRouter';
-import { IRouter } from '../../../../src/core/server';
+import { SELECTED_BACKEND } from '../../common';
+import { ZeppelinBackend } from './zeppelin_backend';
+import { DefaultBackend } from './default_backend';
+import { NotebookAdaptor } from './notebook_adaptor';
 
-export function serverRoute(router: IRouter) {
-  ParaRouter(router);
-  NoteRouter(router);
+let BACKEND: NotebookAdaptor;
+
+// Selects backend based on config
+if (SELECTED_BACKEND == 'ZEPPELIN') {
+  BACKEND = new ZeppelinBackend();
+} else {
+  BACKEND = new DefaultBackend();
 }
+
+export default BACKEND;
