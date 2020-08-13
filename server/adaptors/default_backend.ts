@@ -76,28 +76,28 @@ export class DefaultBackend implements NotebookAdaptor {
   // Update and Run a para in a notebook
   updateRunPara: (
     context: RequestHandlerContext,
-    params: { noteId: string; paraId: string; paraInp: string },
+    params: { noteId: string; paragraphId: string; paragraphInput: string },
     wreckOptions: optionsType
   ) => Promise<any>;
 
   // Update and Run a para in a notebook
   updateFetchPara: (
     context: RequestHandlerContext,
-    params: { noteId: string; paraId: string; paraInp: string },
+    params: { noteId: string; paragraphId: string; paragraphInput: string },
     wreckOptions: optionsType
   ) => Promise<any>;
 
   // Add a new and return the new para in a notebook
   addNewPara: (
     context: RequestHandlerContext,
-    params: { noteId: string; paraIndex: string; paraInp: string },
+    params: { noteId: string; paragraphIndex: string; paragraphInput: string },
     wreckOptions: optionsType
   ) => Promise<any>;
 
   // delete a para and return all other paras in a notebook
   deleteFetchPara: (
     context: RequestHandlerContext,
-    params: { noteId: string; paraId: string },
+    params: { noteId: string; paragraphId: string },
     wreckOptions: optionsType
   ) => Promise<{ paragraphs: any }>;
 

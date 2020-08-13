@@ -26,8 +26,8 @@ export function ParaRouter(router: IRouter) {
       validate: {
         body: schema.object({
           noteId: schema.string(),
-          paraId: schema.string(),
-          paraInp: schema.string(),
+          paragraphId: schema.string(),
+          paragraphInput: schema.string(),
         }),
       },
     },
@@ -56,8 +56,8 @@ export function ParaRouter(router: IRouter) {
       validate: {
         body: schema.object({
           noteId: schema.string(),
-          paraId: schema.string(),
-          paraInp: schema.string(),
+          paragraphId: schema.string(),
+          paragraphInput: schema.string(),
         }),
       },
     },
@@ -86,8 +86,8 @@ export function ParaRouter(router: IRouter) {
       validate: {
         body: schema.object({
           noteId: schema.string(),
-          paraIndex: schema.number(),
-          paraInp: schema.string(),
+          paragraphIndex: schema.number(),
+          paragraphInput: schema.string(),
         }),
       },
     },
@@ -122,7 +122,7 @@ export function ParaRouter(router: IRouter) {
     async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
       const params = {
         noteId: request.params.ids.split('/')[0],
-        paraId: request.params.ids.split('/')[1],
+        paragraphId: request.params.ids.split('/')[1],
       };
       let deleteResponse = {};
       try {

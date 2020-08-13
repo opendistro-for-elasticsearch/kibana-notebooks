@@ -33,7 +33,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       throw new Error('View Notebooks Error');
     }
   };
-  
+
   // Fetches a notebook by id from Zeppelin Server
   // ZS Endpoint => http://[zeppelin-server]:[zeppelin-port]/api/notebook/[noteId]
   fetchNote = async function (
@@ -152,12 +152,12 @@ export class ZeppelinBackend implements NotebookAdaptor {
   // ZS Endpoint => http://[zeppelin-server]:[zeppelin-port]/api/notebook/[noteId]/paragraph
   addPara = async function (
     wreckOptions: optionsType,
-    params: { paraIndex: string; noteId: string; paraInp: string }
+    params: { paragraphIndex: string; noteId: string; paragraphInput: string }
   ) {
     wreckOptions.payload = {
       title: 'Paragraph inserted',
-      text: params.paraInp,
-      index: params.paraIndex,
+      text: params.paragraphInput,
+      index: params.paragraphIndex,
     };
 
     try {
@@ -177,15 +177,15 @@ export class ZeppelinBackend implements NotebookAdaptor {
   // ZS Endpoint => http://[zeppelin-server]:[zeppelin-port]/api/notebook/[noteId]/paragraph/[paragraphId]
   updatePara = async function (
     wreckOptions: optionsType,
-    params: { noteId: string; paraId: string; paraInp: string }
+    params: { noteId: string; paragraphId: string; paragraphInput: string }
   ) {
     wreckOptions.payload = {
-      text: params.paraInp,
+      text: params.paragraphInput,
     };
     try {
       const body = await requestor(
         'PUT',
-        'api/notebook/' + params.noteId + '/paragraph/' + params.paraId,
+        'api/notebook/' + params.noteId + '/paragraph/' + params.paragraphId,
         wreckOptions
       );
       return JSON.parse(body.toString());
@@ -196,12 +196,15 @@ export class ZeppelinBackend implements NotebookAdaptor {
 
   // Run a Paragraph in notebook
   // ZS Endpoint => http://[zeppelin-server]:[zeppelin-port]/api/notebook/run/[noteId]/[paragraphId]
-  runPara = async function (wreckOptions: optionsType, params: { noteId: string; paraId: string }) {
+  runPara = async function (
+    wreckOptions: optionsType,
+    params: { noteId: string; paragraphId: string }
+  ) {
     wreckOptions.payload = {};
     try {
       const body = await requestor(
         'POST',
-        'api/notebook/run/' + params.noteId + '/' + params.paraId,
+        'api/notebook/run/' + params.noteId + '/' + params.paragraphId,
         wreckOptions
       );
       return JSON.parse(body.toString()).status;
@@ -216,7 +219,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
     try {
       const body = await requestor(
         'GET',
-        'api/notebook/' + params.noteId + '/paragraph/' + params.paraId,
+        'api/notebook/' + params.noteId + '/paragraph/' + params.paragraphId,
         wreckOptions
       );
       return JSON.parse(body.toString()).body;
@@ -232,7 +235,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
     try {
       const body = await requestor(
         'DELETE',
-        'api/notebook/' + params.noteId + '/paragraph/' + params.paraId,
+        'api/notebook/' + params.noteId + '/paragraph/' + params.paragraphId,
         wreckOptions
       );
       return JSON.parse(body.toString()).status;
@@ -258,7 +261,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
    */
   updateRunPara = async function (
     _context: RequestHandlerContext,
-    params: { noteId: string; paraId: string; paraInp: string },
+    params: { noteId: string; paragraphId: string; paragraphInput: string },
     wreckOptions: optionsType
   ) {
     try {
@@ -276,7 +279,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
    */
   updateFetchPara = async function (
     _context: RequestHandlerContext,
-    params: { noteId: string; paraId: string; paraInp: string },
+    params: { noteId: string; paragraphId: string; paragraphInput: string },
     wreckOptions: optionsType
   ) {
     try {
@@ -293,12 +296,12 @@ export class ZeppelinBackend implements NotebookAdaptor {
    */
   addNewPara = async function (
     _context: RequestHandlerContext,
-    params: { noteId: string; paraIndex: string; paraInp: string },
+    params: { noteId: string; paragraphIndex: string; paragraphInput: string },
     wreckOptions: optionsType
   ) {
     try {
       const respBody = await this.addPara(wreckOptions, params);
-      const payload = { ...params, paraId: respBody.body };
+      const payload = { ...params, paragraphId: respBody.body };
       const getinfo = await this.getPara(wreckOptions, payload);
       return getinfo;
     } catch (error) {
@@ -311,7 +314,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
    */
   deleteFetchPara = async function (
     context: RequestHandlerContext,
-    params: { noteId: string; paraId: string },
+    params: { noteId: string; paragraphId: string },
     wreckOptions: optionsType
   ) {
     try {

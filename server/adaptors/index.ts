@@ -16,15 +16,12 @@
 import { SELECTED_BACKEND } from '../../common';
 import { ZeppelinBackend } from './zeppelin_backend';
 import { DefaultBackend } from './default_backend';
-import { NotebookAdaptor } from './notebook_adaptor';
-
-let BACKEND: NotebookAdaptor;
 
 // Selects backend based on config
+let BACKEND = new DefaultBackend();
+
 if (SELECTED_BACKEND == 'ZEPPELIN') {
   BACKEND = new ZeppelinBackend();
-} else {
-  BACKEND = new DefaultBackend();
 }
 
 export default BACKEND;
