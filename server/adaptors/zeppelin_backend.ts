@@ -30,7 +30,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       output = JSON.parse(body.toString()).body;
       return output;
     } catch (error) {
-      throw new Error('View Notebooks Error');
+      throw new Error('View Notebooks Error:' + error);
     }
   };
 
@@ -45,7 +45,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       const body = await requestor('GET', 'api/notebook/' + noteId, wreckOptions);
       return JSON.parse(body.toString()).body.paragraphs;
     } catch (error) {
-      throw new Error('Fetching Notebook Error');
+      throw new Error('Fetching Notebook Error:' + error);
     }
   };
 
@@ -61,7 +61,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       const body = await requestor('POST', 'api/notebook/', wreckOptions);
       return JSON.parse(body.toString());
     } catch (error) {
-      throw new Error('Creating New Notebook Error');
+      throw new Error('Creating New Notebook Error:' + error);
     }
   };
 
@@ -81,7 +81,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       );
       return JSON.parse(body.toString());
     } catch (error) {
-      throw new Error('Renaming Notebook Error');
+      throw new Error('Renaming Notebook Error:' + error);
     }
   };
 
@@ -97,7 +97,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       const body = await requestor('POST', 'api/notebook/' + params.noteId, wreckOptions);
       return JSON.parse(body.toString());
     } catch (error) {
-      throw new Error('Cloning Notebook Error');
+      throw new Error('Cloning Notebook Error:' + error);
     }
   };
 
@@ -112,7 +112,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       const body = await requestor('DELETE', 'api/notebook/' + noteId, wreckOptions);
       return JSON.parse(body.toString());
     } catch (error) {
-      throw new Error('Deleting Notebook Error');
+      throw new Error('Deleting Notebook Error:' + error);
     }
   };
 
@@ -127,7 +127,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       const body = await requestor('GET', 'api/notebook/export/' + noteId, wreckOptions);
       return JSON.parse(body.toString());
     } catch (error) {
-      throw new Error('Export Notebook Error');
+      throw new Error('Export Notebook Error:' + error);
     }
   };
 
@@ -144,7 +144,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       const respBody = JSON.parse(body.toString());
       return respBody;
     } catch (error) {
-      throw new Error('Import Notebook Error');
+      throw new Error('Import Notebook Error:' + error);
     }
   };
 
@@ -169,7 +169,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       const respBody = JSON.parse(body.toString());
       return respBody;
     } catch (error) {
-      throw new Error('Adding Paragraph Error');
+      throw new Error('Adding Paragraph Error:' + error);
     }
   };
 
@@ -190,7 +190,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       );
       return JSON.parse(body.toString());
     } catch (error) {
-      throw new Error('Updating Paragraph Error');
+      throw new Error('Updating Paragraph Error:' + error);
     }
   };
 
@@ -209,7 +209,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       );
       return JSON.parse(body.toString()).status;
     } catch (error) {
-      throw new Error('Running Paragraph Error');
+      throw new Error('Running Paragraph Error:' + error);
     }
   };
 
@@ -224,7 +224,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       );
       return JSON.parse(body.toString()).body;
     } catch (error) {
-      throw new Error('Fetching Paragraph Error');
+      throw new Error('Fetching Paragraph Error:' + error);
     }
   };
 
@@ -240,7 +240,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       );
       return JSON.parse(body.toString()).status;
     } catch (error) {
-      throw new Error('Deleting Paragraph Error');
+      throw new Error('Deleting Paragraph Error:' + error);
     }
   };
 
@@ -251,7 +251,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       const body = await requestor('PUT', 'api/notebook/' + noteid + '/clear', wreckOptions);
       return JSON.parse(body.toString()).status;
     } catch (error) {
-      throw new Error('Clearing Paragraph Error');
+      throw new Error('Clearing Paragraph Error:' + error);
     }
   };
 
@@ -270,7 +270,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       const getInfo = await this.getPara(wreckOptions, params);
       return getInfo;
     } catch (error) {
-      throw new Error('Run Para Error');
+      throw new Error('Run Para Error:' + error);
     }
   };
 
@@ -287,7 +287,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       const getInfo = await this.getPara(wreckOptions, params);
       return getInfo;
     } catch (error) {
-      throw new Error('Run Para Error');
+      throw new Error('Run Para Error:' + error);
     }
   };
 
@@ -305,7 +305,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       const getinfo = await this.getPara(wreckOptions, payload);
       return getinfo;
     } catch (error) {
-      throw new Error('Add Para Error');
+      throw new Error('Add Para Error:' + error);
     }
   };
 
@@ -322,7 +322,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       const notebookinfo = await this.fetchNote(context, params.noteId, wreckOptions);
       return { paragraphs: notebookinfo };
     } catch (error) {
-      throw new Error('Delete Para Error');
+      throw new Error('Delete Para Error:' + error);
     }
   };
 
@@ -337,7 +337,7 @@ export class ZeppelinBackend implements NotebookAdaptor {
       const notebookinfo = await this.fetchNote(context, params.noteId, wreckOptions);
       return { paragraphs: notebookinfo };
     } catch (error) {
-      throw new Error('Clear Para Error');
+      throw new Error('Clear Para Error:' + error);
     }
   };
 }

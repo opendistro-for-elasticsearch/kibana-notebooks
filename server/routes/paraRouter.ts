@@ -22,7 +22,7 @@ export function ParaRouter(router: IRouter) {
   // Updates the input content in a paragraph --> Runs the paragraph --> Fetches the updated Paragraph (with new input content)
   router.post(
     {
-      path: `${API_PREFIX}/para/update/run/`,
+      path: `${API_PREFIX}/paragraph/update/run/`,
       validate: {
         body: schema.object({
           noteId: schema.string(),
@@ -52,7 +52,7 @@ export function ParaRouter(router: IRouter) {
   // Updates the input content in a paragraph --> Fetches the updated Paragraph (with new input content)
   router.put(
     {
-      path: `${API_PREFIX}/para/`,
+      path: `${API_PREFIX}/paragraph/`,
       validate: {
         body: schema.object({
           noteId: schema.string(),
@@ -82,7 +82,7 @@ export function ParaRouter(router: IRouter) {
   // Add a new para
   router.post(
     {
-      path: `${API_PREFIX}/para/`,
+      path: `${API_PREFIX}/paragraph/`,
       validate: {
         body: schema.object({
           noteId: schema.string(),
@@ -112,7 +112,7 @@ export function ParaRouter(router: IRouter) {
   // Delete a paragraph
   router.delete(
     {
-      path: `${API_PREFIX}/para/{ids*2}`,
+      path: `${API_PREFIX}/paragraph/{ids*2}`,
       validate: {
         params: schema.object({
           ids: schema.string(),
@@ -144,7 +144,7 @@ export function ParaRouter(router: IRouter) {
   // Clear the output of all paragraphs
   router.put(
     {
-      path: `${API_PREFIX}/para/clear/`,
+      path: `${API_PREFIX}/paragraph/clearall/`,
       validate: {
         body: schema.object({
           noteId: schema.string(),
