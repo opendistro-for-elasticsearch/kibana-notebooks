@@ -24,85 +24,123 @@ export class DefaultBackend implements NotebookAdaptor {
   // Gets all the notebooks available
   viewNotes: (context: RequestHandlerContext, wreckOptions: optionsType) => Promise<any[]>;
 
-  // Fetches a notebook by id
+  /* Fetches a notebook by id
+   * Param: noteId -> Id of notebook to be fetched
+   */
   fetchNote: (
     context: RequestHandlerContext,
     noteId: string,
     wreckOptions: optionsType
   ) => Promise<any[]>;
 
-  // Adds a notebook to storage
+  /* Adds a notebook to storage
+   * Param: name -> name of new notebook
+   */
   addNote: (
     context: RequestHandlerContext,
     params: { name: string },
     wreckOptions: optionsType
   ) => Promise<any>;
 
-  // Renames a notebook
+  /* Renames a notebook
+   * Params: name -> new name for the notebook to be renamed
+   *         noteId -> Id of notebook to be fetched
+   */
   renameNote: (
     context: RequestHandlerContext,
     params: { name: string; noteId: string },
     wreckOptions: optionsType
   ) => Promise<any>;
 
-  // Clones a notebook
+  /* Clone a notebook
+   * Params: name -> new name for the cloned notebook
+   *         noteId -> Id for the notebook to be cloned
+   */
   cloneNote: (
     context: RequestHandlerContext,
     params: { name: string; noteId: string },
     wreckOptions: optionsType
   ) => Promise<any>;
 
-  // Deletes a notebook
+  /* Delete a notebook
+   * Param: noteId -> Id for the notebook to be deleted
+   */
   deleteNote: (
     context: RequestHandlerContext,
     noteId: string,
     wreckOptions: optionsType
   ) => Promise<any>;
 
-  // Export a notebook
+  /* Export a notebook
+   * Param: noteId -> Id for the notebook to be exported
+   */
   exportNote: (
     context: RequestHandlerContext,
     noteId: string,
     wreckOptions: optionsType
   ) => Promise<any>;
 
-  // Import a notebook
+  /* Import a notebook
+   * Params: noteObj -> note Object to be imported
+   */
   importNote: (
     context: RequestHandlerContext,
     noteObj: any,
     wreckOptions: optionsType
   ) => Promise<any>;
 
-  // Update and Run a para in a notebook
-  updateRunPara: (
+  /* --> Updates a Paragraph with input content
+   * --> Runs it
+   * --> Fetches the updated Paragraph (with new input content and output result)
+   * Params: noteId -> Id of the notebook
+   *         paragraphId -> Id of the paragraph to be updated
+   *         paragraphInput -> paragraph input code
+   */
+  updateRunFetchParagraph: (
     context: RequestHandlerContext,
     params: { noteId: string; paragraphId: string; paragraphInput: string },
     wreckOptions: optionsType
   ) => Promise<any>;
 
-  // Update and Run a para in a notebook
-  updateFetchPara: (
+  /* --> Updates a Paragraph with input content
+   * --> Fetches the updated Paragraph (with new input content)
+   * Params: noteId -> Id of the notebook
+   *         paragraphId -> Id of the paragraph to be updated
+   *         paragraphInput -> paragraph input code
+   */
+  updateFetchParagraph: (
     context: RequestHandlerContext,
     params: { noteId: string; paragraphId: string; paragraphInput: string },
     wreckOptions: optionsType
   ) => Promise<any>;
 
-  // Add a new and return the new para in a notebook
-  addNewPara: (
+  /* --> Adds a Paragraph with input content
+   * --> Fetches the Paragraph
+   * Params: noteId -> Id of the notebook
+   *         paragraphId -> Id of the paragraph to be fetched
+   */
+  addFetchNewParagraph: (
     context: RequestHandlerContext,
     params: { noteId: string; paragraphIndex: string; paragraphInput: string },
     wreckOptions: optionsType
   ) => Promise<any>;
 
-  // delete a para and return all other paras in a notebook
-  deleteFetchPara: (
+  /* --> Deletes a Paragraph with id
+   * --> Fetches the all other Paragraphs as a list
+   * Params: noteId -> Id of the notebook
+   *         paragraphId -> Id of the paragraph to be deleted
+   */
+  deleteFetchParagraphs: (
     context: RequestHandlerContext,
     params: { noteId: string; paragraphId: string },
     wreckOptions: optionsType
   ) => Promise<{ paragraphs: any }>;
 
-  // clear outputs of all paras and return all paras in a notebook
-  clearFetchPara: (
+  /* --> Clears output for all the paragraphs
+   * --> Fetches the all Paragraphs as a list (with cleared outputs)
+   * Param: noteId -> Id of notebook to be cleared
+   */
+  clearAllFetchParagraphs: (
     context: RequestHandlerContext,
     params: { noteId: string },
     wreckOptions: optionsType

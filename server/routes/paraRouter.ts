@@ -19,7 +19,10 @@ import { API_PREFIX, wreckOptions } from '../../common';
 import BACKEND from '../adaptors';
 
 export function ParaRouter(router: IRouter) {
-  // Updates the input content in a paragraph --> Runs the paragraph --> Fetches the updated Paragraph (with new input content)
+  /* --> Updates the input content in a paragraph
+   * --> Runs the paragraph
+   * --> Fetches the updated Paragraph (with new input content)
+   */
   router.post(
     {
       path: `${API_PREFIX}/paragraph/update/run/`,
@@ -34,7 +37,7 @@ export function ParaRouter(router: IRouter) {
     async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
       let runResponse = {};
       try {
-        runResponse = await BACKEND.updateRunPara(context, request.body, wreckOptions);
+        runResponse = await BACKEND.updateRunFetchParagraph(context, request.body, wreckOptions);
         return response.ok({
           body: runResponse,
         });
@@ -49,7 +52,9 @@ export function ParaRouter(router: IRouter) {
     }
   );
 
-  // Updates the input content in a paragraph --> Fetches the updated Paragraph (with new input content)
+  /* --> Updates the input content in a paragraph
+   * --> Fetches the updated Paragraph (with new input content)
+   */
   router.put(
     {
       path: `${API_PREFIX}/paragraph/`,
@@ -64,7 +69,7 @@ export function ParaRouter(router: IRouter) {
     async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
       let saveResponse = {};
       try {
-        saveResponse = await BACKEND.updateFetchPara(context, request.body, wreckOptions);
+        saveResponse = await BACKEND.updateFetchParagraph(context, request.body, wreckOptions);
         return response.ok({
           body: saveResponse,
         });
@@ -79,7 +84,9 @@ export function ParaRouter(router: IRouter) {
     }
   );
 
-  // Add a new para
+  /* --> Adds a new paragraph
+   * --> Fetches the added Paragraph
+   */
   router.post(
     {
       path: `${API_PREFIX}/paragraph/`,
@@ -94,7 +101,7 @@ export function ParaRouter(router: IRouter) {
     async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
       let addResponse = {};
       try {
-        addResponse = await BACKEND.addNewPara(context, request.body, wreckOptions);
+        addResponse = await BACKEND.addFetchNewParagraph(context, request.body, wreckOptions);
         return response.ok({
           body: addResponse,
         });
@@ -109,7 +116,9 @@ export function ParaRouter(router: IRouter) {
     }
   );
 
-  // Delete a paragraph
+  /* --> Deletes a paragraph
+   * --> Fetches the all other Paragraphs as a list
+   */
   router.delete(
     {
       path: `${API_PREFIX}/paragraph/{ids*2}`,
@@ -126,7 +135,7 @@ export function ParaRouter(router: IRouter) {
       };
       let deleteResponse = {};
       try {
-        deleteResponse = await BACKEND.deleteFetchPara(context, params, wreckOptions);
+        deleteResponse = await BACKEND.deleteFetchParagraphs(context, params, wreckOptions);
         return response.ok({
           body: deleteResponse,
         });
@@ -141,7 +150,9 @@ export function ParaRouter(router: IRouter) {
     }
   );
 
-  // Clear the output of all paragraphs
+  /* --> Clears output for all the paragraphs
+   * --> Fetches the all Paragraphs as a list (with cleared outputs)
+   */
   router.put(
     {
       path: `${API_PREFIX}/paragraph/clearall/`,
@@ -154,7 +165,11 @@ export function ParaRouter(router: IRouter) {
     async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
       let clearParaResponse = {};
       try {
-        clearParaResponse = await BACKEND.clearFetchPara(context, request.body, wreckOptions);
+        clearParaResponse = await BACKEND.clearAllFetchParagraphs(
+          context,
+          request.body,
+          wreckOptions
+        );
         return response.ok({
           body: clearParaResponse,
         });
