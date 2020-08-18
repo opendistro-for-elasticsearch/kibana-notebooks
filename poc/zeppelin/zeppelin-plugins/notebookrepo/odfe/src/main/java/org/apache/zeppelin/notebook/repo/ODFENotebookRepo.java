@@ -82,7 +82,9 @@ public class ODFENotebookRepo implements NotebookRepo {
     }
 
     private RestHighLevelClient client() {
-//        System.setProperty("javax.net.ssl.trustStore", "/Users/sgguruda/work/opendistroforelasticsearch-1.8.0/config/keystore.jks");
+      //  Uncomment to add path for ssl keystore and using https client
+      //  Discussion on generating keystore with certificate: https://github.com/opendistro-for-elasticsearch/community/issues/64#issuecomment-493258442
+      //  System.setProperty("javax.net.ssl.trustStore", "/path/to/keystore/keystore.jks");
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, password));
 
@@ -111,6 +113,7 @@ public class ODFENotebookRepo implements NotebookRepo {
     @Override
     public void init(ZeppelinConfiguration conf) throws IOException {
         this.conf = conf;
+        // Change Client configuration here
         user = "admin";
         password = "admin";
         host = "localhost";

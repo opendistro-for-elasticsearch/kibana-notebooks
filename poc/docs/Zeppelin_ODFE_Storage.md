@@ -27,18 +27,11 @@
 ### **Usage:**
 
 
-1. Clone kibana-notebooks
+1. Clone kibana-notebooks repository
+
+2. Clone [Apache Zeppelin](https://github.com/apache/zeppelin) and checkout to 'v0.9.0-preview2' branch in a separate folder
 
 ```
-git clone https://github.com/opendistro-for-elasticsearch/kibana-notebooks.git
-
-```
-
-2. Clone Apache Zeppelin and checkout to 'v0.9.0-preview2' branch in a separate folder
-
-```
-cd /your/folder/
-git clone https://github.com/apache/zeppelin.git
 cd zeppelin
 git checkout v0.9.0-preview2
 ```
@@ -77,6 +70,4 @@ cp -r /path/to/kibana-notebooks/poc/zeppelin/zeppelin-plugins/notebookrepo/odfe 
 
 ```
  mvn clean package -DskipTests
-```
-
-
+``` 
