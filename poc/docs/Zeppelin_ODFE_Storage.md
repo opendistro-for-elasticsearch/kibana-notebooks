@@ -27,7 +27,7 @@
 ### **Usage:**
 
 
-1. Clone kibana-notebooks repository
+1. Clone [kibana-notebooks](https://github.com/opendistro-for-elasticsearch/kibana-notebooks) repository
 
 2. Clone [Apache Zeppelin](https://github.com/apache/zeppelin) and checkout to 'v0.9.0-preview2' branch in a separate folder
 
