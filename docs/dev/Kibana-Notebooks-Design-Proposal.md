@@ -137,7 +137,7 @@ Kibana Notebooks enable data-driven, interactive data analytics and collaborativ
   - Zeppelin Backend will provide one stop shop for interpreters, runtime-environments and storage adaptors
 - Cons:
   - Users will not be free to customize Zeppelin Backend runtime-environment/storage adaptors
-  - Need to develop a new storage adaptor for Zeppelin to store notebooks as Elasticsearch indices [(PoC details)](#62-poc-zeppelin-odfe-storage)
+  - Need to develop a new storage adaptor for Zeppelin to store notebooks as Elasticsearch indices [(PoC details)](../../poc/docs/Zeppelin_ODFE_Storage.md)
   - Difficult to maintain releases, as we have to sync version currency/patches to Zeppelin code repository
 
 **4.4.2 Version 2:** In this architecture, Backends are switchable with two options of Default backend (Markdown, Visualization support) or Apache Zeppelin Backend (25+ interpreter support)
@@ -253,15 +253,15 @@ Kibana Notebooks enable data-driven, interactive data analytics and collaborativ
 - **Zeppelin Backend Adaptor**
 
   - **Kibana Plugin Sample UI**:
-    ![Sample UI](images/kibana_notebooks_ss.png)
+    ![Sample UI](images/Zeppelin_ss.png)
   - **Make requests to Elastic Service**:
     ![Elastic service UI](images/elastic_ss.png)
   - **Transmit Data between Interpreters**:
 
-  - **Use output of an ODFE Query as save as a Zeppelin Context in a variable**
-    ![ODFE Query](images/Zeppelin_ss.png)
-  - **Use the Zeppelin Context vairable and import it in python**
-    ![Import Context](images/python_ss.png)
+    - **Use output of an ODFE Query as save as a Zeppelin Context in a variable**
+      ![ODFE Query](images/odfe_ss_zepcontext.png)
+    - **Use the Zeppelin Context vairable and import it in python**
+      ![Import Context](images/python_ss.png)
 
   - **Plot Visualization with Language specific Viz. tools (like Matplotlib)**:
     ![Matplot Viz.](images/matplot_ss.png)
