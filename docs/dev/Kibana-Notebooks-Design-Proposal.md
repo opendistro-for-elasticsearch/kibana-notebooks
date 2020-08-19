@@ -137,7 +137,7 @@ Kibana Notebooks enable data-driven, interactive data analytics and collaborativ
   - Zeppelin Backend will provide one stop shop for interpreters, runtime-environments and storage adaptors
 - Cons:
   - Users will not be free to customize Zeppelin Backend runtime-environment/storage adaptors
-  - Need to develop a new storage adaptor for Zeppelin to store notebooks as Elasticsearch indices [POC details](../poc/Zeppelin_ODFE_Storage.md)
+  - Need to develop a new storage adaptor for Zeppelin to store notebooks as Elasticsearch indices [POC details](../../poc/docs/Zeppelin_ODFE_Storage.md)
   - Difficult to maintain releases, as we have to sync version currency/patches to Zeppelin code repository
 
 **4.4.2 Version 2:** In this architecture, Backends are switchable with two options of Default backend (Markdown, Visualization support) or Apache Zeppelin Backend (25+ interpreter support)
