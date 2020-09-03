@@ -33,6 +33,7 @@ import { NoteButtons } from './note_buttons';
 import { Notebook } from './notebook';
 import { onDownload } from './helpers/download_json';
 import { API_PREFIX } from '../../common';
+import { NotebookPageBody } from './notebook_page_body';
 
 /*
  * "Main" component renders the whole Notebooks as a single page application
@@ -253,19 +254,19 @@ export class Main extends React.Component<MainProps, MainState> {
   render() {
     return (
       <EuiPage>
-        <EuiPageSideBar>
+        {/* <EuiPageSideBar>
           <div>
             <EuiTreeView items={this.state.folderTree} aria-label="Base Path Folder Tree" />
           </div>
-        </EuiPageSideBar>
+        </EuiPageSideBar> */}
         <EuiPageBody component="div">
           <EuiPageHeader>
             <EuiPageHeaderSection>
               <EuiTitle size="l">
-                <h1>Kibana Notebooks</h1>
+                <h1>Notebooks</h1>
               </EuiTitle>
             </EuiPageHeaderSection>
-            <NoteButtons
+            {/* <NoteButtons
               createNotebook={this.createNotebook}
               openNoteName={this.state.openNoteName}
               openNoteId={this.state.openNoteId}
@@ -274,15 +275,26 @@ export class Main extends React.Component<MainProps, MainState> {
               deleteNotebook={this.deleteNotebook}
               exportNotebook={this.exportNotebook}
               importNotebook={this.importNotebook}
-            />
+            /> */}
           </EuiPageHeader>
           <EuiPageContent id="notebookArea">
-            <Notebook
+            {/* TODO: use Notebook when a notebook is open */}
+            {/* <Notebook
               isNoteAvailable={this.state.isNoteAvailable}
               noteId={this.state.openNoteId}
               noteName={this.state.openNoteName}
               DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
               http={this.props.http}
+            /> */}
+            <NotebookPageBody
+              createNotebook={this.createNotebook}
+              openNoteName={this.state.openNoteName}
+              openNoteId={this.state.openNoteId}
+              renameNotebook={this.renameNotebook}
+              cloneNotebook={this.cloneNotebook}
+              deleteNotebook={this.deleteNotebook}
+              exportNotebook={this.exportNotebook}
+              importNotebook={this.importNotebook}
             />
           </EuiPageContent>
         </EuiPageBody>
