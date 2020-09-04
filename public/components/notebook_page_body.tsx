@@ -34,7 +34,7 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
   const [isModalVisible, setIsModalVisible] = useState(false); // Modal Toggle
   const [modalLayout, setModalLayout] = useState(<EuiOverlayMask></EuiOverlayMask>); // Modal Layout
   const [isActionPopoverOpen, setIsActionPopoverOpen] = useState(false);
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedNotebooks, setSelectedNotebooks] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const tableRef = useRef();
   const {
@@ -152,8 +152,9 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
       key="import_from_json"
       onClick={() => {
         setIsActionPopoverOpen(false);
+        importNote();
       }}>
-      Import from JSON
+      <EuiText className="eui-color-primary">Import from JSON</EuiText>
     </EuiContextMenuItem>,
     <EuiContextMenuItem
       key="rename"
@@ -244,7 +245,7 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
             <EuiFlexItem>
               <EuiButton fill onClick={() => createNote()}>
                 Create notebook
-                </EuiButton>
+              </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPageContentHeaderSection>
@@ -256,8 +257,6 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
             <EuiFieldSearch
               fullWidth
               placeholder="Search notebooks"
-              value={''}
-              onChange={() => { }}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -291,7 +290,6 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
         {props.isNoteAvailable ? (
           <EuiInMemoryTable
             ref={tableRef}
-            items={props.notebooks}
             items={searchQuery ?
               props.notebooks.filter((notebook) => notebook.path.toLowerCase().includes(searchQuery.toLowerCase())) :
               props.notebooks}
@@ -310,7 +308,7 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
             allowNeutralSort={false}
             isSelectable={true}
             selection={{
-              onSelectionChange: (items) => setSelectedItems(items),
+              onSelectionChange: (items) => setSelectedNotebooks(items),
             }}
           />
         ) : (

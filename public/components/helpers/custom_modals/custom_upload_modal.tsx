@@ -59,7 +59,7 @@ export const CustomUploadModal = (props: CustomUploadModalProps) => {
     <EuiOverlayMask>
       <EuiModal onClose={closeModal} initialFocus="[name=input]">
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Upload Notebook File</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>Import a notebook</EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>
