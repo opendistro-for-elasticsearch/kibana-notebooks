@@ -61,22 +61,22 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
   };
 
   const onRename = async (newNoteName: string) => {
-    renameNotebook(newNoteName, openNoteId);
+    renameNotebook(newNoteName, selectedNotebooks[0].id);
     closeModal();
   };
 
   const onClone = async () => {
-    cloneNotebook(openNoteName + '_copy', openNoteId);
+    cloneNotebook(selectedNotebooks[0].path + '_copy', selectedNotebooks[0].id);
     closeModal();
   };
 
   const onDelete = async () => {
-    deleteNotebook(openNoteId);
+    selectedNotebooks.forEach((notebook) => deleteNotebook(notebook.id));
     closeModal();
   };
 
   const onExport = async () => {
-    exportNotebook(openNoteName, openNoteId);
+    exportNotebook(selectedNotebooks[0].path, selectedNotebooks[0].id);
   };
 
   const onImport = async (file: FileList) => {
@@ -120,7 +120,8 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
         'Please edit name',
         'Cancel',
         'Rename',
-        openNoteName
+        selectedNotebooks[0].path,
+        'Enter a unique name to describe the purpose of this notebook. The name must be less than 50 characters.'
       )
     );
     showModal();
@@ -148,7 +149,7 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
   );
 
   const items = [
-    <EuiContextMenuItem
+    ...(selectedNotebooks.length === 0 ? [<EuiContextMenuItem
       key="import_from_json"
       onClick={() => {
         setIsActionPopoverOpen(false);
@@ -156,39 +157,42 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
       }}>
       <EuiText className="eui-color-primary">Import from JSON</EuiText>
     </EuiContextMenuItem>,
+    <EuiContextMenuItem key="divider" disabled={true} >
+      <EuiHorizontalRule margin='none' />
+    </EuiContextMenuItem>] : [null]),
     <EuiContextMenuItem
       key="rename"
-      disabled={true}
+      disabled={selectedNotebooks.length !== 1}
       onClick={() => {
         setIsActionPopoverOpen(false);
+        renameNote();
       }}>
       Rename
     </EuiContextMenuItem>,
     <EuiContextMenuItem
       key="duplicate"
+      disabled={selectedNotebooks.length !== 1}
       onClick={() => {
         setIsActionPopoverOpen(false);
+        cloneNote();
       }}>
       Duplicate
     </EuiContextMenuItem>,
     <EuiContextMenuItem
-      key="download_pdf"
-      onClick={() => {
-        setIsActionPopoverOpen(false);
-      }}>
-      Download .pdf
-    </EuiContextMenuItem>,
-    <EuiContextMenuItem
       key="export_json"
+      disabled={selectedNotebooks.length !== 1}
       onClick={() => {
         setIsActionPopoverOpen(false);
+        onExport();
       }}>
       Export JSON
     </EuiContextMenuItem>,
     <EuiContextMenuItem
       key="delete"
+      disabled={selectedNotebooks.length === 0}
       onClick={() => {
         setIsActionPopoverOpen(false);
+        deleteNote();
       }}>
       Delete
     </EuiContextMenuItem>,
@@ -222,7 +226,7 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
           <EuiTitle size="s">
             <h3>
               Notebooks
-                <span className="panel-header-count"> ({'0'})</span>
+                <span className="panel-header-count"> ({props.notebooks.length})</span>
             </h3>
           </EuiTitle>
           <EuiSpacer size='s' />
@@ -239,7 +243,7 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
                 button={popoverButton}
                 isOpen={isActionPopoverOpen}
                 closePopover={() => setIsActionPopoverOpen(false)}>
-                <EuiContextMenuPanel items={items} />
+                <EuiContextMenuPanel items={items.filter((item) => item)} />
               </EuiPopover>
             </EuiFlexItem>
             <EuiFlexItem>

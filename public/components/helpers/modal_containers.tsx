@@ -88,7 +88,7 @@ export const getDeleteModal = (
         buttonColor="danger"
         defaultFocusedButton="confirm"
       >
-        <p>Are you sure you want to delete this notebook?</p>
+        <p>Are you sure you want to delete the selected notebooks?</p>
       </EuiConfirmModal>
     </EuiOverlayMask>
   );
