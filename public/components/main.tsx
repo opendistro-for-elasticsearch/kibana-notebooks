@@ -266,6 +266,7 @@ export class Main extends React.Component<MainProps, MainState> {
                 <h1>Notebooks</h1>
               </EuiTitle>
             </EuiPageHeaderSection>
+            {/* TODO: remove notebuttons.tsx */}
             {/* <NoteButtons
               createNotebook={this.createNotebook}
               openNoteName={this.state.openNoteName}

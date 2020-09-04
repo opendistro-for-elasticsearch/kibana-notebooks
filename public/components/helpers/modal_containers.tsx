@@ -32,7 +32,8 @@ export const getCustomModal = (
   titletxt: string,
   btn1txt: string,
   btn2txt: string,
-  openNoteName?: string
+  openNoteName?: string,
+  helpText?: string,
 ) => {
   return (
     <CustomInputModal
@@ -43,6 +44,7 @@ export const getCustomModal = (
       btn1txt={btn1txt}
       btn2txt={btn2txt}
       openNoteName={openNoteName}
+      helpText={helpText}
     />
   );
 };

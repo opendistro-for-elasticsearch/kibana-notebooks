@@ -95,10 +95,12 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
       getCustomModal(
         onCreate,
         closeModal,
-        'New notebook name',
-        'Please enter name',
+        'Name',
+        'Create notebook',
         'Cancel',
-        'Create'
+        'Create',
+        undefined,
+        'Enter a unique name to describe the purpose of this notebook. The name must be less than 50 characters.'
       )
     );
     showModal();
