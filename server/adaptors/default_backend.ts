@@ -134,7 +134,7 @@ export class DefaultBackend implements NotebookAdaptor {
     try {
       const options: RequestParams.Search = {
         index: '.notebooks',
-        _source: ['id', 'name'],
+        _source: ['id', 'name', 'dateCreated', 'dateModified'],
         body: {
           query: {
             match_all: {},
@@ -145,10 +145,12 @@ export class DefaultBackend implements NotebookAdaptor {
         'search',
         options
       );
-      esClientResponse.hits.hits.map((doc: { _source: { name: string; id: string } }) => {
+      esClientResponse.hits.hits.map((doc: { _source: { name: string; id: string; dateCreated: string; dateModified: string } }) => {
         data.push({
           path: doc._source.name,
           id: doc._source.id,
+          dateCreated: doc._source.dateCreated,
+          dateModified: doc._source.dateModified,
         });
       });
       return data;
