@@ -35,6 +35,7 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
   const [modalLayout, setModalLayout] = useState(<EuiOverlayMask></EuiOverlayMask>); // Modal Layout
   const [isActionPopoverOpen, setIsActionPopoverOpen] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const tableRef = useRef();
   const {
     createNotebook,
@@ -257,6 +258,8 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
               placeholder="Search notebooks"
               value={''}
               onChange={() => { }}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </EuiFlexItem>
           <EuiFlexItem grow={2}>
@@ -289,6 +292,9 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
           <EuiInMemoryTable
             ref={tableRef}
             items={props.notebooks}
+            items={searchQuery ?
+              props.notebooks.filter((notebook) => notebook.path.toLowerCase().includes(searchQuery.toLowerCase())) :
+              props.notebooks}
             itemId='id'
             columns={columns}
             pagination={{
