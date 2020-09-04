@@ -13,12 +13,14 @@
  * permissions and limitations under the License.
  */
 
-import { EuiButton, EuiFieldSearch, EuiFlexGroup, EuiFlexItem, EuiHorizontalRule, EuiLink, EuiPageBody, EuiPageContentHeader, EuiPageContentHeaderSection, EuiSpacer, EuiSuperSelect, EuiText, EuiTitle, EuiOverlayMask, EuiPopover, EuiContextMenu, EuiIcon, EuiContextMenuItem, EuiContextMenuPanel } from '@elastic/eui'
-import React, { useState } from 'react'
+import { EuiButton, EuiFieldSearch, EuiFlexGroup, EuiFlexItem, EuiHorizontalRule, EuiLink, EuiPageBody, EuiPageContentHeader, EuiPageContentHeaderSection, EuiSpacer, EuiSuperSelect, EuiText, EuiTitle, EuiOverlayMask, EuiPopover, EuiContextMenu, EuiIcon, EuiContextMenuItem, EuiContextMenuPanel, EuiInMemoryTable, EuiTableFieldDataColumnType } from '@elastic/eui'
+import React, { useState, useRef } from 'react'
 import { getCustomModal, getCloneModal, getDeleteModal } from './helpers/modal_containers';
 import { CustomUploadModal } from './helpers/custom_modals/custom_upload_modal';
 
 type NotebookPageBodyProps = {
+  isNoteAvailable: boolean;
+  notebooks: Array<{ path: string; id: string; dateCreated: string; dateModified: string; }>;
   createNotebook: (newNoteName: string) => void;
   renameNotebook: (newNoteName: string, noteId: string) => void;
   cloneNotebook: (newNoteName: string, noteId: string) => void;
@@ -32,6 +34,8 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
   const [isModalVisible, setIsModalVisible] = useState(false); // Modal Toggle
   const [modalLayout, setModalLayout] = useState(<EuiOverlayMask></EuiOverlayMask>); // Modal Layout
   const [isActionPopoverOpen, setIsActionPopoverOpen] = useState(false);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const tableRef = useRef();
   const {
     createNotebook,
     renameNotebook,
@@ -141,6 +145,7 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
       Actions
     </EuiButton>
   );
+
   const items = [
     <EuiContextMenuItem
       key="import_from_json"
@@ -186,6 +191,28 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
       Delete
     </EuiContextMenuItem>,
   ];
+
+  const columns = [
+    {
+      field: 'path',
+      name: 'Name',
+      sortable: true,
+      render: (value, record) => value,
+    },
+    {
+      field: 'dateModified',
+      name: 'Last updated',
+      sortable: true,
+      render: (value) => value,
+    },
+    {
+      field: 'dateCreated',
+      name: 'Created',
+      sortable: true,
+      render: (value) => value,
+    },
+  ] as Array<EuiTableFieldDataColumnType<{ path: string; id: string; dateCreated: string; dateModified: string; }>>;
+
   return (
     <>
       <EuiPageContentHeader>
@@ -258,25 +285,51 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiHorizontalRule margin='m' />
-        <EuiSpacer size='xxl' />
-        <EuiText textAlign='center'>
-          <h2>No notebook</h2>
-          <EuiText color="subdued">
-            Use notebooks to create post-modern documents, build Live infrastructure reports, or<br />
+        {props.isNoteAvailable ? (
+          <EuiInMemoryTable
+            ref={tableRef}
+            items={props.notebooks}
+            itemId='id'
+            columns={columns}
+            pagination={{
+              initialPageSize: 10,
+              pageSizeOptions: [8, 10, 13],
+            }}
+            sorting={{
+              sort: {
+                field: 'dateModified',
+                direction: 'desc',
+              }
+            }}
+            allowNeutralSort={false}
+            isSelectable={true}
+            selection={{
+              onSelectionChange: (items) => setSelectedItems(items),
+            }}
+          />
+        ) : (
+            <>
+              <EuiSpacer size='xxl' />
+              <EuiText textAlign='center'>
+                <h2>No notebook</h2>
+                <EuiText color="subdued">
+                  Use notebooks to create post-modern documents, build Live infrastructure reports, or<br />
             foster explorative collaborations with data. Notebooks now supports two types of input:<br />
             markdown, and visualizations created from Kibana Visualize.{' '}
-            <EuiLink external={true} href="/">Learn more</EuiLink>
-          </EuiText>
-        </EuiText>
-        <EuiSpacer size='s' />
-        <EuiFlexGroup justifyContent='spaceAround'>
-          <EuiFlexItem grow={false}>
-            <EuiButton fullWidth={false} onClick={() => createNote()}>
-              Create notebook
+                  <EuiLink external={true} href="/">Learn more</EuiLink>
+                </EuiText>
+              </EuiText>
+              <EuiSpacer size='s' />
+              <EuiFlexGroup justifyContent='spaceAround'>
+                <EuiFlexItem grow={false}>
+                  <EuiButton fullWidth={false} onClick={() => createNote()}>
+                    Create notebook
             </EuiButton>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiSpacer size='xxl' />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              <EuiSpacer size='xxl' />
+            </>
+          )}
       </EuiPageBody>
       {isModalVisible && modalLayout}
     </>

@@ -52,7 +52,7 @@ type MainProps = {
 };
 
 type MainState = {
-  data: Array<{ path: string; id: string }>;
+  data: Array<{ path: string; id: string; dateCreated: string; dateModified: string; }>;
   isNoteAvailable: boolean;
   openNoteId: string; // Id of the notebook open
   openNoteName: string; // name of the notebook open
@@ -288,6 +288,8 @@ export class Main extends React.Component<MainProps, MainState> {
               http={this.props.http}
             /> */}
             <NotebookPageBody
+              isNoteAvailable={this.state.isNoteAvailable}
+              notebooks={this.state.data}
               createNotebook={this.createNotebook}
               openNoteName={this.state.openNoteName}
               openNoteId={this.state.openNoteId}
