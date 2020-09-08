@@ -20,6 +20,11 @@ import {
   EuiPageContentHeaderSection,
   EuiTitle,
   EuiIcon,
+  EuiPage,
+  EuiPageBody,
+  EuiPageHeader,
+  EuiPageHeaderSection,
+  EuiPageContent,
 } from '@elastic/eui';
 import { Cells } from '@nteract/presentational-components';
 
@@ -364,63 +369,63 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
 
   render() {
     return (
-      <div>
-        {/* If a notebook is available populate UI*/}
-        {this.props.isNoteAvailable && (
-          <div>
-            <EuiPageContentHeader>
-              <EuiPageContentHeaderSection>
-                <EuiTitle>
-                  <h2>
-                    {' '}
-                    <EuiIcon id="titleIcon" type="notebookApp" size="l" />
-                    {this.props.noteName}
-                  </h2>
-                </EuiTitle>
-              </EuiPageContentHeaderSection>
-              <ParaButtons
-                toggleInput={this.state.toggleInput}
-                toggleOutput={this.state.toggleOutput}
-                hideInputs={this.hideInputs}
-                hideOutputs={this.hideOutputs}
-                deletePara={this.deleteParagraphButton}
-                runPara={this.runParagraphButton}
-                clonePara={this.cloneParaButton}
-                clearPara={this.clearParagraphButton}
-                savePara={this.saveParagraphButton}
-              />
-            </EuiPageContentHeader>
-            <EuiPageContentBody>
-              <Cells>
-                {this.state.parsedPara.map((para: ParaType, index: number) => (
-                  <Paragraphs
-                    key={'para_' + index.toString()}
-                    para={para}
-                    index={index}
-                    paragraphSelector={this.paragraphSelector}
-                    paragraphHover={this.paragraphHover}
-                    paragraphHoverReset={this.paragraphHoverReset}
-                    textValueEditor={this.textValueEditor}
-                    handleKeyPress={this.handleKeyPress}
-                    addParagraphHover={this.addParagraphHover}
-                    addPara={this.addPara}
-                    DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
-                    deleteVizualization={this.deleteVizualization}
-                    vizualizationEditor={this.vizualizationEditor}
-                    http={this.props.http}
-                  />
-                ))}
-              </Cells>
-            </EuiPageContentBody>
-          </div>
-        )}
-        {/* If any notebook is not available display default messsage*/}
-        {!this.props.isNoteAvailable && (
-          <EuiPageContentBody>
-            You seem to be out of notebooks please create a new one :)
-          </EuiPageContentBody>
-        )}
-      </div>
+      <EuiPage>
+        <EuiPageBody component="div">
+          <EuiPageHeader>
+            <EuiPageHeaderSection>
+              <EuiTitle size="l">
+                <h1>{this.props.noteName}</h1>
+              </EuiTitle>
+            </EuiPageHeaderSection>
+            <EuiPageContent id="notebookArea">
+              <EuiPageContentHeader>
+                <EuiPageContentHeaderSection>
+                  <EuiTitle>
+                    <h2>
+                      {' '}
+                      <EuiIcon id="titleIcon" type="notebookApp" size="l" />
+                      {this.props.noteName}
+                    </h2>
+                  </EuiTitle>
+                </EuiPageContentHeaderSection>
+                <ParaButtons
+                  toggleInput={this.state.toggleInput}
+                  toggleOutput={this.state.toggleOutput}
+                  hideInputs={this.hideInputs}
+                  hideOutputs={this.hideOutputs}
+                  deletePara={this.deleteParagraphButton}
+                  runPara={this.runParagraphButton}
+                  clonePara={this.cloneParaButton}
+                  clearPara={this.clearParagraphButton}
+                  savePara={this.saveParagraphButton}
+                />
+              </EuiPageContentHeader>
+              <EuiPageContentBody>
+                <Cells>
+                  {this.state.parsedPara.map((para: ParaType, index: number) => (
+                    <Paragraphs
+                      key={'para_' + index.toString()}
+                      para={para}
+                      index={index}
+                      paragraphSelector={this.paragraphSelector}
+                      paragraphHover={this.paragraphHover}
+                      paragraphHoverReset={this.paragraphHoverReset}
+                      textValueEditor={this.textValueEditor}
+                      handleKeyPress={this.handleKeyPress}
+                      addParagraphHover={this.addParagraphHover}
+                      addPara={this.addPara}
+                      DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
+                      deleteVizualization={this.deleteVizualization}
+                      vizualizationEditor={this.vizualizationEditor}
+                      http={this.props.http}
+                    />
+                  ))}
+                </Cells>
+              </EuiPageContentBody>
+            </EuiPageContent>
+          </EuiPageHeader>
+        </EuiPageBody>
+      </EuiPage>
     );
   }
 }

@@ -29,11 +29,10 @@ import {
 import { CoreStart } from '../../../../src/core/public';
 import { DashboardStart } from '../../../../src/plugins/dashboard/public';
 
-import { NoteButtons } from './note_buttons';
 import { Notebook } from './notebook';
 import { onDownload } from './helpers/download_json';
 import { API_PREFIX } from '../../common';
-import { NotebookPageBody } from './notebook_page_body';
+import { NoteTable } from './note_table';
 
 /*
  * "Main" component renders the whole Notebooks as a single page application
@@ -252,56 +251,29 @@ export class Main extends React.Component<MainProps, MainState> {
   }
 
   render() {
+    // TODO: remove folderTree, remove notebuttons.tsx
     return (
-      <EuiPage>
-        {/* <EuiPageSideBar>
-          <div>
-            <EuiTreeView items={this.state.folderTree} aria-label="Base Path Folder Tree" />
-          </div>
-        </EuiPageSideBar> */}
-        <EuiPageBody component="div">
-          <EuiPageHeader>
-            <EuiPageHeaderSection>
-              <EuiTitle size="l">
-                <h1>Notebooks</h1>
-              </EuiTitle>
-            </EuiPageHeaderSection>
-            {/* TODO: remove notebuttons.tsx */}
-            {/* <NoteButtons
-              createNotebook={this.createNotebook}
-              openNoteName={this.state.openNoteName}
-              openNoteId={this.state.openNoteId}
-              renameNotebook={this.renameNotebook}
-              cloneNotebook={this.cloneNotebook}
-              deleteNotebook={this.deleteNotebook}
-              exportNotebook={this.exportNotebook}
-              importNotebook={this.importNotebook}
-            /> */}
-          </EuiPageHeader>
-          <EuiPageContent id="notebookArea">
-            {/* TODO: use Notebook when a notebook is open */}
-            {/* <Notebook
-              isNoteAvailable={this.state.isNoteAvailable}
-              noteId={this.state.openNoteId}
-              noteName={this.state.openNoteName}
-              DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
-              http={this.props.http}
-            /> */}
-            <NotebookPageBody
-              isNoteAvailable={this.state.isNoteAvailable}
-              notebooks={this.state.data}
-              createNotebook={this.createNotebook}
-              openNoteName={this.state.openNoteName}
-              openNoteId={this.state.openNoteId}
-              renameNotebook={this.renameNotebook}
-              cloneNotebook={this.cloneNotebook}
-              deleteNotebook={this.deleteNotebook}
-              exportNotebook={this.exportNotebook}
-              importNotebook={this.importNotebook}
-            />
-          </EuiPageContent>
-        </EuiPageBody>
-      </EuiPage>
+      <>
+        {/* <Notebook
+          isNoteAvailable={this.state.isNoteAvailable}
+          noteId={this.state.openNoteId}
+          noteName={this.state.openNoteName}
+          DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
+          http={this.props.http}
+        /> */}
+        <NoteTable
+          isNoteAvailable={this.state.isNoteAvailable}
+          notebooks={this.state.data}
+          createNotebook={this.createNotebook}
+          openNoteName={this.state.openNoteName}
+          openNoteId={this.state.openNoteId}
+          renameNotebook={this.renameNotebook}
+          cloneNotebook={this.cloneNotebook}
+          deleteNotebook={this.deleteNotebook}
+          exportNotebook={this.exportNotebook}
+          importNotebook={this.importNotebook}
+        />
+      </>
     );
   }
 }
