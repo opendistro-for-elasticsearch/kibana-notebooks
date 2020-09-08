@@ -25,6 +25,12 @@ import {
   EuiPageHeader,
   EuiPageHeaderSection,
   EuiPageContent,
+  EuiButtonGroup,
+  EuiButton,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiSpacer,
+  EuiText,
 } from '@elastic/eui';
 import { Cells } from '@nteract/presentational-components';
 
@@ -33,11 +39,12 @@ import { DashboardStart } from '../../../../src/plugins/dashboard/public';
 
 import { ParaButtons } from './paragraph_components/para_buttons';
 import { Paragraphs } from './paragraph_components/paragraphs';
-import { SELECTED_BACKEND } from '../../common';
+import { SELECTED_BACKEND, DATE_FORMAT } from '../../common';
 import { API_PREFIX, ParaType } from '../../common';
 import { zeppelinParagraphParser } from './helpers/zeppelin_parser';
 import { defaultParagraphParser } from './helpers/default_parser';
 import { NotebookType } from './main';
+import moment from 'moment';
 
 /*
  * "Notebook" component is used to display an open notebook
@@ -59,6 +66,7 @@ type NotebookProps = {
 };
 
 type NotebookState = {
+  selectedViewId: string;
   paragraphs: any; // notebook paragraphs fetched from API
   parsedPara: Array<ParaType>; // paragraphs parsed to a common format
   toggleOutput: boolean; // Hide Outputs toggle
@@ -69,6 +77,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   constructor(props: Readonly<NotebookProps>) {
     super(props);
     this.state = {
+      selectedViewId: 'view_both',
       paragraphs: [],
       parsedPara: [],
       toggleOutput: true,
@@ -355,7 +364,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     );
     this.setState({ parsedPara });
   };
-  
+
   loadParas = () => {
     this.showParagraphRunning('queue');
     this.props.http
@@ -387,8 +396,23 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       },
     ]);
   }
-  
+
   render() {
+    const viewOptions = [
+      {
+        id: 'view_both',
+        label: 'View both',
+      },
+      {
+        id: 'input_only',
+        label: 'Input only',
+      },
+      {
+        id: 'output_only',
+        label: 'Output only',
+      },
+    ];
+
     return (
       <EuiPage>
         <EuiPageBody component="div">
@@ -397,54 +421,69 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
               <EuiTitle size="l">
                 <h1>{this.props.openedNotebook.path}</h1>
               </EuiTitle>
+              <EuiSpacer size='m' />
+              <EuiFlexGroup gutterSize='xl'>
+                <EuiFlexItem>
+                  <EuiText color="subdued">Created</EuiText>
+                  <EuiText>{moment(this.props.openedNotebook.dateCreated).format(DATE_FORMAT)}</EuiText>
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <EuiText color="subdued">Last updated</EuiText>
+                  <EuiText>{moment(this.props.openedNotebook.dateModified).format(DATE_FORMAT)}</EuiText>
+                </EuiFlexItem>
+              </EuiFlexGroup>
             </EuiPageHeaderSection>
-            <EuiPageContent id="notebookArea">
-              <EuiPageContentHeader>
-                <EuiPageContentHeaderSection>
-                  <EuiTitle>
-                    <h2>
-                      {' '}
-                      <EuiIcon id="titleIcon" type="notebookApp" size="l" />
-                      {this.props.openedNotebook.path}
-                    </h2>
-                  </EuiTitle>
-                </EuiPageContentHeaderSection>
-                <ParaButtons
-                  toggleInput={this.state.toggleInput}
-                  toggleOutput={this.state.toggleOutput}
-                  hideInputs={this.hideInputs}
-                  hideOutputs={this.hideOutputs}
-                  deletePara={this.deleteParagraphButton}
-                  runPara={this.runParagraphButton}
-                  clonePara={this.cloneParaButton}
-                  clearPara={this.clearParagraphButton}
-                  savePara={this.saveParagraphButton}
-                />
-              </EuiPageContentHeader>
-              <EuiPageContentBody>
-                <Cells>
-                  {this.state.parsedPara.map((para: ParaType, index: number) => (
-                    <Paragraphs
-                      key={'para_' + index.toString()}
-                      para={para}
-                      index={index}
-                      paragraphSelector={this.paragraphSelector}
-                      paragraphHover={this.paragraphHover}
-                      paragraphHoverReset={this.paragraphHoverReset}
-                      textValueEditor={this.textValueEditor}
-                      handleKeyPress={this.handleKeyPress}
-                      addParagraphHover={this.addParagraphHover}
-                      addPara={this.addPara}
-                      DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
-                      deleteVizualization={this.deleteVizualization}
-                      vizualizationEditor={this.vizualizationEditor}
-                      http={this.props.http}
-                    />
-                  ))}
-                </Cells>
-              </EuiPageContentBody>
-            </EuiPageContent>
+            <EuiPageHeaderSection>
+              <EuiFlexGroup gutterSize='s'>
+                <EuiFlexItem>
+                  <EuiButtonGroup
+                    buttonSize='m'
+                    options={viewOptions}
+                    idSelected={this.state.selectedViewId}
+                    onChange={(id) => this.setState({ selectedViewId: id })}
+                  />
+                </EuiFlexItem>
+                <EuiFlexItem />
+                <EuiFlexItem>
+                  <EuiButton>Actions</EuiButton>
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <EuiButton>Run all paragraphs</EuiButton>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiPageHeaderSection>
           </EuiPageHeader>
+          {/* <ParaButtons
+            toggleInput={this.state.toggleInput}
+            toggleOutput={this.state.toggleOutput}
+            hideInputs={this.hideInputs}
+            hideOutputs={this.hideOutputs}
+            deletePara={this.deleteParagraphButton}
+            runPara={this.runParagraphButton}
+            clonePara={this.cloneParaButton}
+            clearPara={this.clearParagraphButton}
+            savePara={this.saveParagraphButton}
+          /> */}
+          <Cells>
+            {this.state.parsedPara.map((para: ParaType, index: number) => (
+              <Paragraphs
+                key={'para_' + index.toString()}
+                para={para}
+                index={index}
+                paragraphSelector={this.paragraphSelector}
+                paragraphHover={this.paragraphHover}
+                paragraphHoverReset={this.paragraphHoverReset}
+                textValueEditor={this.textValueEditor}
+                handleKeyPress={this.handleKeyPress}
+                addParagraphHover={this.addParagraphHover}
+                addPara={this.addPara}
+                DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
+                deleteVizualization={this.deleteVizualization}
+                vizualizationEditor={this.vizualizationEditor}
+                http={this.props.http}
+              />
+            ))}
+          </Cells>
         </EuiPageBody>
       </EuiPage>
     );
