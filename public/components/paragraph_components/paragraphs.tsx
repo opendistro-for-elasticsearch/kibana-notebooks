@@ -243,83 +243,13 @@ export const Paragraphs = (props: ParagraphProps) => {
     </div>
   );
 
-  const renderOutputs = () => {
-    return (
-      <>
-        {!para.isVizualisation ? (
-          <ParaOutput para={para} />
-        ) : (
-            <ParaVisualization
-              DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
-              vizContent={para.vizObjectInput}
-              deleteVizualization={deleteVizualization}
-              para={para}
-              vizualizationEditor={vizualizationEditor}
-            />
-          )
-        }
-      </>
-    )
-  }
-  
-
   return (
     <div>
-      <EuiPanel>
-        {/* Render if para contains code */}
-        {!para.isVizualisation && (
-          <>
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <EuiText color="subdued">
-                  {`[${index}] Markdown`}
-                  <EuiButtonIcon
-                    iconType={showInput ? "arrowUp" : "arrowDown"}
-                    onClick={() => setShowInput(!showInput)}
-                  />
-                </EuiText>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiButtonIcon
-                  iconType="boxesHorizontal"
-                  onClick={() => { }}
-                />
-              </EuiFlexItem>
-            </EuiFlexGroup>
-            <EuiSpacer size='s' />
-            <Cell
-              key={index}
-              _hovered={para.ishovered}
-              isSelected={para.isSelected && showInput}
-              onClick={() => paragraphSelector(index)}
-              onMouseEnter={() => paragraphHover(para)}
-              onMouseLeave={() => paragraphHoverReset()}
-            >
-              {showInput && <ParaInput
-                para={para}
-                index={index}
-                textValueEditor={textValueEditor}
-                handleKeyPress={handleKeyPress}
-              />}
-              <EuiHorizontalRule margin='s' />
-              <ParaOutput para={para} />
-            </Cell>
-          </>
-        )}
-
-        {/* Render if para contains visualization */}
-        {para.isVizualisation && (
-          <>
-            <EuiText color="subdued">{`[${index}] Kibana visualization`}</EuiText>
-            <EuiHorizontalRule margin='s' />
-            <Cell
-              key={index}
-              _hovered={para.ishovered}
-              isSelected={para.isSelected}
-              onClick={() => paragraphSelector(index)}
-              onMouseEnter={() => paragraphHover(para)}
-              onMouseLeave={() => paragraphHoverReset()}
-            >
+      {props.showOutputOnly ? (
+        <>
+          {!para.isVizualisation ? (
+            <ParaOutput para={para} />
+          ) : (
               <ParaVisualization
                 DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
                 vizContent={para.vizObjectInput}
@@ -327,10 +257,77 @@ export const Paragraphs = (props: ParagraphProps) => {
                 para={para}
                 vizualizationEditor={vizualizationEditor}
               />
-            </Cell>
-          </>
+            )
+          }
+        </>
+      ) : (
+          <EuiPanel>
+            {/* Render if para contains code */}
+            {!para.isVizualisation && (
+              <>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiText color="subdued">
+                      {`[${index}] Markdown`}
+                      <EuiButtonIcon
+                        iconType={showInput ? "arrowUp" : "arrowDown"}
+                        onClick={() => setShowInput(!showInput)}
+                      />
+                    </EuiText>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiButtonIcon
+                      iconType="boxesHorizontal"
+                      onClick={() => { }}
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                <EuiSpacer size='s' />
+                <Cell
+                  key={index}
+                  _hovered={para.ishovered}
+                  isSelected={para.isSelected && showInput}
+                  onClick={() => paragraphSelector(index)}
+                  onMouseEnter={() => paragraphHover(para)}
+                  onMouseLeave={() => paragraphHoverReset()}
+                >
+                  {showInput && <ParaInput
+                    para={para}
+                    index={index}
+                    textValueEditor={textValueEditor}
+                    handleKeyPress={handleKeyPress}
+                  />}
+                  <EuiHorizontalRule margin='s' />
+                  <ParaOutput para={para} />
+                </Cell>
+              </>
+            )}
+
+            {/* Render if para contains visualization */}
+            {para.isVizualisation && (
+              <>
+                <EuiText color="subdued">{`[${index}] Kibana visualization`}</EuiText>
+                <EuiHorizontalRule margin='s' />
+                <Cell
+                  key={index}
+                  _hovered={para.ishovered}
+                  isSelected={para.isSelected}
+                  onClick={() => paragraphSelector(index)}
+                  onMouseEnter={() => paragraphHover(para)}
+                  onMouseLeave={() => paragraphHoverReset()}
+                >
+                  <ParaVisualization
+                    DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
+                    vizContent={para.vizObjectInput}
+                    deleteVizualization={deleteVizualization}
+                    para={para}
+                    vizualizationEditor={vizualizationEditor}
+                  />
+                </Cell>
+              </>
+            )}
+          </EuiPanel>
         )}
-      </EuiPanel>
 
       {/* Div populated on hover for adding a new paragraph in notebook */}
       <div

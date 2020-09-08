@@ -31,6 +31,7 @@ import {
   EuiFlexItem,
   EuiSpacer,
   EuiText,
+  EuiPanel,
 } from '@elastic/eui';
 import { Cells } from '@nteract/presentational-components';
 
@@ -45,6 +46,7 @@ import { zeppelinParagraphParser } from './helpers/zeppelin_parser';
 import { defaultParagraphParser } from './helpers/default_parser';
 import { NotebookType } from './main';
 import moment from 'moment';
+import { PanelWrapper } from './helpers/panel_wrapper';
 
 /*
  * "Notebook" component is used to display an open notebook
@@ -486,25 +488,27 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             savePara={this.saveParagraphButton}
           /> */}
           <Cells>
-            {this.state.parsedPara.map((para: ParaType, index: number) => (
-              <Paragraphs
-                key={'para_' + index.toString()}
-                para={para}
-                index={index}
-                paragraphSelector={this.paragraphSelector}
-                paragraphHover={this.paragraphHover}
-                paragraphHoverReset={this.paragraphHoverReset}
-                textValueEditor={this.textValueEditor}
-                handleKeyPress={this.handleKeyPress}
-                addParagraphHover={this.addParagraphHover}
-                addPara={this.addPara}
-                DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
-                deleteVizualization={this.deleteVizualization}
-                vizualizationEditor={this.vizualizationEditor}
-                http={this.props.http}
-                showOutputOnly={this.state.selectedViewId === 'output_only'}
-              />
-            ))}
+            <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
+              {this.state.parsedPara.map((para: ParaType, index: number) => (
+                <Paragraphs
+                  key={'para_' + index.toString()}
+                  para={para}
+                  index={index}
+                  paragraphSelector={this.paragraphSelector}
+                  paragraphHover={this.paragraphHover}
+                  paragraphHoverReset={this.paragraphHoverReset}
+                  textValueEditor={this.textValueEditor}
+                  handleKeyPress={this.handleKeyPress}
+                  addParagraphHover={this.addParagraphHover}
+                  addPara={this.addPara}
+                  DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
+                  deleteVizualization={this.deleteVizualization}
+                  vizualizationEditor={this.vizualizationEditor}
+                  http={this.props.http}
+                  showOutputOnly={this.state.selectedViewId === 'output_only'}
+                />
+              ))}
+            </PanelWrapper>
           </Cells>
         </EuiPageBody>
       </EuiPage>
