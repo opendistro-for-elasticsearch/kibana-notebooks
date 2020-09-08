@@ -54,7 +54,7 @@ export function NoteTable(props: NoteTableProps) {
     openNoteName,
     openNoteId,
   } = props;
-  
+
   useEffect(() => {
     props.setBreadcrumbs([
       {
@@ -278,92 +278,90 @@ export function NoteTable(props: NoteTableProps) {
                 </EuiFlexGroup>
               </EuiPageContentHeaderSection>
             </EuiPageContentHeader>
-            <EuiPageBody>
-              <EuiHorizontalRule margin='m' />
-              <EuiFlexGroup gutterSize='m'>
-                <EuiFlexItem grow={6}>
-                  <EuiFieldSearch
-                    fullWidth
-                    placeholder="Search notebooks"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </EuiFlexItem>
-                <EuiFlexItem grow={2}>
-                  <EuiSuperSelect
-                    options={[
-                      {
-                        value: 'warning',
-                        inputDisplay: 'Last updated',
-                      },
-                    ]}
-                    valueOfSelected={'warning'}
-                    onChange={() => { }}
-                  />
-                </EuiFlexItem>
-                <EuiFlexItem grow={2}>
-                  <EuiSuperSelect
-                    options={[
-                      {
-                        value: 'warning',
-                        inputDisplay: 'Created',
-                      },
-                    ]}
-                    valueOfSelected={'warning'}
-                    onChange={() => { }}
-                  />
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              <EuiHorizontalRule margin='m' />
-              {props.isNoteAvailable ? (
-                <EuiInMemoryTable
-                  ref={tableRef}
-                  items={searchQuery ?
-                    props.notebooks.filter((notebook) => notebook.path.toLowerCase().includes(searchQuery.toLowerCase())) :
-                    props.notebooks}
-                  itemId='id'
-                  columns={tableColumns}
-                  tableLayout='auto'
-                  pagination={{
-                    initialPageSize: 10,
-                    pageSizeOptions: [8, 10, 13],
-                  }}
-                  sorting={{
-                    sort: {
-                      field: 'dateModified',
-                      direction: 'desc',
-                    }
-                  }}
-                  allowNeutralSort={false}
-                  isSelectable={true}
-                  selection={{
-                    onSelectionChange: (items) => setSelectedNotebooks(items),
-                  }}
+            <EuiHorizontalRule margin='m' />
+            <EuiFlexGroup gutterSize='m'>
+              <EuiFlexItem grow={6}>
+                <EuiFieldSearch
+                  fullWidth
+                  placeholder="Search notebooks"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
-              ) : (
-                  <>
-                    <EuiSpacer size='xxl' />
-                    <EuiText textAlign='center'>
-                      <h2>No notebook</h2>
-                      <EuiText color="subdued">
-                        Use notebooks to create post-modern documents, build Live infrastructure reports, or<br />
-            foster explorative collaborations with data. Notebooks now supports two types of input:<br />
-            markdown, and visualizations created from Kibana Visualize.{' '}
-                        <EuiLink external={true} href="/">Learn more</EuiLink>
-                      </EuiText>
+              </EuiFlexItem>
+              <EuiFlexItem grow={2}>
+                <EuiSuperSelect
+                  options={[
+                    {
+                      value: 'warning',
+                      inputDisplay: 'Last updated',
+                    },
+                  ]}
+                  valueOfSelected={'warning'}
+                  onChange={() => { }}
+                />
+              </EuiFlexItem>
+              <EuiFlexItem grow={2}>
+                <EuiSuperSelect
+                  options={[
+                    {
+                      value: 'warning',
+                      inputDisplay: 'Created',
+                    },
+                  ]}
+                  valueOfSelected={'warning'}
+                  onChange={() => { }}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiHorizontalRule margin='m' />
+            {props.notebooks.length > 0 ? (
+              <EuiInMemoryTable
+                ref={tableRef}
+                items={searchQuery ?
+                  props.notebooks.filter((notebook) => notebook.path.toLowerCase().includes(searchQuery.toLowerCase())) :
+                  props.notebooks}
+                itemId='id'
+                columns={tableColumns}
+                tableLayout='auto'
+                pagination={{
+                  initialPageSize: 10,
+                  pageSizeOptions: [8, 10, 13],
+                }}
+                sorting={{
+                  sort: {
+                    field: 'dateModified',
+                    direction: 'desc',
+                  }
+                }}
+                allowNeutralSort={false}
+                isSelectable={true}
+                selection={{
+                  onSelectionChange: (items) => setSelectedNotebooks(items),
+                }}
+              />
+            ) : (
+                <>
+                  <EuiSpacer size='xxl' />
+                  <EuiText textAlign='center'>
+                    <h2>No notebook</h2>
+                    <EuiText color="subdued">
+                      Use notebooks to create post-modern documents, build Live infrastructure reports, or<br />
+                      foster explorative collaborations with data. Notebooks now supports two types of input:<br />
+                      markdown, and visualizations created from Kibana Visualize.{' '}
+                      <EuiLink external={true} href="/">Learn more</EuiLink>
                     </EuiText>
-                    <EuiSpacer size='s' />
-                    <EuiFlexGroup justifyContent='spaceAround'>
-                      <EuiFlexItem grow={false}>
-                        <EuiButton fullWidth={false} onClick={() => createNote()}>
-                          Create notebook
-            </EuiButton>
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                    <EuiSpacer size='xxl' />
-                  </>
-                )}
-            </EuiPageBody>
+                  </EuiText>
+                  <EuiSpacer size='s' />
+                  <EuiFlexGroup justifyContent='spaceAround'>
+                    <EuiFlexItem grow={false}>
+                      <EuiButton fullWidth={false} onClick={() => createNote()}>
+                        Create notebook
+                      </EuiButton>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                  <EuiSpacer size='xxl' />
+                </>
+              )}
           </EuiPageContent>
         </EuiPageBody>
       </EuiPage>
