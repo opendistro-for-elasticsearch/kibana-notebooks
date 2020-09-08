@@ -28,7 +28,7 @@ import {
 } from '@elastic/eui';
 import { Cells } from '@nteract/presentational-components';
 
-import { CoreStart } from '../../../../src/core/public';
+import { CoreStart, ChromeBreadcrumb } from '../../../../src/core/public';
 import { DashboardStart } from '../../../../src/plugins/dashboard/public';
 
 import { ParaButtons } from './paragraph_components/para_buttons';
@@ -54,6 +54,7 @@ type NotebookProps = {
   noteName: string;
   DashboardContainerByValueRenderer: DashboardStart['DashboardContainerByValueRenderer'];
   http: CoreStart['http'];
+  setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
 };
 
 type NotebookState = {

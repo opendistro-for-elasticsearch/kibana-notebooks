@@ -13,12 +13,13 @@
  * permissions and limitations under the License.
  */
 
-import { EuiButton, EuiFieldSearch, EuiFlexGroup, EuiFlexItem, EuiHorizontalRule, EuiLink, EuiPageBody, EuiPageContentHeader, EuiPageContentHeaderSection, EuiSpacer, EuiSuperSelect, EuiText, EuiTitle, EuiOverlayMask, EuiPopover, EuiContextMenu, EuiIcon, EuiContextMenuItem, EuiContextMenuPanel, EuiInMemoryTable, EuiTableFieldDataColumnType, EuiPageContent, EuiPage, EuiPageHeader, EuiPageHeaderSection } from '@elastic/eui'
-import React, { useState, useRef } from 'react'
-import { getCustomModal, getCloneModal, getDeleteModal } from './helpers/modal_containers';
-import { CustomUploadModal } from './helpers/custom_modals/custom_upload_modal';
-import moment from 'moment';
+import { EuiButton, EuiContextMenuItem, EuiContextMenuPanel, EuiFieldSearch, EuiFlexGroup, EuiFlexItem, EuiHorizontalRule, EuiInMemoryTable, EuiLink, EuiOverlayMask, EuiPage, EuiPageBody, EuiPageContent, EuiPageContentHeader, EuiPageContentHeaderSection, EuiPageHeader, EuiPageHeaderSection, EuiPopover, EuiSpacer, EuiSuperSelect, EuiTableFieldDataColumnType, EuiText, EuiTitle } from '@elastic/eui';
 import _ from 'lodash';
+import moment from 'moment';
+import React, { useRef, useState, useEffect } from 'react';
+import { ChromeBreadcrumb } from '../../../../src/core/public';
+import { CustomUploadModal } from './helpers/custom_modals/custom_upload_modal';
+import { getCloneModal, getCustomModal, getDeleteModal } from './helpers/modal_containers';
 
 type NoteTableProps = {
   isNoteAvailable: boolean;
@@ -31,6 +32,7 @@ type NoteTableProps = {
   importNotebook: (fileObj: any) => void;
   openNoteName: string;
   openNoteId: string;
+  setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
 };
 
 export function NoteTable(props: NoteTableProps) {
@@ -50,6 +52,15 @@ export function NoteTable(props: NoteTableProps) {
     openNoteName,
     openNoteId,
   } = props;
+  
+  useEffect(() => {
+    props.setBreadcrumbs([
+      {
+        text: 'Notebooks',
+        href: '#',
+      },
+    ]);
+  }, []);
 
   const closeModal = () => {
     setIsModalVisible(false);

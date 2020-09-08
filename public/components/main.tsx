@@ -26,7 +26,7 @@ import {
   EuiIcon,
 } from '@elastic/eui';
 
-import { CoreStart } from '../../../../src/core/public';
+import { CoreStart, ChromeBreadcrumb } from '../../../../src/core/public';
 import { DashboardStart } from '../../../../src/plugins/dashboard/public';
 
 import { Notebook } from './notebook';
@@ -48,6 +48,7 @@ import { NoteTable } from './note_table';
 type MainProps = {
   DashboardContainerByValueRenderer: DashboardStart['DashboardContainerByValueRenderer'];
   http: CoreStart['http'];
+  setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
 };
 
 type MainState = {
@@ -260,6 +261,7 @@ export class Main extends React.Component<MainProps, MainState> {
           noteName={this.state.openNoteName}
           DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
           http={this.props.http}
+          setBreadcrumbs={this.props.setBreadcrumbs}
         /> */}
         <NoteTable
           isNoteAvailable={this.state.isNoteAvailable}
@@ -272,6 +274,7 @@ export class Main extends React.Component<MainProps, MainState> {
           deleteNotebook={this.deleteNotebook}
           exportNotebook={this.exportNotebook}
           importNotebook={this.importNotebook}
+          setBreadcrumbs={this.props.setBreadcrumbs}
         />
       </>
     );
