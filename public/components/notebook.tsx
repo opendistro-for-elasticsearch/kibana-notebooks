@@ -15,30 +15,23 @@
 
 import React, { Component } from 'react';
 import {
-  EuiPageContentBody,
-  EuiPageContentHeader,
-  EuiPageContentHeaderSection,
   EuiTitle,
-  EuiIcon,
   EuiPage,
   EuiPageBody,
   EuiPageHeader,
   EuiPageHeaderSection,
-  EuiPageContent,
   EuiButtonGroup,
   EuiButton,
   EuiFlexGroup,
   EuiFlexItem,
   EuiSpacer,
   EuiText,
-  EuiPanel,
 } from '@elastic/eui';
 import { Cells } from '@nteract/presentational-components';
 
 import { CoreStart, ChromeBreadcrumb } from '../../../../src/core/public';
 import { DashboardStart } from '../../../../src/plugins/dashboard/public';
 
-import { ParaButtons } from './paragraph_components/para_buttons';
 import { Paragraphs } from './paragraph_components/paragraphs';
 import { SELECTED_BACKEND, DATE_FORMAT } from '../../common';
 import { API_PREFIX, ParaType } from '../../common';
@@ -52,14 +45,12 @@ import { PanelWrapper } from './helpers/panel_wrapper';
  * "Notebook" component is used to display an open notebook
  *
  * Props taken in as params are:
- * isNoteAvailable - boolean to check is any notebooks exists
  * noteName - current open notebook name
  * noteId - current open notebook id
  * DashboardContainerByValueRenderer - Dashboard container renderer for visualization
  * http object: for making API requests
  */
 type NotebookProps = {
-  isNoteAvailable: boolean;
   openedNotebook: NotebookType;
   setOpenedNotebook: (notebook: NotebookType) => void;
   DashboardContainerByValueRenderer: DashboardStart['DashboardContainerByValueRenderer'];
@@ -347,27 +338,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     }
   };
 
-  // Toggles hiding outputs
-  hideOutputs = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ toggleOutput: e.target.checked });
-    let parsedPara = this.state.parsedPara;
-    this.state.parsedPara.map(
-      (para: ParaType, index: number) => (parsedPara[index].isOutputHidden = !para.isOutputHidden)
-    );
-    this.setState({ parsedPara });
-  };
-
-  // Toggles hiding inputs
-  hideInputs = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ toggleInput: e.target.checked });
-    let parsedPara = this.state.parsedPara;
-    this.state.parsedPara.map(
-      (para: ParaType, index: number) => (parsedPara[index].isInputHidden = !para.isInputHidden)
-    );
-    this.setState({ parsedPara });
-  };
-
-  // TODO: remove hideInputs/Outputs, toggleInput/Output
   updateView = () => {
     let hideInput = false, hideOutput = false;
     if (this.state.selectedViewId === 'input_only')
@@ -397,7 +367,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
 
   // Loads a notebook based on the Notebook Id
   componentDidUpdate(prevProps: NotebookProps, _prevState: NotebookState) {
-    if (this.props.isNoteAvailable && this.props.openedNotebook.id !== prevProps.openedNotebook.id) {
+    if (this.props.openedNotebook.id !== prevProps.openedNotebook.id) {
       this.loadParas();
     }
     if (this.state.selectedViewId !== _prevState.selectedViewId) {

@@ -14,17 +14,6 @@
  */
 
 import React from 'react';
-import {
-  EuiPage,
-  EuiPageBody,
-  EuiPageContent,
-  EuiPageHeader,
-  EuiPageHeaderSection,
-  EuiPageSideBar,
-  EuiTitle,
-  EuiTreeView,
-  EuiIcon,
-} from '@elastic/eui';
 
 import { CoreStart, ChromeBreadcrumb } from '../../../../src/core/public';
 import { DashboardStart } from '../../../../src/plugins/dashboard/public';
@@ -51,23 +40,9 @@ type MainProps = {
   setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
 };
 
-// TODO: remove open/switchNoteId/Name, isNoteAvailable, folderTree
 type MainState = {
   data: Array<NotebookType>;
   openedNotebook: NotebookType;
-  isNoteAvailable: boolean;
-  openNoteId: string; // Id of the notebook open
-  openNoteName: string; // name of the notebook open
-  switchName: string; // name of the notebook to be opened
-  switchId: string; // Id of the notebook to be opened
-  folderTree: Array<{
-    label: string;
-    id: string;
-    icon: JSX.Element;
-    iconWhenExpanded: JSX.Element;
-    isExpanded: boolean;
-    children: Array<{ label: string; id: string; icon: JSX.Element }>; // folder tree eui element
-  }>;
 };
 
 export type NotebookType = {
@@ -83,21 +58,6 @@ export class Main extends React.Component<MainProps, MainState> {
     this.state = {
       data: [],
       openedNotebook: undefined,
-      isNoteAvailable: false,
-      openNoteId: '',
-      openNoteName: '',
-      switchId: '',
-      switchName: '',
-      folderTree: [
-        {
-          label: 'Base Path',
-          id: 'Base_path',
-          icon: <EuiIcon type="folderClosed" />,
-          iconWhenExpanded: <EuiIcon type="folderOpen" />,
-          isExpanded: true,
-          children: [],
-        },
-      ],
     };
     this.setOpenedNotebook = this.setOpenedNotebook.bind(this);
   }
@@ -118,7 +78,6 @@ export class Main extends React.Component<MainProps, MainState> {
 
   // Creates a new notebook
   createNotebook = (newNoteName: string) => {
-    let newNoteId = '';
     const newNoteObject = {
       name: newNoteName,
     };
@@ -127,11 +86,7 @@ export class Main extends React.Component<MainProps, MainState> {
       .post(`${API_PREFIX}/note`, {
         body: JSON.stringify(newNoteObject),
       })
-      .then((res) => {
-        newNoteId = res.body;
-        this.setState({ switchId: newNoteId, switchName: newNoteName });
-        this.fetchNotebooks();
-      })
+      .then((res) => this.fetchNotebooks())
       .catch((err) => console.error('Issue in creating a notebook', err.body.message));
   };
 
@@ -146,16 +101,12 @@ export class Main extends React.Component<MainProps, MainState> {
       .put(`${API_PREFIX}/note/rename`, {
         body: JSON.stringify(renameNoteObject),
       })
-      .then((res) => {
-        this.setState({ switchId: editedNoteID, switchName: editedNoteName });
-        this.fetchNotebooks();
-      })
+      .then((res) => this.fetchNotebooks())
       .catch((err) => console.error('Issue in renaming the notebook', err.body.message));
   };
 
   // Clones an existing notebook
   cloneNotebook = (clonedNoteName: string, clonedNoteID: string) => {
-    let newNoteId = '';
     const cloneNoteObject = {
       name: clonedNoteName,
       noteId: clonedNoteID,
@@ -165,11 +116,7 @@ export class Main extends React.Component<MainProps, MainState> {
       .post(`${API_PREFIX}/note/clone`, {
         body: JSON.stringify(cloneNoteObject),
       })
-      .then((res) => {
-        newNoteId = res.body;
-        this.setState({ switchId: newNoteId, switchName: clonedNoteName });
-        this.fetchNotebooks();
-      })
+      .then((res) => this.fetchNotebooks())
       .catch((err) => console.error('Issue in cloning the notebook', err.body.message));
   };
 
@@ -193,73 +140,14 @@ export class Main extends React.Component<MainProps, MainState> {
 
   // Imports a new notebook
   importNotebook = (noteObject: any) => {
-    let newNoteId = '';
     const importObject = {
       noteObj: noteObject,
     };
     this.props.http
       .post(`${API_PREFIX}/note/import`, { body: JSON.stringify(importObject) })
-      .then((res) => {
-        newNoteId = res.body;
-        this.setState({ switchId: newNoteId, switchName: noteObject.name });
-        this.fetchNotebooks();
-      })
+      .then((res) => this.fetchNotebooks())
       .catch((err) => console.error('Issue in importing the notebook', err.body.message));
   };
-
-  // Sets new notebook to open from folder tree
-  loadNotebook = (nbId: string, nbName: string) => {
-    this.setState({ openNoteId: nbId, openNoteName: nbName });
-  };
-
-  // Reloads folder tree on the side side panel
-  realodSidePanel = () => {
-    let folderTree = this.state.folderTree;
-    let noteArray: Array<{ label: string; id: string; icon: JSX.Element }> = [];
-    this.state.data.map((note: { path: string; id: string }, index: number) => {
-      const noteName = note.path.split('/').pop();
-      const noteObj = {
-        label: noteName,
-        id: note.id,
-        icon: <EuiIcon type="notebookApp" aria-label={'note_' + index} />,
-        callback: () => this.loadNotebook(note.id, noteName),
-      };
-      noteArray.push(noteObj);
-    });
-
-    folderTree[0].children = noteArray;
-    this.setState({ folderTree });
-  };
-
-  // Opens the first notebook in folder tree and loads it
-  // If any notebook is selected it switches to that notebook
-  // If no notebook is available then sets isNoteAvailable to false
-  setNoteOpen = () => {
-    if (this.state.data[0] === undefined) {
-      this.setState({ isNoteAvailable: false });
-    } else if (this.state.switchId !== '') {
-      this.loadNotebook(this.state.switchId, this.state.switchName);
-      this.setState({ switchId: '', switchName: '' });
-      this.setState({ isNoteAvailable: true });
-    } else {
-      let openNoteId = '';
-      let openNoteName = '';
-      openNoteId = this.state.data[0].id;
-      openNoteName = this.state.data[0].path.split('/').pop();
-      this.setState({ openNoteId });
-      this.setState({ openNoteName });
-      this.setState({ isNoteAvailable: true });
-    }
-  };
-
-  // If state of list of notebooks is changed then reloads folder tree
-  // and opens a notebook
-  componentDidUpdate(prevProps: MainProps, prevState: MainState) {
-    if (this.state.data !== prevState.data) {
-      this.realodSidePanel();
-      this.setNoteOpen();
-    }
-  }
 
   // On mount fetch all notebooks
   componentDidMount() {
@@ -267,12 +155,10 @@ export class Main extends React.Component<MainProps, MainState> {
   }
 
   render() {
-    // TODO: remove folderTree, remove notebuttons.tsx
     return (
       <>
         {this.state.openedNotebook ? (
           <Notebook
-            isNoteAvailable={this.state.isNoteAvailable}
             openedNotebook={this.state.openedNotebook}
             setOpenedNotebook={this.setOpenedNotebook}
             DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
@@ -281,12 +167,9 @@ export class Main extends React.Component<MainProps, MainState> {
           />
         ) : (
             <NoteTable
-              isNoteAvailable={this.state.isNoteAvailable}
               notebooks={this.state.data}
               setOpenedNotebook={this.setOpenedNotebook}
               createNotebook={this.createNotebook}
-              openNoteName={this.state.openNoteName}
-              openNoteId={this.state.openNoteId}
               renameNotebook={this.renameNotebook}
               cloneNotebook={this.cloneNotebook}
               deleteNotebook={this.deleteNotebook}

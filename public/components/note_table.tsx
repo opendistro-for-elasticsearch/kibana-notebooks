@@ -13,18 +13,41 @@
  * permissions and limitations under the License.
  */
 
-import { EuiButton, EuiContextMenuItem, EuiContextMenuPanel, EuiFieldSearch, EuiFlexGroup, EuiFlexItem, EuiHorizontalRule, EuiInMemoryTable, EuiLink, EuiOverlayMask, EuiPage, EuiPageBody, EuiPageContent, EuiPageContentHeader, EuiPageContentHeaderSection, EuiPageHeader, EuiPageHeaderSection, EuiPopover, EuiSpacer, EuiSuperSelect, EuiTableFieldDataColumnType, EuiText, EuiTitle } from '@elastic/eui';
+import {
+  EuiButton,
+  EuiContextMenuItem,
+  EuiContextMenuPanel,
+  EuiFieldSearch,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiHorizontalRule,
+  EuiInMemoryTable,
+  EuiLink,
+  EuiOverlayMask,
+  EuiPage,
+  EuiPageBody,
+  EuiPageContent,
+  EuiPageContentHeader,
+  EuiPageContentHeaderSection,
+  EuiPageHeader,
+  EuiPageHeaderSection,
+  EuiPopover,
+  EuiSpacer,
+  EuiSuperSelect,
+  EuiTableFieldDataColumnType,
+  EuiText,
+  EuiTitle
+} from '@elastic/eui';
 import _ from 'lodash';
 import moment from 'moment';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ChromeBreadcrumb } from '../../../../src/core/public';
+import { DATE_FORMAT } from '../../common';
 import { CustomUploadModal } from './helpers/custom_modals/custom_upload_modal';
 import { getCloneModal, getCustomModal, getDeleteModal } from './helpers/modal_containers';
 import { NotebookType } from './main';
-import { DATE_FORMAT } from '../../common';
 
 type NoteTableProps = {
-  isNoteAvailable: boolean;
   notebooks: Array<NotebookType>;
   setOpenedNotebook: (notebook: NotebookType) => void;
   createNotebook: (newNoteName: string) => void;
@@ -33,8 +56,6 @@ type NoteTableProps = {
   deleteNotebook: (noteId: string) => void;
   exportNotebook: (noteName: string, noteId: string) => void;
   importNotebook: (fileObj: any) => void;
-  openNoteName: string;
-  openNoteId: string;
   setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
 };
 
@@ -44,7 +65,6 @@ export function NoteTable(props: NoteTableProps) {
   const [isActionPopoverOpen, setIsActionPopoverOpen] = useState(false);
   const [selectedNotebooks, setSelectedNotebooks] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const tableRef = useRef();
   const {
     createNotebook,
     renameNotebook,
@@ -52,8 +72,6 @@ export function NoteTable(props: NoteTableProps) {
     deleteNotebook,
     exportNotebook,
     importNotebook,
-    openNoteName,
-    openNoteId,
   } = props;
 
   useEffect(() => {
@@ -293,11 +311,11 @@ export function NoteTable(props: NoteTableProps) {
                 <EuiSuperSelect
                   options={[
                     {
-                      value: 'warning',
+                      value: 'last_updated',
                       inputDisplay: 'Last updated',
                     },
                   ]}
-                  valueOfSelected={'warning'}
+                  valueOfSelected={'last_updated'}
                   onChange={() => { }}
                 />
               </EuiFlexItem>
@@ -305,11 +323,11 @@ export function NoteTable(props: NoteTableProps) {
                 <EuiSuperSelect
                   options={[
                     {
-                      value: 'warning',
+                      value: 'created',
                       inputDisplay: 'Created',
                     },
                   ]}
-                  valueOfSelected={'warning'}
+                  valueOfSelected={'created'}
                   onChange={() => { }}
                 />
               </EuiFlexItem>
@@ -317,7 +335,6 @@ export function NoteTable(props: NoteTableProps) {
             <EuiHorizontalRule margin='m' />
             {props.notebooks.length > 0 ? (
               <EuiInMemoryTable
-                ref={tableRef}
                 items={searchQuery ?
                   props.notebooks.filter((notebook) => notebook.path.toLowerCase().includes(searchQuery.toLowerCase())) :
                   props.notebooks}

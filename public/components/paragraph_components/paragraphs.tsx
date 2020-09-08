@@ -30,7 +30,6 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiText,
-  EuiIcon,
   EuiHorizontalRule,
   EuiButtonIcon,
   EuiSpacer,
@@ -63,8 +62,9 @@ import { API_PREFIX, ParaType } from '../../../common';
  * addParagraphHover - function used to detect hover on "Add Para" Div
  * addPara - function to add a new para onclick - "Add Para" Div
  * DashboardContainerByValueRenderer - Dashboard container renderer for visualization
- * deleteVizualization -  function to delete a para
- * http object: for making API requests
+ * deleteVizualization - function to delete a para
+ * http object - for making API requests
+ * showOutputOnly - boolean used to only show output without input and panels
  *
  * Cell component of nteract used as a container for paragraphs in notebook UI.
  * https://components.nteract.io/#cell
