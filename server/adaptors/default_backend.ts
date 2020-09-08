@@ -127,13 +127,14 @@ export class DefaultBackend implements NotebookAdaptor {
     }
   };
 
-  // gets all the notebooks available
+  // gets first 1000 notebooks available
   viewNotes = async function (context: RequestHandlerContext, _wreckOptions: optionsType) {
     let esClientResponse;
     let data = [];
     try {
       const options: RequestParams.Search = {
         index: '.notebooks',
+        size: 1000,
         _source: ['id', 'name', 'dateCreated', 'dateModified'],
         body: {
           query: {
