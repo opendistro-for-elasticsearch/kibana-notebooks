@@ -270,6 +270,7 @@ export const Paragraphs = (props: ParagraphProps) => {
                     <EuiText color="subdued">
                       {`[${index}] Markdown`}
                       <EuiButtonIcon
+                        aria-label="Toggle show input"
                         iconType={showInput ? "arrowUp" : "arrowDown"}
                         onClick={() => setShowInput(!showInput)}
                       />
@@ -277,6 +278,7 @@ export const Paragraphs = (props: ParagraphProps) => {
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
                     <EuiButtonIcon
+                      aria-label="Open paragraph menu"
                       iconType="boxesHorizontal"
                       onClick={() => { }}
                     />
