@@ -17,6 +17,8 @@ import { EuiButton, EuiFieldSearch, EuiFlexGroup, EuiFlexItem, EuiHorizontalRule
 import React, { useState, useRef } from 'react'
 import { getCustomModal, getCloneModal, getDeleteModal } from './helpers/modal_containers';
 import { CustomUploadModal } from './helpers/custom_modals/custom_upload_modal';
+import moment from 'moment';
+import _ from 'lodash';
 
 type NotebookPageBodyProps = {
   isNoteAvailable: boolean;
@@ -148,7 +150,8 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
     </EuiButton>
   );
 
-  const items = [
+  const popoverItems = [
+    // show `Import from JSON` only if no notebooks are selected
     ...(selectedNotebooks.length === 0 ? [<EuiContextMenuItem
       key="import_from_json"
       onClick={() => {
@@ -198,24 +201,25 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
     </EuiContextMenuItem>,
   ];
 
-  const columns = [
+  const tableColumns = [
     {
       field: 'path',
       name: 'Name',
       sortable: true,
-      render: (value, record) => value,
+      truncateText: true,
+      render: (value, record) => <EuiLink href={`#/${record.id}`} >{_.truncate(value, { 'length': 100 })}</EuiLink>,
     },
     {
       field: 'dateModified',
       name: 'Last updated',
       sortable: true,
-      render: (value) => value,
+      render: (value) => moment(value).format('MM/DD/YYYY hh:mmA'),
     },
     {
       field: 'dateCreated',
       name: 'Created',
       sortable: true,
-      render: (value) => value,
+      render: (value) => moment(value).format('MM/DD/YYYY hh:mmA'),
     },
   ] as Array<EuiTableFieldDataColumnType<{ path: string; id: string; dateCreated: string; dateModified: string; }>>;
 
@@ -243,7 +247,7 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
                 button={popoverButton}
                 isOpen={isActionPopoverOpen}
                 closePopover={() => setIsActionPopoverOpen(false)}>
-                <EuiContextMenuPanel items={items.filter((item) => item)} />
+                <EuiContextMenuPanel items={popoverItems.filter((item) => item)} />
               </EuiPopover>
             </EuiFlexItem>
             <EuiFlexItem>
@@ -298,7 +302,8 @@ export function NotebookPageBody(props: NotebookPageBodyProps) {
               props.notebooks.filter((notebook) => notebook.path.toLowerCase().includes(searchQuery.toLowerCase())) :
               props.notebooks}
             itemId='id'
-            columns={columns}
+            columns={tableColumns}
+            tableLayout='auto'
             pagination={{
               initialPageSize: 10,
               pageSizeOptions: [8, 10, 13],
