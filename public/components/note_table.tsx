@@ -21,6 +21,7 @@ import { ChromeBreadcrumb } from '../../../../src/core/public';
 import { CustomUploadModal } from './helpers/custom_modals/custom_upload_modal';
 import { getCloneModal, getCustomModal, getDeleteModal } from './helpers/modal_containers';
 import { NotebookType } from './main';
+import { DATE_FORMAT } from '../../common';
 
 type NoteTableProps = {
   isNoteAvailable: boolean;
@@ -228,13 +229,13 @@ export function NoteTable(props: NoteTableProps) {
       field: 'dateModified',
       name: 'Last updated',
       sortable: true,
-      render: (value) => moment(value).format('MM/DD/YYYY hh:mmA'),
+      render: (value) => moment(value).format(DATE_FORMAT),
     },
     {
       field: 'dateCreated',
       name: 'Created',
       sortable: true,
-      render: (value) => moment(value).format('MM/DD/YYYY hh:mmA'),
+      render: (value) => moment(value).format(DATE_FORMAT),
     },
   ] as Array<EuiTableFieldDataColumnType<{ path: string; id: string; dateCreated: string; dateModified: string; }>>;
 

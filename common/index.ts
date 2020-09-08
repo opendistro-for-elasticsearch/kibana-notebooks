@@ -17,6 +17,7 @@ export const PLUGIN_ID = 'kibanaNotebooks';
 export const PLUGIN_NAME = 'Kibana Notebooks';
 export const API_PREFIX = '/api/notebooks';
 export const SELECTED_BACKEND = 'DEFAULT'; // ZEPPELIN || DEFAULT
+export const DATE_FORMAT = 'MM/DD/YYYY hh:mmA';
 
 export const zeppelinURL = 'http://localhost:8080';
 
