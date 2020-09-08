@@ -51,8 +51,10 @@ type MainProps = {
   setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
 };
 
+// TODO: remove open/switchNoteId/Name, isNoteAvailable, folderTree
 type MainState = {
-  data: Array<{ path: string; id: string; dateCreated: string; dateModified: string; }>;
+  data: Array<NotebookType>;
+  openedNotebook: NotebookType;
   isNoteAvailable: boolean;
   openNoteId: string; // Id of the notebook open
   openNoteName: string; // name of the notebook open
@@ -68,11 +70,19 @@ type MainState = {
   }>;
 };
 
+export type NotebookType = {
+  path: string;
+  id: string;
+  dateCreated: string;
+  dateModified: string;
+}
+
 export class Main extends React.Component<MainProps, MainState> {
   constructor(props: Readonly<MainProps>) {
     super(props);
     this.state = {
       data: [],
+      openedNotebook: undefined,
       isNoteAvailable: false,
       openNoteId: '',
       openNoteName: '',
@@ -89,6 +99,11 @@ export class Main extends React.Component<MainProps, MainState> {
         },
       ],
     };
+    this.setOpenedNotebook = this.setOpenedNotebook.bind(this);
+  }
+
+  setOpenedNotebook(notebook: NotebookType) {
+    this.setState({ openedNotebook: notebook });
   }
 
   // Fetches path and id for all stored notebooks
@@ -255,27 +270,31 @@ export class Main extends React.Component<MainProps, MainState> {
     // TODO: remove folderTree, remove notebuttons.tsx
     return (
       <>
-        {/* <Notebook
-          isNoteAvailable={this.state.isNoteAvailable}
-          noteId={this.state.openNoteId}
-          noteName={this.state.openNoteName}
-          DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
-          http={this.props.http}
-          setBreadcrumbs={this.props.setBreadcrumbs}
-        /> */}
-        <NoteTable
-          isNoteAvailable={this.state.isNoteAvailable}
-          notebooks={this.state.data}
-          createNotebook={this.createNotebook}
-          openNoteName={this.state.openNoteName}
-          openNoteId={this.state.openNoteId}
-          renameNotebook={this.renameNotebook}
-          cloneNotebook={this.cloneNotebook}
-          deleteNotebook={this.deleteNotebook}
-          exportNotebook={this.exportNotebook}
-          importNotebook={this.importNotebook}
-          setBreadcrumbs={this.props.setBreadcrumbs}
-        />
+        {this.state.openedNotebook ? (
+          <Notebook
+            isNoteAvailable={this.state.isNoteAvailable}
+            openedNotebook={this.state.openedNotebook}
+            setOpenedNotebook={this.setOpenedNotebook}
+            DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
+            http={this.props.http}
+            setBreadcrumbs={this.props.setBreadcrumbs}
+          />
+        ) : (
+            <NoteTable
+              isNoteAvailable={this.state.isNoteAvailable}
+              notebooks={this.state.data}
+              setOpenedNotebook={this.setOpenedNotebook}
+              createNotebook={this.createNotebook}
+              openNoteName={this.state.openNoteName}
+              openNoteId={this.state.openNoteId}
+              renameNotebook={this.renameNotebook}
+              cloneNotebook={this.cloneNotebook}
+              deleteNotebook={this.deleteNotebook}
+              exportNotebook={this.exportNotebook}
+              importNotebook={this.importNotebook}
+              setBreadcrumbs={this.props.setBreadcrumbs}
+            />
+          )}
       </>
     );
   }

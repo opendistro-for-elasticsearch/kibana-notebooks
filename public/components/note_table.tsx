@@ -20,10 +20,12 @@ import React, { useRef, useState, useEffect } from 'react';
 import { ChromeBreadcrumb } from '../../../../src/core/public';
 import { CustomUploadModal } from './helpers/custom_modals/custom_upload_modal';
 import { getCloneModal, getCustomModal, getDeleteModal } from './helpers/modal_containers';
+import { NotebookType } from './main';
 
 type NoteTableProps = {
   isNoteAvailable: boolean;
-  notebooks: Array<{ path: string; id: string; dateCreated: string; dateModified: string; }>;
+  notebooks: Array<NotebookType>;
+  setOpenedNotebook: (notebook: NotebookType) => void;
   createNotebook: (newNoteName: string) => void;
   renameNotebook: (newNoteName: string, noteId: string) => void;
   cloneNotebook: (newNoteName: string, noteId: string) => void;
@@ -219,7 +221,8 @@ export function NoteTable(props: NoteTableProps) {
       name: 'Name',
       sortable: true,
       truncateText: true,
-      render: (value, record) => <EuiLink href={`#/${record.id}`} >{_.truncate(value, { 'length': 100 })}</EuiLink>,
+      render: (value, record) =>
+        <EuiLink onClick={() => { props.setOpenedNotebook(record) }}>{_.truncate(value, { 'length': 100 })}</EuiLink>,
     },
     {
       field: 'dateModified',

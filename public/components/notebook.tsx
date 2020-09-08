@@ -37,6 +37,7 @@ import { SELECTED_BACKEND } from '../../common';
 import { API_PREFIX, ParaType } from '../../common';
 import { zeppelinParagraphParser } from './helpers/zeppelin_parser';
 import { defaultParagraphParser } from './helpers/default_parser';
+import { NotebookType } from './main';
 
 /*
  * "Notebook" component is used to display an open notebook
@@ -50,8 +51,8 @@ import { defaultParagraphParser } from './helpers/default_parser';
  */
 type NotebookProps = {
   isNoteAvailable: boolean;
-  noteId: string;
-  noteName: string;
+  openedNotebook: NotebookType;
+  setOpenedNotebook: (notebook: NotebookType) => void;
   DashboardContainerByValueRenderer: DashboardStart['DashboardContainerByValueRenderer'];
   http: CoreStart['http'];
   setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
@@ -172,7 +173,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     const delparagraphIndex = selectedParaObject.paragraphIndex;
     if (delparagraphIndex !== -1) {
       this.props.http
-        .delete(`${API_PREFIX}/paragraph/` + this.props.noteId + '/' + delPara.uniqueId)
+        .delete(`${API_PREFIX}/paragraph/` + this.props.openedNotebook.id + '/' + delPara.uniqueId)
         .then((res) => {
           this.setState({ paragraphs: res.paragraphs });
           this.parseParagraphs();
@@ -184,7 +185,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   // Function for delete Visualization from notebook
   deleteVizualization = (uniqueId: string) => {
     this.props.http
-      .delete(`${API_PREFIX}/paragraph/` + this.props.noteId + '/' + uniqueId)
+      .delete(`${API_PREFIX}/paragraph/` + this.props.openedNotebook.id + '/' + uniqueId)
       .then((res) => {
         this.setState({ paragraphs: res.paragraphs });
         this.parseParagraphs();
@@ -197,7 +198,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     let paragraphs = this.state.paragraphs;
 
     const addParaObj = {
-      noteId: this.props.noteId,
+      noteId: this.props.openedNotebook.id,
       paragraphIndex: index,
       paragraphInput: newParaContent,
       inputType: inpType,
@@ -233,7 +234,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   clearParagraphButton = () => {
     this.showParagraphRunning('loading');
     const clearParaObj = {
-      noteId: this.props.noteId,
+      noteId: this.props.openedNotebook.id,
     };
     this.props.http
       .put(`${API_PREFIX}/paragraph/clearall/`, {
@@ -252,7 +253,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     let paragraphs = this.state.paragraphs;
 
     const paraUpdateObject = {
-      noteId: this.props.noteId,
+      noteId: this.props.openedNotebook.id,
       paragraphId: para.uniqueId,
       paragraphInput: para.inp,
     };
@@ -285,7 +286,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     let paragraphs = this.state.paragraphs;
 
     const paraUpdateObject = {
-      noteId: this.props.noteId,
+      noteId: this.props.openedNotebook.id,
       paragraphId: para.uniqueId,
       paragraphInput: para.inp,
     };
@@ -354,20 +355,39 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     );
     this.setState({ parsedPara });
   };
+  
+  loadParas = () => {
+    this.showParagraphRunning('queue');
+    this.props.http
+      .get(`${API_PREFIX}/note/` + this.props.openedNotebook.id)
+      .then((res) => this.setState(res, this.parseParagraphs))
+      .catch((err) => console.error('Fetching notebook issue: ', err.body.message));
+    this.setState({ toggleInput: true });
+    this.setState({ toggleOutput: true });
+  }
 
   // Loads a notebook based on the Notebook Id
   componentDidUpdate(prevProps: NotebookProps, _prevState: NotebookState) {
-    if (this.props.isNoteAvailable && this.props.noteId !== prevProps.noteId) {
-      this.showParagraphRunning('queue');
-      this.props.http
-        .get(`${API_PREFIX}/note/` + this.props.noteId)
-        .then((res) => this.setState(res, this.parseParagraphs))
-        .catch((err) => console.error('Fetching notebook issue: ', err.body.message));
-      this.setState({ toggleInput: true });
-      this.setState({ toggleOutput: true });
+    if (this.props.isNoteAvailable && this.props.openedNotebook.id !== prevProps.openedNotebook.id) {
+      this.loadParas();
     }
   }
 
+  componentDidMount() {
+    this.loadParas();
+    this.props.setBreadcrumbs([
+      {
+        text: 'Notebooks',
+        href: '#',
+        onClick: () => this.props.setOpenedNotebook(undefined),
+      },
+      {
+        text: this.props.openedNotebook.path,
+        href: '#',
+      },
+    ]);
+  }
+  
   render() {
     return (
       <EuiPage>
@@ -375,7 +395,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           <EuiPageHeader>
             <EuiPageHeaderSection>
               <EuiTitle size="l">
-                <h1>{this.props.noteName}</h1>
+                <h1>{this.props.openedNotebook.path}</h1>
               </EuiTitle>
             </EuiPageHeaderSection>
             <EuiPageContent id="notebookArea">
@@ -385,7 +405,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                     <h2>
                       {' '}
                       <EuiIcon id="titleIcon" type="notebookApp" size="l" />
-                      {this.props.noteName}
+                      {this.props.openedNotebook.path}
                     </h2>
                   </EuiTitle>
                 </EuiPageContentHeaderSection>
