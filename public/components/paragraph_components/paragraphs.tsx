@@ -83,6 +83,7 @@ type ParagraphProps = {
   deleteVizualization: (uniqueId: string) => void;
   vizualizationEditor: (vizContent: string, index: number) => void;
   http: CoreStart['http'];
+  showOutputOnly: boolean;
 };
 export const Paragraphs = (props: ParagraphProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false); // Boolean for showing visualization modal
@@ -241,6 +242,26 @@ export const Paragraphs = (props: ParagraphProps) => {
       </table>
     </div>
   );
+
+  const renderOutputs = () => {
+    return (
+      <>
+        {!para.isVizualisation ? (
+          <ParaOutput para={para} />
+        ) : (
+            <ParaVisualization
+              DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
+              vizContent={para.vizObjectInput}
+              deleteVizualization={deleteVizualization}
+              para={para}
+              vizualizationEditor={vizualizationEditor}
+            />
+          )
+        }
+      </>
+    )
+  }
+  
 
   return (
     <div>

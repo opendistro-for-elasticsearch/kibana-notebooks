@@ -365,6 +365,24 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.setState({ parsedPara });
   };
 
+  // TODO: remove hideInputs/Outputs, toggleInput/Output
+  updateView = () => {
+    let hideInput = false, hideOutput = false;
+    if (this.state.selectedViewId === 'input_only')
+      hideOutput = true;
+    else if (this.state.selectedViewId === 'output_only')
+      hideInput = true;
+
+    let parsedPara = this.state.parsedPara;
+    this.state.parsedPara.map(
+      (para: ParaType, index: number) => {
+        parsedPara[index].isInputHidden = hideInput;
+        parsedPara[index].isOutputHidden = hideOutput;
+      }
+    );
+    this.setState({ parsedPara });
+  }
+
   loadParas = () => {
     this.showParagraphRunning('queue');
     this.props.http
@@ -379,6 +397,9 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   componentDidUpdate(prevProps: NotebookProps, _prevState: NotebookState) {
     if (this.props.isNoteAvailable && this.props.openedNotebook.id !== prevProps.openedNotebook.id) {
       this.loadParas();
+    }
+    if (this.state.selectedViewId !== _prevState.selectedViewId) {
+      this.updateView();
     }
   }
 
@@ -481,6 +502,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                 deleteVizualization={this.deleteVizualization}
                 vizualizationEditor={this.vizualizationEditor}
                 http={this.props.http}
+                showOutputOnly={this.state.selectedViewId === 'output_only'}
               />
             ))}
           </Cells>
