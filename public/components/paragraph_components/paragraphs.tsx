@@ -36,6 +36,7 @@ import {
   EuiPopover,
   EuiLink,
   EuiContextMenu,
+  EuiButton,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui/lib/services';
 
@@ -49,13 +50,14 @@ import { CoreStart } from '../../../../../src/core/public';
 import { ParaOutput } from './para_output';
 import { ParaInput } from './para_input';
 import { ParaVisualization } from './para_vizualizations';
-import { API_PREFIX, ParaType } from '../../../common';
+import { API_PREFIX, ParaType, DATE_FORMAT } from '../../../common';
 
 /*
  * "Paragraphs" component is used to render cells of the notebook open and "add para div" between paragraphs
  *
  * Props taken in as params are:
  * para - parsed paragraph from notebook
+ * dateModified - last modified time of paragraph
  * index - index of paragraph in the notebook
  * paragraphSelector - function used to select a para on click
  * paragraphHover - function used to highlight a para on hover
@@ -78,6 +80,7 @@ import { API_PREFIX, ParaType } from '../../../common';
  */
 type ParagraphProps = {
   para: ParaType;
+  dateModified: string;
   index: number;
   paragraphSelector: (index: number) => void;
   paragraphHover: (para: ParaType) => void;
@@ -380,7 +383,7 @@ export const Paragraphs = (props: ParagraphProps) => {
         </>
       ) : (
           <EuiPanel>
-             {renderParaHeader(para.isVizualisation ? 'Kibana visualization' : 'Markdown')}
+            {renderParaHeader(para.isVizualisation ? 'Kibana visualization' : 'Markdown')}
             {/* Render if para contains code */}
             {!para.isVizualisation && (
               <>
@@ -398,6 +401,16 @@ export const Paragraphs = (props: ParagraphProps) => {
                     textValueEditor={textValueEditor}
                     handleKeyPress={handleKeyPress}
                   />}
+                  <EuiSpacer size='s' />
+                  <EuiFlexGroup alignItems='center'>
+                    <EuiFlexItem grow={false} />
+                    <EuiFlexItem grow={false}>
+                      <EuiButton size='s' onClick={() => props.runPara(para, index)}>Run</EuiButton>
+                    </EuiFlexItem>
+                    <EuiFlexItem>
+                      <EuiText color='subdued'>{`Last saved: ${moment(props.dateModified).format(DATE_FORMAT)}`}</EuiText>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                   <EuiHorizontalRule margin='s' />
                   <ParaOutput para={para} />
                 </Cell>
