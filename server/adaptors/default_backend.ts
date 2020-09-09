@@ -172,12 +172,7 @@ export class DefaultBackend implements NotebookAdaptor {
   ) {
     try {
       const noteObject = await this.getNote(context, noteId);
-      return {
-        path: noteObject.name,
-        dateCreated: noteObject.dateCreated,
-        dateModified: noteObject.dateModified,
-        paragraphs: noteObject.paragraphs,
-      };
+      return noteObject.paragraphs;
     } catch (error) {
       throw new Error('Fetching Notebook Error:' + error);
     }
