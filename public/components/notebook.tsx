@@ -30,6 +30,7 @@ import {
   EuiIcon,
   EuiPopover,
   EuiContextMenu,
+  EuiOverlayMask,
 } from '@elastic/eui';
 import { Cells } from '@nteract/presentational-components';
 
@@ -44,6 +45,7 @@ import { defaultParagraphParser } from './helpers/default_parser';
 import { NotebookType } from './main';
 import moment from 'moment';
 import { PanelWrapper } from './helpers/panel_wrapper';
+import { getDeleteModal } from './helpers/modal_containers';
 
 /*
  * "Notebook" component is used to display an open notebook
@@ -73,6 +75,8 @@ type NotebookState = {
   vizPrefix: string; // prefix for visualizations in Zeppelin Adaptor
   isAddParaPopoverOpen: boolean;
   isActionsPopoverOpen: boolean;
+  isModalVisible: boolean;
+  modalLayout: React.ReactNode;
 };
 export class Notebook extends Component<NotebookProps, NotebookState> {
   child: React.RefObject<any>;
@@ -90,6 +94,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       vizPrefix: '',
       isAddParaPopoverOpen: false,
       isActionsPopoverOpen: false,
+      isModalVisible: false,
+      modalLayout: <EuiOverlayMask></EuiOverlayMask>,
     };
     this.child = React.createRef();
   }
@@ -183,6 +189,50 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         .catch((err) => console.error('Delete paragraph issue: ', err.body.message));
     }
   };
+
+  showDeleteParaModal = (para: ParaType, index: number) => {
+    this.setState({
+      modalLayout: getDeleteModal(
+        () => this.setState({ isModalVisible: false }),
+        () => {
+          this.deleteParagraphButton(para, index);
+          this.setState({ isModalVisible: false });
+        },
+        'Delete paragraph',
+        'Are you sure you want to delete the paragraph? The action cannot be undone.')
+    });
+    this.setState({ isModalVisible: true });
+  };
+
+  showDeleteAllParaModal = () => {
+    this.setState({
+      modalLayout: getDeleteModal(
+        () => this.setState({ isModalVisible: false }),
+        () => {
+          this.state.parsedPara.forEach((para: ParaType, index: number) => this.deleteParagraphButton(para, index))
+          this.setState({ isModalVisible: false });
+        },
+        'Delete all paragraphs',
+        'Are you sure you want to delete all paragraphs? The action cannot be undone.')
+    });
+    this.setState({ isModalVisible: true });
+  };
+  
+  showClearOutputsModal = () => {
+    this.setState({
+      modalLayout: getDeleteModal(
+        () => this.setState({ isModalVisible: false }),
+        () => {
+          this.clearParagraphButton();
+          this.setState({ isModalVisible: false });
+        },
+        'Clear all outputs',
+        'Are you sure you want to clear all outputs? The action cannot be undone.',
+        'Yes, clear'
+      )
+    });
+    this.setState({ isModalVisible: true });
+  }
 
   // Function for delete Visualization from notebook
   deleteVizualization = (uniqueId: string) => {
@@ -436,43 +486,44 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             panel: 2,
           },
           {
-            name: 'Clear all output',
+            name: 'Clear all outputs',
             onClick: () => {
               this.setState({ isActionsPopoverOpen: false });
-              this.clearParagraphButton();
+              this.showClearOutputsModal();
             },
           },
           {
             name: 'Delete all paragraphs',
             onClick: () => {
               this.setState({ isActionsPopoverOpen: false });
+              this.showDeleteAllParaModal();
             },
           },
         ],
       },
       {
         id: 1,
-        title: 'Add paragraph to top',
+        title: 'Add to top',
         items: [
           {
             name: 'Markdown',
             onClick: () => {
               this.setState({ isActionsPopoverOpen: false });
-              this.addPara(-1, '', 'CODE');
+              this.addPara(0, '', 'CODE');
             },
           },
           {
             name: 'Kibana visualization',
             onClick: () => {
               this.setState({ isActionsPopoverOpen: false });
-              this.child.current.showAddVisualizationModal(-1);
+              this.child.current.showAddVisualizationModal(0);
             },
           }
         ],
       },
-{
+      {
         id: 2,
-        title: 'Add paragraph to bottom',
+        title: 'Add to bottom',
         items: [
           {
             name: 'Markdown',
@@ -493,136 +544,139 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     ];
 
     return (
-      <EuiPage>
-        <EuiPageBody component="div">
-          <EuiPageHeader>
-            <EuiPageHeaderSection>
-              <EuiTitle size="l">
-                <h1>{this.state.path}</h1>
-              </EuiTitle>
-              <EuiSpacer size='m' />
-              <EuiFlexGroup gutterSize='xl'>
-                <EuiFlexItem>
-                  <EuiText color="subdued">Created: {moment(this.state.dateCreated).format(DATE_FORMAT)}</EuiText>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiPageHeaderSection>
-            <EuiPageHeaderSection>
-              <EuiFlexGroup gutterSize='s'>
-                <EuiFlexItem>
-                  <EuiButtonGroup
-                    buttonSize='m'
-                    options={viewOptions}
-                    idSelected={this.state.selectedViewId}
-                    onChange={(id) => this.setState({ selectedViewId: id })}
-                  />
-                </EuiFlexItem>
-                <EuiFlexItem />
-                <EuiFlexItem>
-                  <EuiPopover
-                    panelPaddingSize="none"
-                    withTitle
-                    button={
-                      <EuiButton
-                        iconType='arrowDown'
-                        iconSide='right'
-                        onClick={() => this.setState({ isActionsPopoverOpen: true })}
-                      >Actions</EuiButton>
-                    }
-                    isOpen={this.state.isActionsPopoverOpen}
-                    closePopover={() => this.setState({ isActionsPopoverOpen: false })}>
-                    <EuiContextMenu initialPanelId={0} panels={actionsPanels} />
-                  </EuiPopover>
-                </EuiFlexItem>
-                <EuiFlexItem>
-                  <EuiButton onClick={() => this.runAllPara()}>Run all paragraphs</EuiButton>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiPageHeaderSection>
-          </EuiPageHeader>
-          {this.state.parsedPara.length > 0 ? (
-            <>
-              <Cells>
-                <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
-                  {this.state.parsedPara.map((para: ParaType, index: number) => (
-                    <Paragraphs
-                      ref={index === 0 && this.child}
-                      key={'para_' + index.toString()}
-                      para={para}
-                      dateModified={this.state.paragraphs[index]?.dateModified}
-                      index={index}
-                      paragraphSelector={this.paragraphSelector}
-                      paragraphHover={this.paragraphHover}
-                      paragraphHoverReset={this.paragraphHoverReset}
-                      textValueEditor={this.textValueEditor}
-                      handleKeyPress={this.handleKeyPress}
-                      addPara={this.addPara}
-                      DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
-                      deleteVizualization={this.deleteVizualization}
-                      vizualizationEditor={this.vizualizationEditor}
-                      http={this.props.http}
-                      showOutputOnly={this.state.selectedViewId === 'output_only'}
-                      deletePara={this.deleteParagraphButton}
-                      runPara={this.updateRunParagraph}
-                      clonePara={this.cloneParaButton}
-                      savePara={this.savePara}
-                    />
-                  ))}
-                </PanelWrapper>
-              </Cells>
-              <EuiPopover
-                panelPaddingSize="none"
-                withTitle
-                button={
-                  <EuiButton
-                    iconType='arrowDown'
-                    iconSide='right'
-                    onClick={() => this.setState({ isAddParaPopoverOpen: true })}
-                  >Add paragraph</EuiButton>
-                }
-                isOpen={this.state.isAddParaPopoverOpen}
-                closePopover={() => this.setState({ isAddParaPopoverOpen: false })}>
-                <EuiContextMenu initialPanelId={0} panels={addParaPanels} />
-              </EuiPopover>
-            </>
-          ) : (
-              <EuiPanel>
-                <EuiSpacer size='xxl' />
-                <EuiText textAlign='center'>
-                  <h2>No paragraph</h2>
-                  <EuiText>
-                    Add paragraph to compose your document or story. Notebook now supports two types of input:
-                  </EuiText>
-                </EuiText>
-                <EuiSpacer size='xl' />
-                <EuiFlexGroup justifyContent='spaceAround'>
-                  <EuiFlexItem grow={false}>
-                    <EuiText textAlign='center'>
-                      <EuiIcon size="xxl" type="editorCodeBlock" />
-                      <h3>Markdown</h3>
-                      <p>Create rich text with markup language.</p>
-                    </EuiText>
-                    <EuiButton onClick={() => this.addPara(-1, '', 'CODE')}>
-                      Add markdown paragraph
-                    </EuiButton>
-                  </EuiFlexItem>
-                  <EuiFlexItem grow={false}>
-                    <EuiText textAlign='center'>
-                      <EuiIcon size="xxl" type="visArea" />
-                      <h3>Kibana visualization</h3>
-                      <p>Import Kibana visualizations to the notes</p>
-                    </EuiText>
-                    {/* TODO: add vis para, won't work if no ref */}
-                    <EuiButton onClick={() => { }}>
-                      Add Kibana visualization paragraph
-                    </EuiButton>
+      <>
+        <EuiPage>
+          <EuiPageBody component="div">
+            <EuiPageHeader>
+              <EuiPageHeaderSection>
+                <EuiTitle size="l">
+                  <h1>{this.state.path}</h1>
+                </EuiTitle>
+                <EuiSpacer size='m' />
+                <EuiFlexGroup gutterSize='xl'>
+                  <EuiFlexItem>
+                    <EuiText color="subdued">Created: {moment(this.state.dateCreated).format(DATE_FORMAT)}</EuiText>
                   </EuiFlexItem>
                 </EuiFlexGroup>
-                <EuiSpacer size='xxl' />
-              </EuiPanel>
-            )}
-        </EuiPageBody>
-      </EuiPage>
+              </EuiPageHeaderSection>
+              <EuiPageHeaderSection>
+                <EuiFlexGroup gutterSize='s'>
+                  <EuiFlexItem>
+                    <EuiButtonGroup
+                      buttonSize='m'
+                      options={viewOptions}
+                      idSelected={this.state.selectedViewId}
+                      onChange={(id) => this.setState({ selectedViewId: id })}
+                    />
+                  </EuiFlexItem>
+                  <EuiFlexItem />
+                  <EuiFlexItem>
+                    <EuiPopover
+                      panelPaddingSize="none"
+                      withTitle
+                      button={
+                        <EuiButton
+                          iconType='arrowDown'
+                          iconSide='right'
+                          onClick={() => this.setState({ isActionsPopoverOpen: true })}
+                        >Actions</EuiButton>
+                      }
+                      isOpen={this.state.isActionsPopoverOpen}
+                      closePopover={() => this.setState({ isActionsPopoverOpen: false })}>
+                      <EuiContextMenu initialPanelId={0} panels={actionsPanels} />
+                    </EuiPopover>
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiButton onClick={() => this.runAllPara()}>Run all paragraphs</EuiButton>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiPageHeaderSection>
+            </EuiPageHeader>
+            {this.state.parsedPara.length > 0 ? (
+              <>
+                <Cells>
+                  <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
+                    {this.state.parsedPara.map((para: ParaType, index: number) => (
+                      <Paragraphs
+                        ref={index === 0 && this.child}
+                        key={'para_' + index.toString()}
+                        para={para}
+                        dateModified={this.state.paragraphs[index]?.dateModified}
+                        index={index}
+                        paragraphSelector={this.paragraphSelector}
+                        paragraphHover={this.paragraphHover}
+                        paragraphHoverReset={this.paragraphHoverReset}
+                        textValueEditor={this.textValueEditor}
+                        handleKeyPress={this.handleKeyPress}
+                        addPara={this.addPara}
+                        DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
+                        deleteVizualization={this.deleteVizualization}
+                        vizualizationEditor={this.vizualizationEditor}
+                        http={this.props.http}
+                        showOutputOnly={this.state.selectedViewId === 'output_only'}
+                        deletePara={this.showDeleteParaModal}
+                        runPara={this.updateRunParagraph}
+                        clonePara={this.cloneParaButton}
+                        savePara={this.savePara}
+                      />
+                    ))}
+                  </PanelWrapper>
+                </Cells>
+                <EuiPopover
+                  panelPaddingSize="none"
+                  withTitle
+                  button={
+                    <EuiButton
+                      iconType='arrowDown'
+                      iconSide='right'
+                      onClick={() => this.setState({ isAddParaPopoverOpen: true })}
+                    >Add paragraph</EuiButton>
+                  }
+                  isOpen={this.state.isAddParaPopoverOpen}
+                  closePopover={() => this.setState({ isAddParaPopoverOpen: false })}>
+                  <EuiContextMenu initialPanelId={0} panels={addParaPanels} />
+                </EuiPopover>
+              </>
+            ) : (
+                <EuiPanel>
+                  <EuiSpacer size='xxl' />
+                  <EuiText textAlign='center'>
+                    <h2>No paragraph</h2>
+                    <EuiText>
+                      Add paragraph to compose your document or story. Notebook now supports two types of input:
+                  </EuiText>
+                  </EuiText>
+                  <EuiSpacer size='xl' />
+                  <EuiFlexGroup justifyContent='spaceAround'>
+                    <EuiFlexItem grow={false}>
+                      <EuiText textAlign='center'>
+                        <EuiIcon size="xxl" type="editorCodeBlock" />
+                        <h3>Markdown</h3>
+                        <p>Create rich text with markup language.</p>
+                      </EuiText>
+                      <EuiButton onClick={() => this.addPara(0, '', 'CODE')}>
+                        Add markdown paragraph
+                    </EuiButton>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                      <EuiText textAlign='center'>
+                        <EuiIcon size="xxl" type="visArea" />
+                        <h3>Kibana visualization</h3>
+                        <p>Import Kibana visualizations to the notes</p>
+                      </EuiText>
+                      {/* TODO: add vis para, won't work if no ref */}
+                      <EuiButton onClick={() => { }}>
+                        Add Kibana visualization paragraph
+                    </EuiButton>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                  <EuiSpacer size='xxl' />
+                </EuiPanel>
+              )}
+          </EuiPageBody>
+        </EuiPage>
+        {this.state.isModalVisible && this.state.modalLayout}
+      </>
     );
   }
 }

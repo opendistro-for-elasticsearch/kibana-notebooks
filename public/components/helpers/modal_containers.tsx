@@ -75,20 +75,23 @@ export const getDeleteModal = (
   onCancel: (
     event?: React.KeyboardEvent<HTMLDivElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => void,
-  onConfirm: (event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  onConfirm: (event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+  title?: string,
+  message?: string,
+  confirmMessage?: string,
 ) => {
   return (
     <EuiOverlayMask>
       <EuiConfirmModal
-        title="Delete Notebook"
+        title={title || "Delete Notebook"}
         onCancel={onCancel}
         onConfirm={onConfirm}
         cancelButtonText="Cancel"
-        confirmButtonText="Yes, Delete"
+        confirmButtonText={confirmMessage || "Yes, delete"}
         buttonColor="danger"
         defaultFocusedButton="confirm"
       >
-        <p>Are you sure you want to delete the selected notebooks?</p>
+        {message || <p>Are you sure you want to delete the selected notebooks?</p>}
       </EuiConfirmModal>
     </EuiOverlayMask>
   );
