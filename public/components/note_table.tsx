@@ -40,7 +40,7 @@ import {
 } from '@elastic/eui';
 import _ from 'lodash';
 import moment from 'moment';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, ReactElement } from 'react';
 import { ChromeBreadcrumb } from '../../../../src/core/public';
 import { DATE_FORMAT } from '../../common';
 import { CustomUploadModal } from './helpers/custom_modals/custom_upload_modal';
@@ -186,7 +186,7 @@ export function NoteTable(props: NoteTableProps) {
     </EuiButton>
   );
 
-  const popoverItems = [
+  const popoverItems: ReactElement[] = [
     // show `Import from JSON` only if no notebooks are selected
     selectedNotebooks.length === 0 ? <EuiContextMenuItem
       key="import_from_json"

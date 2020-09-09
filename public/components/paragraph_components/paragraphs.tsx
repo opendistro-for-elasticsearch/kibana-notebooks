@@ -34,9 +34,9 @@ import {
   EuiButtonIcon,
   EuiSpacer,
   EuiPopover,
-  EuiLink,
   EuiContextMenu,
   EuiButton,
+  EuiContextMenuPanelDescriptor,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui/lib/services';
 
@@ -247,7 +247,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
 
   const renderParaHeader = (type: string) => {
     const isVisualization = type === 'Kibana visualization';
-    const panels = [
+    const panels: EuiContextMenuPanelDescriptor[] = [
       {
         id: 0,
         title: 'Paragraph actions',

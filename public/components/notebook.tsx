@@ -31,6 +31,8 @@ import {
   EuiPopover,
   EuiContextMenu,
   EuiOverlayMask,
+  EuiContextMenuPanelDescriptor,
+  EuiButtonGroupOption,
 } from '@elastic/eui';
 import { Cells } from '@nteract/presentational-components';
 
@@ -51,10 +53,10 @@ import { getDeleteModal, getCustomModal, getCloneModal } from './helpers/modal_c
  * "Notebook" component is used to display an open notebook
  *
  * Props taken in as params are:
- * noteName - current open notebook name
- * noteId - current open notebook id
+ * basename - base url for kibana notebooks
  * DashboardContainerByValueRenderer - Dashboard container renderer for visualization
- * http object: for making API requests
+ * http object - for making API requests
+ * setBreadcrumbs - sets breadcrumbs on top
  */
 type NotebookProps = {
   basename: string;
@@ -139,23 +141,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.setState({ parsedPara });
   };
 
-  // Gets the paragraph and its index which is selected by the user
-  getSelectedParagraph = () => {
-    let selectedPara: ParaType;
-    let selectedparagraphIndex = -1;
-    this.state.parsedPara.map((para: ParaType, index: number) => {
-      if (para.isSelected === true) {
-        selectedPara = para;
-        selectedparagraphIndex = index;
-      }
-    });
-
-    if (selectedparagraphIndex === -1) {
-      alert('Please select a Paragraph');
-    }
-    return { para: selectedPara, paragraphIndex: selectedparagraphIndex };
-  };
-
   // Sets a paragraph to selected and deselects all others
   paragraphSelector = (index: number) => {
     let parsedPara = this.state.parsedPara;
@@ -213,7 +198,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       modalLayout: getDeleteModal(
         () => this.setState({ isModalVisible: false }),
         () => {
-          this.reduceAllParas(this.deleteParagraphButton);
+          this.runForAllParagraphs(this.deleteParagraphButton);
           this.setState({ isModalVisible: false });
         },
         'Delete all paragraphs',
@@ -232,8 +217,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         },
         'Clear all outputs',
         'Are you sure you want to clear all outputs? The action cannot be undone.',
-        'Yes, clear'
-      )
+        'Yes, clear')
     });
     this.setState({ isModalVisible: true });
   };
@@ -252,8 +236,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         'Cancel',
         'Rename',
         this.state.path,
-        'Enter a unique name to describe the purpose of this notebook. The name must be less than 50 characters.'
-      )
+        'Enter a unique name to describe the purpose of this notebook. The name must be less than 50 characters.')
     });
     this.setState({ isModalVisible: true });
   }
@@ -358,8 +341,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .catch((err) => console.error('run paragraph issue: ', err.body.message));
   };
 
-  reduceAllParas = (callback: any) => {
-    this.state.parsedPara.map((para: ParaType, index: number) => () => callback(para, index))
+  runForAllParagraphs = (reducer: any) => {
+    this.state.parsedPara.map((para: ParaType, index: number) => () => reducer(para, index))
       .reduce((chain, func) => chain.then(func), Promise.resolve());
   }
 
@@ -386,17 +369,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .catch((err) => console.error('save paragraph issue: ', err.body.message));
   };
 
-  // Function for save paragraph button
-  // TODO remove
-  saveParagraphButton = () => {
-    const selectedParaObject = this.getSelectedParagraph();
-    const savePara = selectedParaObject.para;
-    const saveparagraphIndex = selectedParaObject.paragraphIndex;
-    if (saveparagraphIndex !== -1) {
-      this.savePara(savePara, saveparagraphIndex);
-    }
-  };
-
   // Hanldes Edits in visualization and syncs with paragraph input
   vizualizationEditor = (vizContent: string, index: number) => {
     let parsedPara = this.state.parsedPara;
@@ -420,11 +392,11 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     }
   };
 
-  updateView = () => {
+  updateView = (viewId: string) => {
     let hideInput = false, hideOutput = false;
-    if (this.state.selectedViewId === 'input_only')
+    if (viewId === 'input_only')
       hideOutput = true;
-    else if (this.state.selectedViewId === 'output_only')
+    else if (viewId === 'output_only')
       hideInput = true;
 
     let parsedPara = this.state.parsedPara;
@@ -450,13 +422,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.setState({ toggleOutput: true });
   }
 
-  // Loads a notebook based on the Notebook Id
-  componentDidUpdate(prevProps: NotebookProps, _prevState: NotebookState) {
-    if (this.state.selectedViewId !== _prevState.selectedViewId) {
-      this.updateView();
-    }
-  }
-
   setBreadcrumbs(path: string) {
     this.props.setBreadcrumbs([
       {
@@ -475,7 +440,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   }
 
   render() {
-    const viewOptions = [
+    const viewOptions: EuiButtonGroupOption[] = [
       {
         id: 'view_both',
         label: 'View both',
@@ -489,7 +454,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         label: 'Output only',
       },
     ];
-    const addParaPanels = [
+    const addParaPanels: EuiContextMenuPanelDescriptor[] = [
       {
         id: 0,
         title: 'Input type',
@@ -511,7 +476,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         ],
       },
     ];
-    const actionsPanels = [
+    const actionsPanels: EuiContextMenuPanelDescriptor[] = [
       {
         id: 0,
         title: 'Actions',
@@ -626,7 +591,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                       buttonSize='m'
                       options={viewOptions}
                       idSelected={this.state.selectedViewId}
-                      onChange={(id) => this.setState({ selectedViewId: id })}
+                      onChange={(id) => {
+                        this.setState({ selectedViewId: id });
+                        this.updateView(id);
+                      }}
                     />
                   </EuiFlexItem>
                   <EuiFlexItem />
@@ -647,7 +615,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                     </EuiPopover>
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiButton onClick={() => this.reduceAllParas(this.updateRunParagraph)}>Run all paragraphs</EuiButton>
+                    <EuiButton onClick={() => this.runForAllParagraphs(this.updateRunParagraph)}>Run all paragraphs</EuiButton>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiPageHeaderSection>
