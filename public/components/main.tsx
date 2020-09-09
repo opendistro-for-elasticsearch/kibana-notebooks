@@ -161,10 +161,14 @@ export class Main extends React.Component<MainProps, MainState> {
               path='/:id'
               render={(props) =>
                 <Notebook
+                  basename={this.props.basename}
                   openedNoteId={props.match.params.id}
                   DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
                   http={this.props.http}
                   setBreadcrumbs={this.props.setBreadcrumbs}
+                  renameNotebook={this.renameNotebook}
+                  deleteNotebook={this.deleteNotebook}
+                  exportNotebook={this.exportNotebook}
                 />
               }
             />

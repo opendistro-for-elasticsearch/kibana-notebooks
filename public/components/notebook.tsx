@@ -45,7 +45,7 @@ import { defaultParagraphParser } from './helpers/default_parser';
 import { NotebookType } from './main';
 import moment from 'moment';
 import { PanelWrapper } from './helpers/panel_wrapper';
-import { getDeleteModal } from './helpers/modal_containers';
+import { getDeleteModal, getCustomModal, getCloneModal } from './helpers/modal_containers';
 
 /*
  * "Notebook" component is used to display an open notebook
@@ -57,10 +57,14 @@ import { getDeleteModal } from './helpers/modal_containers';
  * http object: for making API requests
  */
 type NotebookProps = {
+  basename: string;
   openedNoteId: string;
   DashboardContainerByValueRenderer: DashboardStart['DashboardContainerByValueRenderer'];
   http: CoreStart['http'];
   setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
+  renameNotebook: (newNoteName: string, noteId: string) => void;
+  deleteNotebook: (noteId: string) => void;
+  exportNotebook: (noteName: string, noteId: string) => void;
 };
 
 type NotebookState = {
@@ -209,7 +213,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       modalLayout: getDeleteModal(
         () => this.setState({ isModalVisible: false }),
         () => {
-          this.reduceAllParas(this.deleteParagraphButton)
+          this.reduceAllParas(this.deleteParagraphButton);
           this.setState({ isModalVisible: false });
         },
         'Delete all paragraphs',
@@ -230,6 +234,41 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         'Are you sure you want to clear all outputs? The action cannot be undone.',
         'Yes, clear'
       )
+    });
+    this.setState({ isModalVisible: true });
+  };
+  
+  showRenameModal = () => {
+    this.setState({
+      modalLayout: getCustomModal(
+        (newName: string) => {
+          this.props.renameNotebook(newName, this.props.openedNoteId);
+          this.setState({ isModalVisible: false });
+          this.loadNotebook();
+        },
+        () => this.setState({ isModalVisible: false }),
+        'Edit notebook name',
+        'Please edit name',
+        'Cancel',
+        'Rename',
+        this.state.path,
+        'Enter a unique name to describe the purpose of this notebook. The name must be less than 50 characters.'
+      )
+    });
+    this.setState({ isModalVisible: true });
+  }
+  
+  showDeleteNotebookModal = () => {
+    this.setState({
+      modalLayout: getDeleteModal(
+        () => this.setState({ isModalVisible: false }),
+        () => {
+          this.props.deleteNotebook(this.props.openedNoteId);
+          this.setState({ isModalVisible: false });
+          window.location.replace(`${this.props.basename}#`);
+        },
+        `Delete notebook "${this.state.path}"`,
+        'Are you sure you want to delete the notebook? The action cannot be undone.')
     });
     this.setState({ isModalVisible: true });
   }
@@ -497,6 +536,27 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             onClick: () => {
               this.setState({ isActionsPopoverOpen: false });
               this.showDeleteAllParaModal();
+            },
+          },
+          {
+            name: 'Rename notebook',
+            onClick: () => {
+              this.setState({ isActionsPopoverOpen: false });
+              this.showRenameModal();
+            },
+          },
+          {
+            name: 'Export notebook',
+            onClick: () => {
+              this.setState({ isActionsPopoverOpen: false });
+              this.props.exportNotebook(this.state.path, this.props.openedNoteId);
+            },
+          },
+          {
+            name: 'Delete notebook',
+            onClick: () => {
+              this.setState({ isActionsPopoverOpen: false });
+              this.showDeleteNotebookModal();
             },
           },
         ],
