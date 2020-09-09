@@ -22,6 +22,8 @@ import { Notebook } from './notebook';
 import { onDownload } from './helpers/download_json';
 import { API_PREFIX } from '../../common';
 import { NoteTable } from './note_table';
+import { HashRouter } from 'react-router-dom';
+import { Switch, Route } from 'react-router';
 
 /*
  * "Main" component renders the whole Notebooks as a single page application
@@ -35,6 +37,7 @@ import { NoteTable } from './note_table';
  */
 
 type MainProps = {
+  basename: string;
   DashboardContainerByValueRenderer: DashboardStart['DashboardContainerByValueRenderer'];
   http: CoreStart['http'];
   setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
@@ -149,36 +152,42 @@ export class Main extends React.Component<MainProps, MainState> {
       .catch((err) => console.error('Issue in importing the notebook', err.body.message));
   };
 
-  // On mount fetch all notebooks
-  componentDidMount() {
-    this.fetchNotebooks();
-  }
-
   render() {
     return (
-      <>
-        {this.state.openedNotebook ? (
-          <Notebook
-            openedNotebook={this.state.openedNotebook}
-            setOpenedNotebook={this.setOpenedNotebook}
-            DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
-            http={this.props.http}
-            setBreadcrumbs={this.props.setBreadcrumbs}
-          />
-        ) : (
-            <NoteTable
-              notebooks={this.state.data}
-              setOpenedNotebook={this.setOpenedNotebook}
-              createNotebook={this.createNotebook}
-              renameNotebook={this.renameNotebook}
-              cloneNotebook={this.cloneNotebook}
-              deleteNotebook={this.deleteNotebook}
-              exportNotebook={this.exportNotebook}
-              importNotebook={this.importNotebook}
-              setBreadcrumbs={this.props.setBreadcrumbs}
+      <HashRouter basename={this.props.basename}>
+        <>
+          <Switch>
+            <Route
+              path='/:id'
+              render={(props) =>
+                <Notebook
+                  openedNoteId={props.match.params.id}
+                  DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
+                  http={this.props.http}
+                  setBreadcrumbs={this.props.setBreadcrumbs}
+                />
+              }
             />
-          )}
-      </>
-    );
+            <Route
+              path='/'
+              render={(props) =>
+                <NoteTable
+                  fetchNotebooks={this.fetchNotebooks}
+                  notebooks={this.state.data}
+                  setOpenedNotebook={this.setOpenedNotebook}
+                  createNotebook={this.createNotebook}
+                  renameNotebook={this.renameNotebook}
+                  cloneNotebook={this.cloneNotebook}
+                  deleteNotebook={this.deleteNotebook}
+                  exportNotebook={this.exportNotebook}
+                  importNotebook={this.importNotebook}
+                  setBreadcrumbs={this.props.setBreadcrumbs}
+                />
+              }
+            />
+          </Switch>
+        </>
+      </HashRouter>
+    )
   }
 }

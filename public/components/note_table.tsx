@@ -48,6 +48,7 @@ import { getCloneModal, getCustomModal, getDeleteModal } from './helpers/modal_c
 import { NotebookType } from './main';
 
 type NoteTableProps = {
+  fetchNotebooks: () => void;
   notebooks: Array<NotebookType>;
   setOpenedNotebook: (notebook: NotebookType) => void;
   createNotebook: (newNoteName: string) => void;
@@ -66,6 +67,7 @@ export function NoteTable(props: NoteTableProps) {
   const [selectedNotebooks, setSelectedNotebooks] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const {
+    notebooks,
     createNotebook,
     renameNotebook,
     cloneNotebook,
@@ -81,6 +83,7 @@ export function NoteTable(props: NoteTableProps) {
         href: '#',
       },
     ]);
+    props.fetchNotebooks();
   }, []);
 
   const closeModal = () => {
@@ -238,7 +241,7 @@ export function NoteTable(props: NoteTableProps) {
       sortable: true,
       truncateText: true,
       render: (value, record) =>
-        <EuiLink onClick={() => { props.setOpenedNotebook(record) }}>{_.truncate(value, { 'length': 100 })}</EuiLink>,
+        <EuiLink href={`#${record.id}`}>{_.truncate(value, { 'length': 100 })}</EuiLink>,
     },
     {
       field: 'dateModified',
@@ -269,7 +272,7 @@ export function NoteTable(props: NoteTableProps) {
             <EuiPageContentHeader>
               <EuiPageContentHeaderSection>
                 <EuiTitle size="s">
-                  <h3>Notebooks<span className="panel-header-count"> ({props.notebooks.length})</span></h3>
+                  <h3>Notebooks<span className="panel-header-count"> ({notebooks.length})</span></h3>
                 </EuiTitle>
                 <EuiSpacer size='s' />
                 <EuiText size="s" color="subdued">
@@ -330,11 +333,11 @@ export function NoteTable(props: NoteTableProps) {
               </EuiFlexItem>
             </EuiFlexGroup>
             <EuiHorizontalRule margin='m' />
-            {props.notebooks.length > 0 ? (
+            {notebooks.length > 0 ? (
               <EuiInMemoryTable
                 items={searchQuery ?
-                  props.notebooks.filter((notebook) => notebook.path.toLowerCase().includes(searchQuery.toLowerCase())) :
-                  props.notebooks}
+                  notebooks.filter((notebook) => notebook.path.toLowerCase().includes(searchQuery.toLowerCase())) :
+                  notebooks}
                 itemId='id'
                 columns={tableColumns}
                 tableLayout='auto'

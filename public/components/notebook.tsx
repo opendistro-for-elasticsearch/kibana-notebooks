@@ -53,8 +53,7 @@ import { PanelWrapper } from './helpers/panel_wrapper';
  * http object: for making API requests
  */
 type NotebookProps = {
-  openedNotebook: NotebookType;
-  setOpenedNotebook: (notebook: NotebookType) => void;
+  openedNoteId: string;
   DashboardContainerByValueRenderer: DashboardStart['DashboardContainerByValueRenderer'];
   http: CoreStart['http'];
   setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
@@ -62,6 +61,9 @@ type NotebookProps = {
 
 type NotebookState = {
   selectedViewId: string;
+  path: string;
+  dateCreated: string;
+  dateModified: string;
   paragraphs: any; // notebook paragraphs fetched from API
   parsedPara: Array<ParaType>; // paragraphs parsed to a common format
   toggleOutput: boolean; // Hide Outputs toggle
@@ -73,6 +75,9 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     super(props);
     this.state = {
       selectedViewId: 'view_both',
+      path: '',
+      dateCreated: '',
+      dateModified: '',
       paragraphs: [],
       parsedPara: [],
       toggleOutput: true,
@@ -162,7 +167,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   deleteParagraphButton = (para: ParaType, index: number) => {
     if (index !== -1) {
       this.props.http
-        .delete(`${API_PREFIX}/paragraph/` + this.props.openedNotebook.id + '/' + para.uniqueId)
+        .delete(`${API_PREFIX}/paragraph/` + this.props.openedNoteId + '/' + para.uniqueId)
         .then((res) => {
           this.setState({ paragraphs: res.paragraphs });
           this.parseParagraphs();
@@ -174,7 +179,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   // Function for delete Visualization from notebook
   deleteVizualization = (uniqueId: string) => {
     this.props.http
-      .delete(`${API_PREFIX}/paragraph/` + this.props.openedNotebook.id + '/' + uniqueId)
+      .delete(`${API_PREFIX}/paragraph/` + this.props.openedNoteId + '/' + uniqueId)
       .then((res) => {
         this.setState({ paragraphs: res.paragraphs });
         this.parseParagraphs();
@@ -187,7 +192,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     let paragraphs = this.state.paragraphs;
 
     const addParaObj = {
-      noteId: this.props.openedNotebook.id,
+      noteId: this.props.openedNoteId,
       paragraphIndex: index,
       paragraphInput: newParaContent,
       inputType: inpType,
@@ -220,7 +225,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   clearParagraphButton = () => {
     this.showParagraphRunning('loading');
     const clearParaObj = {
-      noteId: this.props.openedNotebook.id,
+      noteId: this.props.openedNoteId,
     };
     this.props.http
       .put(`${API_PREFIX}/paragraph/clearall/`, {
@@ -239,7 +244,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     let paragraphs = this.state.paragraphs;
 
     const paraUpdateObject = {
-      noteId: this.props.openedNotebook.id,
+      noteId: this.props.openedNoteId,
       paragraphId: para.uniqueId,
       paragraphInput: para.inp,
     };
@@ -267,7 +272,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     let paragraphs = this.state.paragraphs;
 
     const paraUpdateObject = {
-      noteId: this.props.openedNotebook.id,
+      noteId: this.props.openedNoteId,
       paragraphId: para.uniqueId,
       paragraphInput: para.inp,
     };
@@ -335,11 +340,14 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.setState({ parsedPara });
   }
 
-  loadParas = () => {
+  loadNotebook = () => {
     this.showParagraphRunning('queue');
     this.props.http
-      .get(`${API_PREFIX}/note/` + this.props.openedNotebook.id)
-      .then((res) => this.setState(res, this.parseParagraphs))
+      .get(`${API_PREFIX}/note/` + this.props.openedNoteId)
+      .then((res) => {
+        this.setBreadcrumbs(res.path);
+        this.setState(res, this.parseParagraphs);
+      })
       .catch((err) => console.error('Fetching notebook issue: ', err.body.message));
     this.setState({ toggleInput: true });
     this.setState({ toggleOutput: true });
@@ -347,27 +355,26 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
 
   // Loads a notebook based on the Notebook Id
   componentDidUpdate(prevProps: NotebookProps, _prevState: NotebookState) {
-    if (this.props.openedNotebook.id !== prevProps.openedNotebook.id) {
-      this.loadParas();
-    }
     if (this.state.selectedViewId !== _prevState.selectedViewId) {
       this.updateView();
     }
   }
-
-  componentDidMount() {
-    this.loadParas();
+  
+  setBreadcrumbs(path: string) {
     this.props.setBreadcrumbs([
       {
         text: 'Notebooks',
         href: '#',
-        onClick: () => this.props.setOpenedNotebook(undefined),
       },
       {
-        text: this.props.openedNotebook.path,
-        href: '#',
+        text: path,
+        href: `#${this.props.openedNoteId}`,
       },
     ]);
+  }
+
+  componentDidMount() {
+    this.loadNotebook();
   }
 
   render() {
@@ -392,17 +399,12 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           <EuiPageHeader>
             <EuiPageHeaderSection>
               <EuiTitle size="l">
-                <h1>{this.props.openedNotebook.path}</h1>
+                <h1>{this.state.path}</h1>
               </EuiTitle>
               <EuiSpacer size='m' />
               <EuiFlexGroup gutterSize='xl'>
                 <EuiFlexItem>
-                  <EuiText color="subdued">Created</EuiText>
-                  <EuiText>{moment(this.props.openedNotebook.dateCreated).format(DATE_FORMAT)}</EuiText>
-                </EuiFlexItem>
-                <EuiFlexItem>
-                  <EuiText color="subdued">Last updated</EuiText>
-                  <EuiText>{moment(this.props.openedNotebook.dateModified).format(DATE_FORMAT)}</EuiText>
+                  <EuiText color="subdued">Created: {moment(this.state.dateCreated).format(DATE_FORMAT)}</EuiText>
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiPageHeaderSection>

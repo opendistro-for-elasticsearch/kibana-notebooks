@@ -55,13 +55,10 @@ export function NoteRouter(router: IRouter) {
       },
     },
     async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
-      let notebookinfo = [];
       try {
-        notebookinfo = await BACKEND.fetchNote(context, request.params.noteId, wreckOptions);
+        const notebookinfo = await BACKEND.fetchNote(context, request.params.noteId, wreckOptions);
         return response.ok({
-          body: {
-            paragraphs: notebookinfo,
-          },
+          body: notebookinfo,
         });
       } catch (error) {
         return response.custom({

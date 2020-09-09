@@ -42,12 +42,15 @@ export const KibanaNotebooksApp = ({
 }: KibanaNotebooksAppDeps) => {
   // Render the application DOM.
   return (
-    <Router basename={basename}>
-      <I18nProvider>
-        <>
-          <Main DashboardContainerByValueRenderer={DashboardContainerByValueRenderer} http={http} setBreadcrumbs={chrome.setBreadcrumbs} />
-        </>
-      </I18nProvider>
-    </Router>
+    <I18nProvider>
+      <>
+        <Main
+          basename={basename}
+          DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
+          http={http}
+          setBreadcrumbs={chrome.setBreadcrumbs}
+        />
+      </>
+    </I18nProvider>
   );
 };
