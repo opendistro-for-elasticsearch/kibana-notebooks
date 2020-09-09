@@ -424,17 +424,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
               </EuiFlexGroup>
             </EuiPageHeaderSection>
           </EuiPageHeader>
-          {/* <ParaButtons
-            toggleInput={this.state.toggleInput}
-            toggleOutput={this.state.toggleOutput}
-            hideInputs={this.hideInputs}
-            hideOutputs={this.hideOutputs}
-            deletePara={this.deleteParagraphButton}
-            runPara={this.runParagraphButton}
-            clonePara={this.cloneParaButton}
-            clearPara={this.clearParagraphButton}
-            savePara={this.saveParagraphButton}
-          /> */}
           <Cells>
             <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
               {this.state.parsedPara.map((para: ParaType, index: number) => (
