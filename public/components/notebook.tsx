@@ -433,7 +433,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                   <Paragraphs
                     key={'para_' + index.toString()}
                     para={para}
-                    dateModified={this.state.paragraphs[index].dateModified}
+                    dateModified={this.state.paragraphs[index]?.dateModified}
                     index={index}
                     paragraphSelector={this.paragraphSelector}
                     paragraphHover={this.paragraphHover}
