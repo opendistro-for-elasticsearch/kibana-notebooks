@@ -185,17 +185,14 @@ export function NoteTable(props: NoteTableProps) {
 
   const popoverItems = [
     // show `Import from JSON` only if no notebooks are selected
-    ...(selectedNotebooks.length === 0 ? [<EuiContextMenuItem
+    selectedNotebooks.length === 0 ? <EuiContextMenuItem
       key="import_from_json"
       onClick={() => {
         setIsActionPopoverOpen(false);
         importNote();
       }}>
       <EuiText className="eui-color-primary">Import from JSON</EuiText>
-    </EuiContextMenuItem>,
-    <EuiContextMenuItem key="divider" disabled={true} >
-      <EuiHorizontalRule margin='none' />
-    </EuiContextMenuItem>] : [null]),
+    </EuiContextMenuItem> : null,
     <EuiContextMenuItem
       key="rename"
       disabled={selectedNotebooks.length !== 1}
