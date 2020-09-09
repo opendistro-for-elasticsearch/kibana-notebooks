@@ -401,22 +401,26 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                   onMouseEnter={() => paragraphHover(para)}
                   onMouseLeave={() => paragraphHoverReset()}
                 >
-                  {showInput && <ParaInput
-                    para={para}
-                    index={index}
-                    textValueEditor={textValueEditor}
-                    handleKeyPress={handleKeyPress}
-                  />}
-                  <EuiSpacer size='s' />
-                  <EuiFlexGroup alignItems='center'>
-                    <EuiFlexItem grow={false} />
-                    <EuiFlexItem grow={false}>
-                      <EuiButton size='s' onClick={() => props.runPara(para, index)}>Run</EuiButton>
-                    </EuiFlexItem>
-                    <EuiFlexItem>
-                      <EuiText color='subdued'>{`Last saved: ${moment(props.dateModified).format(DATE_FORMAT)}`}</EuiText>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
+                  {showInput &&
+                    <>
+                      <ParaInput
+                        para={para}
+                        index={index}
+                        textValueEditor={textValueEditor}
+                        handleKeyPress={handleKeyPress}
+                      />
+                      <EuiSpacer size='s' />
+                      <EuiFlexGroup alignItems='center'>
+                        <EuiFlexItem grow={false} />
+                        <EuiFlexItem grow={false}>
+                          <EuiButton size='s' onClick={() => props.runPara(para, index)}>Run</EuiButton>
+                        </EuiFlexItem>
+                        <EuiFlexItem>
+                          <EuiText color='subdued'>{`Last saved: ${moment(props.dateModified).format(DATE_FORMAT)}`}</EuiText>
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                    </>
+                  }
                   <EuiHorizontalRule margin='s' />
                   <ParaOutput para={para} />
                 </Cell>
