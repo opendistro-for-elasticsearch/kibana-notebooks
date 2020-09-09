@@ -28,6 +28,8 @@ import {
   EuiText,
   EuiPanel,
   EuiIcon,
+  EuiPopover,
+  EuiContextMenu,
 } from '@elastic/eui';
 import { Cells } from '@nteract/presentational-components';
 
@@ -69,6 +71,8 @@ type NotebookState = {
   toggleOutput: boolean; // Hide Outputs toggle
   toggleInput: boolean; // Hide Inputs toggle
   vizPrefix: string; // prefix for visualizations in Zeppelin Adaptor
+  isAddParaPopoverOpen: boolean;
+  isActionsPopoverOpen: boolean;
 };
 export class Notebook extends Component<NotebookProps, NotebookState> {
   constructor(props: Readonly<NotebookProps>) {
@@ -83,6 +87,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       toggleOutput: true,
       toggleInput: true,
       vizPrefix: '',
+      isAddParaPopoverOpen: false,
+      isActionsPopoverOpen: false,
     };
   }
 
@@ -359,7 +365,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       this.updateView();
     }
   }
-  
+
   setBreadcrumbs(path: string) {
     this.props.setBreadcrumbs([
       {
@@ -392,6 +398,49 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         label: 'Output only',
       },
     ];
+    const addParaPanels = [
+      {
+        id: 0,
+        title: 'Input type',
+        items: [
+          {
+            name: 'Markdown',
+            onClick: () => {
+              this.setState({ isAddParaPopoverOpen: false });
+              this.addPara(this.state.paragraphs.length, '', 'CODE');
+            },
+          },
+          {
+            name: 'Kibana visualization',
+            onClick: () => {
+              this.setState({ isAddParaPopoverOpen: false });
+              // TODO add vis here
+            },
+          },
+        ],
+      },
+    ];
+    const actionsPanels = [
+      {
+        id: 0,
+        title: 'Actions',
+        items: [
+          {
+            name: 'Clear all output',
+            onClick: () => {
+              this.setState({ isActionsPopoverOpen: false });
+              this.clearParagraphButton();
+            },
+          },
+          {
+            name: 'Kibana visualization',
+            onClick: () => {
+              this.setState({ isActionsPopoverOpen: false });
+            },
+          },
+        ],
+      },
+    ];
 
     return (
       <EuiPage>
@@ -420,7 +469,20 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                 </EuiFlexItem>
                 <EuiFlexItem />
                 <EuiFlexItem>
-                  <EuiButton>Actions</EuiButton>
+                  <EuiPopover
+                    panelPaddingSize="none"
+                    withTitle
+                    button={
+                      <EuiButton
+                        iconType='arrowDown'
+                        iconSide='right'
+                        onClick={() => this.setState({ isActionsPopoverOpen: true })}
+                      >Actions</EuiButton>
+                    }
+                    isOpen={this.state.isActionsPopoverOpen}
+                    closePopover={() => this.setState({ isActionsPopoverOpen: false })}>
+                    <EuiContextMenu initialPanelId={0} panels={actionsPanels} />
+                  </EuiPopover>
                 </EuiFlexItem>
                 <EuiFlexItem>
                   <EuiButton onClick={() => this.runAllPara()}>Run all paragraphs</EuiButton>
@@ -429,33 +491,49 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             </EuiPageHeaderSection>
           </EuiPageHeader>
           {this.state.parsedPara.length > 0 ? (
-            <Cells>
-              <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
-                {this.state.parsedPara.map((para: ParaType, index: number) => (
-                  <Paragraphs
-                    key={'para_' + index.toString()}
-                    para={para}
-                    dateModified={this.state.paragraphs[index]?.dateModified}
-                    index={index}
-                    paragraphSelector={this.paragraphSelector}
-                    paragraphHover={this.paragraphHover}
-                    paragraphHoverReset={this.paragraphHoverReset}
-                    textValueEditor={this.textValueEditor}
-                    handleKeyPress={this.handleKeyPress}
-                    addPara={this.addPara}
-                    DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
-                    deleteVizualization={this.deleteVizualization}
-                    vizualizationEditor={this.vizualizationEditor}
-                    http={this.props.http}
-                    showOutputOnly={this.state.selectedViewId === 'output_only'}
-                    deletePara={this.deleteParagraphButton}
-                    runPara={this.updateRunParagraph}
-                    clonePara={this.cloneParaButton}
-                    savePara={this.savePara}
-                  />
-                ))}
-              </PanelWrapper>
-            </Cells>
+            <>
+              <Cells>
+                <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
+                  {this.state.parsedPara.map((para: ParaType, index: number) => (
+                    <Paragraphs
+                      key={'para_' + index.toString()}
+                      para={para}
+                      dateModified={this.state.paragraphs[index]?.dateModified}
+                      index={index}
+                      paragraphSelector={this.paragraphSelector}
+                      paragraphHover={this.paragraphHover}
+                      paragraphHoverReset={this.paragraphHoverReset}
+                      textValueEditor={this.textValueEditor}
+                      handleKeyPress={this.handleKeyPress}
+                      addPara={this.addPara}
+                      DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
+                      deleteVizualization={this.deleteVizualization}
+                      vizualizationEditor={this.vizualizationEditor}
+                      http={this.props.http}
+                      showOutputOnly={this.state.selectedViewId === 'output_only'}
+                      deletePara={this.deleteParagraphButton}
+                      runPara={this.updateRunParagraph}
+                      clonePara={this.cloneParaButton}
+                      savePara={this.savePara}
+                    />
+                  ))}
+                </PanelWrapper>
+              </Cells>
+              <EuiPopover
+                panelPaddingSize="none"
+                withTitle
+                button={
+                  <EuiButton
+                    iconType='arrowDown'
+                    iconSide='right'
+                    onClick={() => this.setState({ isAddParaPopoverOpen: true })}
+                  >Add paragraph</EuiButton>
+                }
+                isOpen={this.state.isAddParaPopoverOpen}
+                closePopover={() => this.setState({ isAddParaPopoverOpen: false })}>
+                <EuiContextMenu initialPanelId={0} panels={addParaPanels} />
+              </EuiPopover>
+            </>
           ) : (
               <EuiPanel>
                 <EuiSpacer size='xxl' />
