@@ -180,7 +180,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   // Function for delete a Notebook button
   deleteParagraphButton = (para: ParaType, index: number) => {
     if (index !== -1) {
-      this.props.http
+      return this.props.http
         .delete(`${API_PREFIX}/paragraph/` + this.props.openedNoteId + '/' + para.uniqueId)
         .then((res) => {
           this.setState({ paragraphs: res.paragraphs });
@@ -209,7 +209,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       modalLayout: getDeleteModal(
         () => this.setState({ isModalVisible: false }),
         () => {
-          this.state.parsedPara.forEach((para: ParaType, index: number) => this.deleteParagraphButton(para, index))
+          this.reduceAllParas(this.deleteParagraphButton)
           this.setState({ isModalVisible: false });
         },
         'Delete all paragraphs',
@@ -217,7 +217,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     });
     this.setState({ isModalVisible: true });
   };
-  
+
   showClearOutputsModal = () => {
     this.setState({
       modalLayout: getDeleteModal(
@@ -307,7 +307,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       paragraphInput: para.inp,
     };
 
-    this.props.http
+    return this.props.http
       .post(`${API_PREFIX}/paragraph/update/run/`, {
         body: JSON.stringify(paraUpdateObject),
       })
@@ -319,10 +319,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .catch((err) => console.error('run paragraph issue: ', err.body.message));
   };
 
-  // Function to run all paragraphs
-  runAllPara = () => {
-    this.state.parsedPara.forEach((para: ParaType, index: number) => this.updateRunParagraph(para, index));
-  };
+  reduceAllParas = (callback: any) => {
+    this.state.parsedPara.map((para: ParaType, index: number) => () => callback(para, index))
+      .reduce((chain, func) => chain.then(func), Promise.resolve());
+  }
 
   // Backend call to save contents of paragraph
   savePara = (para: ParaType, index: number) => {
@@ -587,7 +587,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                     </EuiPopover>
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiButton onClick={() => this.runAllPara()}>Run all paragraphs</EuiButton>
+                    <EuiButton onClick={() => this.reduceAllParas(this.updateRunParagraph)}>Run all paragraphs</EuiButton>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiPageHeaderSection>
