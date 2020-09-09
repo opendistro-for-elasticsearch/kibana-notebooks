@@ -75,6 +75,7 @@ type NotebookState = {
   isActionsPopoverOpen: boolean;
 };
 export class Notebook extends Component<NotebookProps, NotebookState> {
+  child: React.RefObject<any>;
   constructor(props: Readonly<NotebookProps>) {
     super(props);
     this.state = {
@@ -90,6 +91,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       isAddParaPopoverOpen: false,
       isActionsPopoverOpen: false,
     };
+    this.child = React.createRef();
   }
 
   // parse paragraphs based on backend
@@ -414,7 +416,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             name: 'Kibana visualization',
             onClick: () => {
               this.setState({ isAddParaPopoverOpen: false });
-              // TODO add vis here
+              this.child.current.showAddVisualizationModal(this.state.paragraphs.length);
             },
           },
         ],
@@ -426,6 +428,14 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         title: 'Actions',
         items: [
           {
+            name: 'Add paragraph to top',
+            panel: 1,
+          },
+          {
+            name: 'Add paragraph to bottom',
+            panel: 2,
+          },
+          {
             name: 'Clear all output',
             onClick: () => {
               this.setState({ isActionsPopoverOpen: false });
@@ -433,13 +443,53 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             },
           },
           {
-            name: 'Kibana visualization',
+            name: 'Delete all paragraphs',
             onClick: () => {
               this.setState({ isActionsPopoverOpen: false });
             },
           },
         ],
       },
+      {
+        id: 1,
+        title: 'Add paragraph to top',
+        items: [
+          {
+            name: 'Markdown',
+            onClick: () => {
+              this.setState({ isActionsPopoverOpen: false });
+              this.addPara(-1, '', 'CODE');
+            },
+          },
+          {
+            name: 'Kibana visualization',
+            onClick: () => {
+              this.setState({ isActionsPopoverOpen: false });
+              this.child.current.showAddVisualizationModal(-1);
+            },
+          }
+        ],
+      },
+{
+        id: 2,
+        title: 'Add paragraph to bottom',
+        items: [
+          {
+            name: 'Markdown',
+            onClick: () => {
+              this.setState({ isActionsPopoverOpen: false });
+              this.addPara(this.state.paragraphs.length, '', 'CODE');
+            },
+          },
+          {
+            name: 'Kibana visualization',
+            onClick: () => {
+              this.setState({ isActionsPopoverOpen: false });
+              this.child.current.showAddVisualizationModal(this.state.paragraphs.length);
+            },
+          }
+        ],
+      }
     ];
 
     return (
@@ -496,6 +546,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                 <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
                   {this.state.parsedPara.map((para: ParaType, index: number) => (
                     <Paragraphs
+                      ref={index === 0 && this.child}
                       key={'para_' + index.toString()}
                       para={para}
                       dateModified={this.state.paragraphs[index]?.dateModified}
@@ -561,7 +612,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                       <h3>Kibana visualization</h3>
                       <p>Import Kibana visualizations to the notes</p>
                     </EuiText>
-                    {/* TODO: add vis para */}
+                    {/* TODO: add vis para, won't work if no ref */}
                     <EuiButton onClick={() => { }}>
                       Add Kibana visualization paragraph
                     </EuiButton>

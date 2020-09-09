@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, forwardRef, useRef, useImperativeHandle } from 'react';
 import moment from 'moment';
 import { Cell } from '@nteract/presentational-components';
 import {
@@ -98,7 +98,7 @@ type ParagraphProps = {
   clonePara: (para: ParaType, index: number) => void;
   savePara: (para: ParaType, index: number) => void;
 };
-export const Paragraphs = (props: ParagraphProps) => {
+export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   const [isModalVisible, setIsModalVisible] = useState(false); // Boolean for showing visualization modal
   const [options, setOptions] = useState([]); // options for loading saved visualizations
   const [currentPara, setCurrentPara] = useState(0); // set current paragraph
@@ -119,6 +119,12 @@ export const Paragraphs = (props: ParagraphProps) => {
     vizualizationEditor,
     http,
   } = props;
+
+  useImperativeHandle(ref, () => ({
+    showAddVisualizationModal(index: number) {
+      showModal(index);
+    }
+  }));
 
   const createNewVizObject = (objectId: string) => {
     const vizUniqueId = htmlIdGenerator()();
@@ -444,4 +450,4 @@ export const Paragraphs = (props: ParagraphProps) => {
       {isModalVisible && modalLayout}
     </div>
   );
-};
+});
