@@ -63,7 +63,7 @@ type NoteTableProps = {
 export function NoteTable(props: NoteTableProps) {
   const [isModalVisible, setIsModalVisible] = useState(false); // Modal Toggle
   const [modalLayout, setModalLayout] = useState(<EuiOverlayMask></EuiOverlayMask>); // Modal Layout
-  const [isActionPopoverOpen, setIsActionPopoverOpen] = useState(false);
+  const [isActionsPopoverOpen, setIsActionsPopoverOpen] = useState(false);
   const [selectedNotebooks, setSelectedNotebooks] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const {
@@ -181,7 +181,7 @@ export function NoteTable(props: NoteTableProps) {
   };
 
   const popoverButton = (
-    <EuiButton iconType="arrowDown" iconSide="right" onClick={() => setIsActionPopoverOpen(!isActionPopoverOpen)}>
+    <EuiButton iconType="arrowDown" iconSide="right" onClick={() => setIsActionsPopoverOpen(!isActionsPopoverOpen)}>
       Actions
     </EuiButton>
   );
@@ -191,7 +191,7 @@ export function NoteTable(props: NoteTableProps) {
     selectedNotebooks.length === 0 ? <EuiContextMenuItem
       key="import_from_json"
       onClick={() => {
-        setIsActionPopoverOpen(false);
+        setIsActionsPopoverOpen(false);
         importNote();
       }}>
       <EuiText className="eui-color-primary">Import from JSON</EuiText>
@@ -200,7 +200,7 @@ export function NoteTable(props: NoteTableProps) {
       key="rename"
       disabled={selectedNotebooks.length !== 1}
       onClick={() => {
-        setIsActionPopoverOpen(false);
+        setIsActionsPopoverOpen(false);
         renameNote();
       }}>
       Rename
@@ -209,7 +209,7 @@ export function NoteTable(props: NoteTableProps) {
       key="duplicate"
       disabled={selectedNotebooks.length !== 1}
       onClick={() => {
-        setIsActionPopoverOpen(false);
+        setIsActionsPopoverOpen(false);
         cloneNote();
       }}>
       Duplicate
@@ -218,7 +218,7 @@ export function NoteTable(props: NoteTableProps) {
       key="export_json"
       disabled={selectedNotebooks.length !== 1}
       onClick={() => {
-        setIsActionPopoverOpen(false);
+        setIsActionsPopoverOpen(false);
         onExport();
       }}>
       Export JSON
@@ -227,7 +227,7 @@ export function NoteTable(props: NoteTableProps) {
       key="delete"
       disabled={selectedNotebooks.length === 0}
       onClick={() => {
-        setIsActionPopoverOpen(false);
+        setIsActionsPopoverOpen(false);
         deleteNote();
       }}>
       Delete
@@ -286,8 +286,8 @@ export function NoteTable(props: NoteTableProps) {
                     <EuiPopover
                       panelPaddingSize="none"
                       button={popoverButton}
-                      isOpen={isActionPopoverOpen}
-                      closePopover={() => setIsActionPopoverOpen(false)}>
+                      isOpen={isActionsPopoverOpen}
+                      closePopover={() => setIsActionsPopoverOpen(false)}>
                       <EuiContextMenuPanel items={popoverItems.filter((item) => item)} />
                     </EuiPopover>
                   </EuiFlexItem>
