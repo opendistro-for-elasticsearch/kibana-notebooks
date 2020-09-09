@@ -141,18 +141,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.setState({ parsedPara });
   };
 
-  // Sets boolean for "add new paragraph div" when hovered between paragraphs
-  addParagraphHover = (para: ParaType) => {
-    let parsedPara = this.state.parsedPara;
-    this.state.parsedPara.map((_: ParaType, index: number) => {
-      parsedPara[index].ishovered = false;
-      if (index == para.id - 1) {
-        para.showAddPara = !para.showAddPara;
-      }
-    });
-    this.setState({ parsedPara });
-  };
-
   // Resets all paragraphs state to hover:false
   paragraphHoverReset = () => {
     let parsedPara = this.state.parsedPara;
@@ -459,7 +447,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                   paragraphHoverReset={this.paragraphHoverReset}
                   textValueEditor={this.textValueEditor}
                   handleKeyPress={this.handleKeyPress}
-                  addParagraphHover={this.addParagraphHover}
                   addPara={this.addPara}
                   DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
                   deleteVizualization={this.deleteVizualization}

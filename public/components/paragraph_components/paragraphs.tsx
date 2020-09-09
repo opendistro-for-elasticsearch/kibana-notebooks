@@ -62,7 +62,6 @@ import { API_PREFIX, ParaType } from '../../../common';
  * paragraphHoverReset - function used to reset all hover-highlighted paras
  * textValueEditor - function for handling input in textarea
  * handleKeyPress - function for handling key press like "Shift-key+Enter" to run paragraph
- * addParagraphHover - function used to detect hover on "Add Para" Div
  * addPara - function to add a new para onclick - "Add Para" Div
  * DashboardContainerByValueRenderer - Dashboard container renderer for visualization
  * deleteVizualization - function to delete a para
@@ -85,7 +84,6 @@ type ParagraphProps = {
   paragraphHoverReset: () => void;
   textValueEditor: (evt: React.ChangeEvent<HTMLTextAreaElement>, index: number) => void;
   handleKeyPress: (evt: React.KeyboardEvent<Element>, para: ParaType, index: number) => void;
-  addParagraphHover: (para: ParaType) => void;
   addPara: (index: number, newParaContent: string, inputType: string) => void;
   DashboardContainerByValueRenderer: DashboardStart['DashboardContainerByValueRenderer'];
   deleteVizualization: (uniqueId: string) => void;
@@ -112,7 +110,6 @@ export const Paragraphs = (props: ParagraphProps) => {
     paragraphHoverReset,
     textValueEditor,
     handleKeyPress,
-    addParagraphHover,
     addPara,
     DashboardContainerByValueRenderer,
     deleteVizualization,
@@ -237,23 +234,6 @@ export const Paragraphs = (props: ParagraphProps) => {
         </EuiModalFooter>
       </EuiModal>
     </EuiOverlayMask>
-  );
-
-  const addNewDiv = (
-    <div>
-      <table className="hoveredDiv">
-        <tbody>
-          <tr>
-            <td className="addParagraphButton" onClick={() => addPara(para.id, '', 'CODE')}>
-              +Para
-            </td>
-            <td className="addVisualizationButton" onClick={() => showModal(para.id)}>
-              +Viz
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
   );
 
   const renderParaHeader = (type: string) => {
@@ -448,15 +428,6 @@ export const Paragraphs = (props: ParagraphProps) => {
           </EuiPanel>
         )}
 
-      {/* Div populated on hover for adding a new paragraph in notebook */}
-      {/* TODO remove */}
-      <div
-        className="hoverDiv"
-        onMouseEnter={() => addParagraphHover(para)}
-        onMouseLeave={() => addParagraphHover(para)}
-      >
-        {para.showAddPara && addNewDiv}
-      </div>
       {isModalVisible && modalLayout}
     </div>
   );
