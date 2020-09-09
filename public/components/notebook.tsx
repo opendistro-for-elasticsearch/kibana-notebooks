@@ -26,6 +26,8 @@ import {
   EuiFlexItem,
   EuiSpacer,
   EuiText,
+  EuiPanel,
+  EuiIcon,
 } from '@elastic/eui';
 import { Cells } from '@nteract/presentational-components';
 
@@ -424,33 +426,70 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
               </EuiFlexGroup>
             </EuiPageHeaderSection>
           </EuiPageHeader>
-          <Cells>
-            <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
-              {this.state.parsedPara.map((para: ParaType, index: number) => (
-                <Paragraphs
-                  key={'para_' + index.toString()}
-                  para={para}
-                  dateModified={this.state.paragraphs[index].dateModified}
-                  index={index}
-                  paragraphSelector={this.paragraphSelector}
-                  paragraphHover={this.paragraphHover}
-                  paragraphHoverReset={this.paragraphHoverReset}
-                  textValueEditor={this.textValueEditor}
-                  handleKeyPress={this.handleKeyPress}
-                  addPara={this.addPara}
-                  DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
-                  deleteVizualization={this.deleteVizualization}
-                  vizualizationEditor={this.vizualizationEditor}
-                  http={this.props.http}
-                  showOutputOnly={this.state.selectedViewId === 'output_only'}
-                  deletePara={this.deleteParagraphButton}
-                  runPara={this.updateRunParagraph}
-                  clonePara={this.cloneParaButton}
-                  savePara={this.savePara}
-                />
-              ))}
-            </PanelWrapper>
-          </Cells>
+          {this.state.parsedPara.length > 0 ? (
+            <Cells>
+              <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
+                {this.state.parsedPara.map((para: ParaType, index: number) => (
+                  <Paragraphs
+                    key={'para_' + index.toString()}
+                    para={para}
+                    dateModified={this.state.paragraphs[index].dateModified}
+                    index={index}
+                    paragraphSelector={this.paragraphSelector}
+                    paragraphHover={this.paragraphHover}
+                    paragraphHoverReset={this.paragraphHoverReset}
+                    textValueEditor={this.textValueEditor}
+                    handleKeyPress={this.handleKeyPress}
+                    addPara={this.addPara}
+                    DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
+                    deleteVizualization={this.deleteVizualization}
+                    vizualizationEditor={this.vizualizationEditor}
+                    http={this.props.http}
+                    showOutputOnly={this.state.selectedViewId === 'output_only'}
+                    deletePara={this.deleteParagraphButton}
+                    runPara={this.updateRunParagraph}
+                    clonePara={this.cloneParaButton}
+                    savePara={this.savePara}
+                  />
+                ))}
+              </PanelWrapper>
+            </Cells>
+          ) : (
+              <EuiPanel>
+                <EuiSpacer size='xxl' />
+                <EuiText textAlign='center'>
+                  <h2>No paragraph</h2>
+                  <EuiText>
+                    Add paragraph to compose your document or story. Notebook now supports two types of input:
+                  </EuiText>
+                </EuiText>
+                <EuiSpacer size='xl' />
+                <EuiFlexGroup justifyContent='spaceAround'>
+                  <EuiFlexItem grow={false}>
+                    <EuiText textAlign='center'>
+                      <EuiIcon size="xxl" type="editorCodeBlock" />
+                      <h3>Markdown</h3>
+                      <p>Create rich text with markup language.</p>
+                    </EuiText>
+                    <EuiButton onClick={() => this.addPara(-1, '', 'CODE')}>
+                      Add markdown paragraph
+                    </EuiButton>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiText textAlign='center'>
+                      <EuiIcon size="xxl" type="visArea" />
+                      <h3>Kibana visualization</h3>
+                      <p>Import Kibana visualizations to the notes</p>
+                    </EuiText>
+                    {/* TODO: add vis para */}
+                    <EuiButton onClick={() => { }}>
+                      Add Kibana visualization paragraph
+                    </EuiButton>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                <EuiSpacer size='xxl' />
+              </EuiPanel>
+            )}
         </EuiPageBody>
       </EuiPage>
     );
