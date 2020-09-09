@@ -335,7 +335,7 @@ export const Paragraphs = (props: ParagraphProps) => {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText color="subdued">
-              {`[${index}] ${type}`}
+              {`${type}`}
               {!isVisualization &&
                 <EuiButtonIcon
                   aria-label="Toggle show input"
