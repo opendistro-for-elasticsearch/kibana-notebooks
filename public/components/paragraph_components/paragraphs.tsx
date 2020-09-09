@@ -33,6 +33,9 @@ import {
   EuiHorizontalRule,
   EuiButtonIcon,
   EuiSpacer,
+  EuiPopover,
+  EuiLink,
+  EuiContextMenu,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui/lib/services';
 
@@ -65,6 +68,11 @@ import { API_PREFIX, ParaType } from '../../../common';
  * deleteVizualization - function to delete a para
  * http object - for making API requests
  * showOutputOnly - boolean used to only show output without input and panels
+ * deletePara - function to delete the selected para
+ * runPara - function to run the selected para
+ * clonePara - function to clone the selected para
+ * clearPara - function to clear output of all the paras
+ * savePara - function to save code of the selected para
  *
  * Cell component of nteract used as a container for paragraphs in notebook UI.
  * https://components.nteract.io/#cell
@@ -84,12 +92,17 @@ type ParagraphProps = {
   vizualizationEditor: (vizContent: string, index: number) => void;
   http: CoreStart['http'];
   showOutputOnly: boolean;
+  deletePara: (para: ParaType, index: number) => void;
+  runPara: (para: ParaType, index: number) => void;
+  clonePara: (para: ParaType, index: number) => void;
+  savePara: (para: ParaType, index: number) => void;
 };
 export const Paragraphs = (props: ParagraphProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false); // Boolean for showing visualization modal
   const [options, setOptions] = useState([]); // options for loading saved visualizations
   const [currentPara, setCurrentPara] = useState(0); // set current paragraph
   const [showInput, setShowInput] = useState(true);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const {
     para,
@@ -243,6 +256,131 @@ export const Paragraphs = (props: ParagraphProps) => {
     </div>
   );
 
+  const renderParaHeader = (type: string) => {
+    const isVisualization = type === 'Kibana visualization';
+    const panels = [
+      {
+        id: 0,
+        title: 'Paragraph actions',
+        items: [
+          {
+            name: 'Duplicate',
+            onClick: () => {
+              setIsPopoverOpen(false);
+              props.clonePara(para, index);
+            },
+          },
+          {
+            name: 'Save',
+            onClick: () => {
+              setIsPopoverOpen(false);
+              props.savePara(para, index);
+            },
+          },
+          {
+            name: 'Insert paragraph above',
+            panel: 1,
+          },
+          {
+            name: 'Insert paragraph below',
+            panel: 2,
+          },
+          {
+            name: 'Delete',
+            onClick: () => {
+              setIsPopoverOpen(false);
+              props.deletePara(para, index);
+            },
+          },
+        ]
+      },
+      {
+        id: 1,
+        title: 'Insert paragraph above',
+        items: [
+          {
+            name: 'Markdown',
+            onClick: () => {
+              setIsPopoverOpen(false);
+              props.addPara(para.id - 1, '', 'CODE');
+            },
+          },
+          {
+            name: 'Visualization',
+            onClick: () => {
+              setIsPopoverOpen(false);
+              showModal(para.id - 1);
+            },
+          },
+        ],
+      },
+      {
+        id: 2,
+        title: 'Insert paragraph below',
+        items: [
+          {
+            name: 'Markdown',
+            onClick: () => {
+              setIsPopoverOpen(false);
+              props.addPara(para.id, '', 'CODE');
+            },
+          },
+          {
+            name: 'Visualization',
+            onClick: () => {
+              setIsPopoverOpen(false);
+              showModal(para.id);
+            },
+          },
+        ],
+      },
+    ];
+    if (!isVisualization) {
+      panels[0].items.unshift(
+        {
+          name: 'Run input',
+          onClick: () => {
+            setIsPopoverOpen(false);
+            props.runPara(para, index);
+          },
+        },
+      )
+    }
+
+    return (
+      <>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiText color="subdued">
+              {`[${index}] ${type}`}
+              {!isVisualization &&
+                <EuiButtonIcon
+                  aria-label="Toggle show input"
+                  iconType={showInput ? "arrowUp" : "arrowDown"}
+                  onClick={() => setShowInput(!showInput)}
+                />}
+            </EuiText>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiPopover
+              panelPaddingSize="none"
+              withTitle
+              button={(<EuiButtonIcon
+                aria-label="Open paragraph menu"
+                iconType="boxesHorizontal"
+                onClick={() => setIsPopoverOpen(true)}
+              />)}
+              isOpen={isPopoverOpen}
+              closePopover={() => setIsPopoverOpen(false)}>
+              <EuiContextMenu initialPanelId={0} panels={panels} />
+            </EuiPopover>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiSpacer size='s' />
+      </>
+    );
+  }
+
   return (
     <div>
       {props.showOutputOnly ? (
@@ -262,29 +400,10 @@ export const Paragraphs = (props: ParagraphProps) => {
         </>
       ) : (
           <EuiPanel>
+             {renderParaHeader(para.isVizualisation ? 'Kibana visualization' : 'Markdown')}
             {/* Render if para contains code */}
             {!para.isVizualisation && (
               <>
-                <EuiFlexGroup>
-                  <EuiFlexItem>
-                    <EuiText color="subdued">
-                      {`[${index}] Markdown`}
-                      <EuiButtonIcon
-                        aria-label="Toggle show input"
-                        iconType={showInput ? "arrowUp" : "arrowDown"}
-                        onClick={() => setShowInput(!showInput)}
-                      />
-                    </EuiText>
-                  </EuiFlexItem>
-                  <EuiFlexItem grow={false}>
-                    <EuiButtonIcon
-                      aria-label="Open paragraph menu"
-                      iconType="boxesHorizontal"
-                      onClick={() => { }}
-                    />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-                <EuiSpacer size='s' />
                 <Cell
                   key={index}
                   _hovered={para.ishovered}
@@ -308,8 +427,6 @@ export const Paragraphs = (props: ParagraphProps) => {
             {/* Render if para contains visualization */}
             {para.isVizualisation && (
               <>
-                <EuiText color="subdued">{`[${index}] Kibana visualization`}</EuiText>
-                <EuiHorizontalRule margin='s' />
                 <Cell
                   key={index}
                   _hovered={para.ishovered}
@@ -332,6 +449,7 @@ export const Paragraphs = (props: ParagraphProps) => {
         )}
 
       {/* Div populated on hover for adding a new paragraph in notebook */}
+      {/* TODO remove */}
       <div
         className="hoverDiv"
         onMouseEnter={() => addParagraphHover(para)}

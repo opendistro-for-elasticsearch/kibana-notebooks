@@ -169,13 +169,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   };
 
   // Function for delete a Notebook button
-  deleteParagraphButton = () => {
-    const selectedParaObject = this.getSelectedParagraph();
-    const delPara = selectedParaObject.para;
-    const delparagraphIndex = selectedParaObject.paragraphIndex;
-    if (delparagraphIndex !== -1) {
+  deleteParagraphButton = (para: ParaType, index: number) => {
+    if (index !== -1) {
       this.props.http
-        .delete(`${API_PREFIX}/paragraph/` + this.props.openedNotebook.id + '/' + delPara.uniqueId)
+        .delete(`${API_PREFIX}/paragraph/` + this.props.openedNotebook.id + '/' + para.uniqueId)
         .then((res) => {
           this.setState({ paragraphs: res.paragraphs });
           this.parseParagraphs();
@@ -219,16 +216,13 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   };
 
   // Function to clone a paragraph
-  cloneParaButton = () => {
-    const selectedParaObject = this.getSelectedParagraph();
-    const clonePara = selectedParaObject.para;
-    const cloneparagraphIndex = selectedParaObject.paragraphIndex;
+  cloneParaButton = (para: ParaType, index: number) => {
     let inputType = 'CODE';
-    if (clonePara.isVizualisation === true) {
+    if (para.isVizualisation === true) {
       inputType = 'VISUALIZATION';
     }
-    if (cloneparagraphIndex !== -1) {
-      this.addPara(cloneparagraphIndex, clonePara.inp, inputType);
+    if (index !== -1) {
+      this.addPara(index, para.inp, inputType);
     }
   };
 
@@ -272,14 +266,9 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .catch((err) => console.error('run paragraph issue: ', err.body.message));
   };
 
-  // Function for run paragraph button
-  runParagraphButton = () => {
-    const selectedParaObject = this.getSelectedParagraph();
-    const runPara = selectedParaObject.para;
-    const runparagraphIndex = selectedParaObject.paragraphIndex;
-    if (runparagraphIndex !== -1) {
-      this.updateRunParagraph(runPara, runparagraphIndex);
-    }
+  // Function to run all paragraphs
+  runAllPara = () => {
+    this.state.parsedPara.forEach((para: ParaType, index: number) => this.updateRunParagraph(para, index));
   };
 
   // Backend call to save contents of paragraph
@@ -306,6 +295,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   };
 
   // Function for save paragraph button
+  // TODO remove
   saveParagraphButton = () => {
     const selectedParaObject = this.getSelectedParagraph();
     const savePara = selectedParaObject.para;
@@ -441,7 +431,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                   <EuiButton>Actions</EuiButton>
                 </EuiFlexItem>
                 <EuiFlexItem>
-                  <EuiButton>Run all paragraphs</EuiButton>
+                  <EuiButton onClick={() => this.runAllPara()}>Run all paragraphs</EuiButton>
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiPageHeaderSection>
@@ -476,6 +466,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                   vizualizationEditor={this.vizualizationEditor}
                   http={this.props.http}
                   showOutputOnly={this.state.selectedViewId === 'output_only'}
+                  deletePara={this.deleteParagraphButton}
+                  runPara={this.updateRunParagraph}
+                  clonePara={this.cloneParaButton}
+                  savePara={this.savePara}
                 />
               ))}
             </PanelWrapper>
