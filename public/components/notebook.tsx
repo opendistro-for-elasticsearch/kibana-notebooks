@@ -221,7 +221,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     });
     this.setState({ isModalVisible: true });
   };
-  
+
   showRenameModal = () => {
     this.setState({
       modalLayout: getCustomModal(
@@ -240,7 +240,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     });
     this.setState({ isModalVisible: true });
   }
-  
+
   showDeleteNotebookModal = () => {
     this.setState({
       modalLayout: getDeleteModal(
@@ -666,40 +666,28 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                 </EuiPopover>
               </>
             ) : (
-                <EuiPanel>
-                  <EuiSpacer size='xxl' />
-                  <EuiText textAlign='center'>
-                    <h2>No paragraph</h2>
-                    <EuiText>
-                      Add paragraph to compose your document or story. Notebook now supports two types of input:
-                  </EuiText>
-                  </EuiText>
-                  <EuiSpacer size='xl' />
-                  <EuiFlexGroup justifyContent='spaceAround'>
-                    <EuiFlexItem grow={false}>
-                      <EuiText textAlign='center'>
-                        <EuiIcon size="xxl" type="editorCodeBlock" />
-                        <h3>Markdown</h3>
-                        <p>Create rich text with markup language.</p>
-                      </EuiText>
-                      <EuiButton onClick={() => this.addPara(0, '', 'CODE')}>
-                        Add markdown paragraph
-                    </EuiButton>
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                      <EuiText textAlign='center'>
-                        <EuiIcon size="xxl" type="visArea" />
-                        <h3>Kibana visualization</h3>
-                        <p>Import Kibana visualizations to the notes</p>
-                      </EuiText>
-                      {/* TODO: add vis para, won't work if no ref */}
-                      <EuiButton onClick={() => { }}>
-                        Add Kibana visualization paragraph
-                    </EuiButton>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                  <EuiSpacer size='xxl' />
-                </EuiPanel>
+                // show default paragraph if no paragraphs in this notebook
+                <Paragraphs
+                  ref={this.child}
+                  para={undefined}
+                  dateModified={undefined}
+                  index={undefined}
+                  paragraphSelector={undefined}
+                  paragraphHover={undefined}
+                  paragraphHoverReset={undefined}
+                  textValueEditor={undefined}
+                  handleKeyPress={undefined}
+                  addPara={this.addPara}
+                  DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
+                  deleteVizualization={this.deleteVizualization}
+                  vizualizationEditor={this.vizualizationEditor}
+                  http={this.props.http}
+                  showOutputOnly={undefined}
+                  deletePara={undefined}
+                  runPara={undefined}
+                  clonePara={undefined}
+                  savePara={undefined}
+                />
               )}
           </EuiPageBody>
         </EuiPage>

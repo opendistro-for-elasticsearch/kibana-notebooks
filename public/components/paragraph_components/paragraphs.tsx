@@ -37,6 +37,7 @@ import {
   EuiContextMenu,
   EuiButton,
   EuiContextMenuPanelDescriptor,
+  EuiIcon,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui/lib/services';
 
@@ -188,6 +189,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     http
       .get(`${API_PREFIX}/visualizations`)
       .then((res) => {
+        console.log(res)
         const opt = res.savedVisualizations.map((vizObject) => ({
           label: vizObject.label,
           key: vizObject.key,
@@ -368,6 +370,48 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
         <EuiSpacer size='s' />
       </>
     );
+  };
+
+  // show default paragraph if no paragraphs in this notebook
+  if (props.para === undefined) {
+    return (
+      <>
+        <EuiPanel>
+          <EuiSpacer size='xxl' />
+          <EuiText textAlign='center'>
+            <h2>No paragraph</h2>
+            <EuiText>
+              Add paragraph to compose your document or story. Notebook now supports two types of input:
+          </EuiText>
+          </EuiText>
+          <EuiSpacer size='xl' />
+          <EuiFlexGroup justifyContent='spaceAround'>
+            <EuiFlexItem grow={false}>
+              <EuiText textAlign='center'>
+                <EuiIcon size="xxl" type="editorCodeBlock" />
+                <h3>Markdown</h3>
+                <p>Create rich text with markup language.</p>
+              </EuiText>
+              <EuiButton onClick={() => props.addPara(0, '', 'CODE')}>
+                Add markdown paragraph
+            </EuiButton>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiText textAlign='center'>
+                <EuiIcon size="xxl" type="visArea" />
+                <h3>Kibana visualization</h3>
+                <p>Import Kibana visualizations to the notes</p>
+              </EuiText>
+              <EuiButton onClick={() => showModal(0)}>
+                Add Kibana visualization paragraph
+            </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiSpacer size='xxl' />
+        </EuiPanel>
+        {isModalVisible && modalLayout}
+      </>
+    )
   }
 
   return (
