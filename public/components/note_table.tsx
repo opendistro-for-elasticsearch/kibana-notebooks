@@ -298,40 +298,12 @@ export function NoteTable(props: NoteTableProps) {
               </EuiPageContentHeaderSection>
             </EuiPageContentHeader>
             <EuiHorizontalRule margin='m' />
-            <EuiFlexGroup gutterSize='m'>
-              <EuiFlexItem grow={6}>
-                <EuiFieldSearch
-                  fullWidth
-                  placeholder="Search notebooks"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </EuiFlexItem>
-              <EuiFlexItem grow={2}>
-                <EuiSuperSelect
-                  options={[
-                    {
-                      value: 'last_updated',
-                      inputDisplay: 'Last updated',
-                    },
-                  ]}
-                  valueOfSelected={'last_updated'}
-                  onChange={() => { }}
-                />
-              </EuiFlexItem>
-              <EuiFlexItem grow={2}>
-                <EuiSuperSelect
-                  options={[
-                    {
-                      value: 'created',
-                      inputDisplay: 'Created',
-                    },
-                  ]}
-                  valueOfSelected={'created'}
-                  onChange={() => { }}
-                />
-              </EuiFlexItem>
-            </EuiFlexGroup>
+            <EuiFieldSearch
+              fullWidth
+              placeholder="Search notebooks"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
             <EuiHorizontalRule margin='m' />
             {notebooks.length > 0 ? (
               <EuiInMemoryTable
