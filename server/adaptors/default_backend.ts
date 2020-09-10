@@ -16,7 +16,7 @@
 import { v4 as uuid } from 'uuid';
 import { NotebookAdaptor } from './notebook_adaptor';
 import { RequestHandlerContext } from '../../../../src/core/server';
-import { optionsType } from '../../common';
+import { optionsType, FETCH_SIZE } from '../../common';
 import { RequestParams, errors } from '@elastic/elasticsearch';
 import {
   DefaultNotebooks,
@@ -127,14 +127,14 @@ export class DefaultBackend implements NotebookAdaptor {
     }
   };
 
-  // gets first 1000 notebooks available
+  // gets first `FETCH_SIZE` notebooks available
   viewNotes = async function (context: RequestHandlerContext, _wreckOptions: optionsType) {
     let esClientResponse;
     let data = [];
     try {
       const options: RequestParams.Search = {
         index: '.notebooks',
-        size: 1000,
+        size: FETCH_SIZE,
         _source: ['id', 'name', 'dateCreated', 'dateModified'],
         body: {
           query: {
