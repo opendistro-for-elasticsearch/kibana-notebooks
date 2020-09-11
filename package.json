@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@hapi/wreck": "^17.0.0",
-    "@nteract/outputs": "^3.0.9",
-    "@nteract/presentational-components": "^3.4.0"
+    "@nteract/outputs": "https://raw.githubusercontent.com/joshuali925/outputs/master/packages/outputs/nteract-outputs-v3.0.10.tgz",
+    "@nteract/presentational-components": "https://raw.githubusercontent.com/joshuali925/nteract/3.4.2/packages/presentational-components/nteract-presentational-components-v3.4.2.tgz"
   }
 }
