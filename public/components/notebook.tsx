@@ -341,7 +341,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .catch((err) => console.error('run paragraph issue: ', err.body.message));
   };
 
-  runForAllParagraphs = (reducer: any) => {
+  runForAllParagraphs = (reducer: (para: ParaType, index: number) => Promise<any>) => {
     this.state.parsedPara.map((para: ParaType, index: number) => () => reducer(para, index))
       .reduce((chain, func) => chain.then(func), Promise.resolve());
   }
@@ -678,9 +678,9 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                   textValueEditor={undefined}
                   handleKeyPress={undefined}
                   addPara={this.addPara}
-                  DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
-                  deleteVizualization={this.deleteVizualization}
-                  vizualizationEditor={this.vizualizationEditor}
+                  DashboardContainerByValueRenderer={undefined}
+                  deleteVizualization={undefined}
+                  vizualizationEditor={undefined}
                   http={this.props.http}
                   showOutputOnly={undefined}
                   deletePara={undefined}
