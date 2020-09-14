@@ -275,7 +275,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       inputType: inpType,
     };
 
-    this.props.http
+    return this.props.http
       .post(`${API_PREFIX}/paragraph/`, {
         body: JSON.stringify(addParaObj),
       })
@@ -294,8 +294,29 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       inputType = 'VISUALIZATION';
     }
     if (index !== -1) {
-      this.addPara(index, para.inp, inputType);
+      return this.addPara(index, para.inp, inputType);
     }
+  };
+
+  // Function to move a paragraph
+  movePara = (index: number, targetIndex: number) => {
+    const paragraphs = this.state.paragraphs;
+    paragraphs.splice(targetIndex, 0, paragraphs.splice(index, 1)[0]);
+
+    const moveParaObj = {
+      noteId: this.props.openedNoteId,
+      paragraphs,
+    };
+
+    return this.props.http
+      .post(`${API_PREFIX}/set_paragraphs/`, {
+        body: JSON.stringify(moveParaObj),
+      })
+      .then((res) => {
+        this.setState({ paragraphs });
+        this.parseParagraphs();
+      })
+      .catch((err) => console.error('Move paragraph issue: ', err.body.message));
   };
 
   // Function for clearing outputs button
@@ -628,6 +649,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                         para={para}
                         dateModified={this.state.paragraphs[index]?.dateModified}
                         index={index}
+                        paraCount={this.state.parsedPara.length}
                         paragraphSelector={this.paragraphSelector}
                         paragraphHover={this.paragraphHover}
                         paragraphHoverReset={this.paragraphHoverReset}
@@ -643,6 +665,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                         runPara={this.updateRunParagraph}
                         clonePara={this.cloneParaButton}
                         savePara={this.savePara}
+                        movePara={this.movePara}
                       />
                     ))}
                   </PanelWrapper>
@@ -669,6 +692,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                   para={undefined}
                   dateModified={undefined}
                   index={undefined}
+                  paraCount={undefined}
                   paragraphSelector={undefined}
                   paragraphHover={undefined}
                   paragraphHoverReset={undefined}
@@ -684,6 +708,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                   runPara={undefined}
                   clonePara={undefined}
                   savePara={undefined}
+                  movePara={undefined}
                 />
               )}
           </EuiPageBody>

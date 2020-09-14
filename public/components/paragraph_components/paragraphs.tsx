@@ -75,6 +75,7 @@ import { API_PREFIX, ParaType, DATE_FORMAT } from '../../../common';
  * clonePara - function to clone the selected para
  * clearPara - function to clear output of all the paras
  * savePara - function to save code of the selected para
+ * movePara - function to move a paragraph at an index to another index
  *
  * Cell component of nteract used as a container for paragraphs in notebook UI.
  * https://components.nteract.io/#cell
@@ -83,6 +84,7 @@ type ParagraphProps = {
   para: ParaType;
   dateModified: string;
   index: number;
+  paraCount: number;
   paragraphSelector: (index: number) => void;
   paragraphHover: (para: ParaType) => void;
   paragraphHoverReset: () => void;
@@ -98,6 +100,7 @@ type ParagraphProps = {
   runPara: (para: ParaType, index: number) => void;
   clonePara: (para: ParaType, index: number) => void;
   savePara: (para: ParaType, index: number) => void;
+  movePara: (index: number, targetIndex: number) => void;
 };
 export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   const [isModalVisible, setIsModalVisible] = useState(false); // Boolean for showing visualization modal
@@ -253,6 +256,38 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
         id: 0,
         title: 'Paragraph actions',
         items: [
+          {
+            name: 'Move up',
+            disabled: index === 0,
+            onClick: () => {
+              setIsPopoverOpen(false);
+              props.movePara(index, index - 1);
+            },
+          },
+          {
+            name: 'Move to top',
+            disabled: index === 0,
+            onClick: () => {
+              setIsPopoverOpen(false);
+              props.movePara(index, 0);
+            },
+          },
+          {
+            name: 'Move down',
+            disabled: index === props.paraCount - 1,
+            onClick: () => {
+              setIsPopoverOpen(false);
+              props.movePara(index, index + 1);
+            },
+          },
+          {
+            name: 'Move to bottom',
+            disabled: index === props.paraCount - 1,
+            onClick: () => {
+              setIsPopoverOpen(false);
+              props.movePara(index, props.paraCount - 1);
+            },
+          },
           {
             name: 'Duplicate',
             onClick: () => {
