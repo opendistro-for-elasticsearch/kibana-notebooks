@@ -189,7 +189,6 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     http
       .get(`${API_PREFIX}/visualizations`)
       .then((res) => {
-        console.log(res)
         const opt = res.savedVisualizations.map((vizObject) => ({
           label: vizObject.label,
           key: vizObject.key,
