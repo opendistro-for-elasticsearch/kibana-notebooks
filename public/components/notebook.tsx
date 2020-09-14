@@ -26,8 +26,6 @@ import {
   EuiFlexItem,
   EuiSpacer,
   EuiText,
-  EuiPanel,
-  EuiIcon,
   EuiPopover,
   EuiContextMenu,
   EuiOverlayMask,
@@ -44,10 +42,9 @@ import { SELECTED_BACKEND, DATE_FORMAT } from '../../common';
 import { API_PREFIX, ParaType } from '../../common';
 import { zeppelinParagraphParser } from './helpers/zeppelin_parser';
 import { defaultParagraphParser } from './helpers/default_parser';
-import { NotebookType } from './main';
 import moment from 'moment';
 import { PanelWrapper } from './helpers/panel_wrapper';
-import { getDeleteModal, getCustomModal, getCloneModal } from './helpers/modal_containers';
+import { getDeleteModal, getCustomModal } from './helpers/modal_containers';
 
 /*
  * "Notebook" component is used to display an open notebook

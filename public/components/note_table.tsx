@@ -33,14 +33,13 @@ import {
   EuiPageHeaderSection,
   EuiPopover,
   EuiSpacer,
-  EuiSuperSelect,
   EuiTableFieldDataColumnType,
   EuiText,
   EuiTitle
 } from '@elastic/eui';
 import _ from 'lodash';
 import moment from 'moment';
-import React, { useEffect, useRef, useState, ReactElement } from 'react';
+import React, { useEffect, useState, ReactElement } from 'react';
 import { ChromeBreadcrumb } from '../../../../src/core/public';
 import { DATE_FORMAT } from '../../common';
 import { CustomUploadModal } from './helpers/custom_modals/custom_upload_modal';
@@ -104,7 +103,7 @@ export function NoteTable(props: NoteTableProps) {
   };
 
   const onClone = async () => {
-    cloneNotebook(selectedNotebooks[0].path + '_copy', selectedNotebooks[0].id);
+    cloneNotebook(selectedNotebooks[0].path + ' (copy)', selectedNotebooks[0].id);
     closeModal();
   };
 
