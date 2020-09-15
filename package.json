@@ -4,7 +4,7 @@
   "description": "Kibana Notebooks ",
   "main": "index.ts",
   "kibana": {
-    "version": "7.9.0",
+    "version": "7.9.1",
     "templateVersion": "1.0.0"
   },
   "scripts": {
@@ -58,6 +58,10 @@
         }
       ]
     ]
+  },
+  "engines": {
+    "node": "10.22.0",
+    "yarn": "^1.21.1"
   }
 }
 
