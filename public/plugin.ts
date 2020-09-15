@@ -14,7 +14,7 @@
  */
 
 import { i18n } from '@kbn/i18n';
-import { AppMountParameters, CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
+import { AppMountParameters, CoreSetup, CoreStart, Plugin, DEFAULT_APP_CATEGORIES } from '../../../src/core/public';
 import {
   KibanaNotebooksPluginSetup,
   KibanaNotebooksPluginStart,
@@ -29,6 +29,8 @@ export class KibanaNotebooksPlugin
     core.application.register({
       id: 'kibanaNotebooks',
       title: PLUGIN_NAME,
+      category: DEFAULT_APP_CATEGORIES.kibana,
+      order: 8041,
       async mount(params: AppMountParameters) {
         // Load application bundle
         const { renderApp } = await import('./application');
