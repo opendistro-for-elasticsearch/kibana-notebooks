@@ -590,12 +590,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                 <EuiTitle size="l">
                   <h1>{this.state.path}</h1>
                 </EuiTitle>
-                <EuiSpacer size='m' />
-                <EuiFlexGroup gutterSize='xl'>
-                  <EuiFlexItem>
-                    <EuiText color="subdued">Created: {moment(this.state.dateCreated).format(DATE_FORMAT)}</EuiText>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
               </EuiPageHeaderSection>
               <EuiPageHeaderSection>
                 <EuiFlexGroup gutterSize='s'>
@@ -646,6 +640,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                 </EuiFlexGroup>
               </EuiPageHeaderSection>
             </EuiPageHeader>
+            <EuiText color="subdued">Created: {moment(this.state.dateCreated).format(DATE_FORMAT)}</EuiText>
             {this.state.parsedPara.length > 0 ? (
               <>
                 <Cells>
