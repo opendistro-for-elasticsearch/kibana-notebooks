@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import React, { Component } from 'react';
+import React, { Component, RefObject } from 'react';
 import {
   EuiTitle,
   EuiPage,
@@ -73,6 +73,7 @@ type NotebookState = {
   dateModified: string;
   paragraphs: any; // notebook paragraphs fetched from API
   parsedPara: Array<ParaType>; // paragraphs parsed to a common format
+  paraRefs: Array<RefObject<HTMLDivElement>>; // paragraph refs for auto scrolling after moved
   toggleOutput: boolean; // Hide Outputs toggle
   toggleInput: boolean; // Hide Inputs toggle
   vizPrefix: string; // prefix for visualizations in Zeppelin Adaptor
@@ -92,6 +93,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       dateModified: '',
       paragraphs: [],
       parsedPara: [],
+      paraRefs: [],
       toggleOutput: true,
       toggleInput: true,
       vizPrefix: '',
@@ -113,10 +115,11 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       } else {
         parsedPara = defaultParagraphParser(this.state.paragraphs);
       }
-      this.setState({ parsedPara });
+      const paraRefs = parsedPara.map(() => React.createRef());
+      this.setState({ parsedPara, paraRefs });
     } catch (error) {
       console.error('Parsing paragraph has some issue', error);
-      this.setState({ parsedPara: [] });
+      this.setState({ parsedPara: [], paraRefs: [] });
     }
   };
 
@@ -300,7 +303,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
 
   // Function to move a paragraph
   movePara = (index: number, targetIndex: number) => {
-    const paragraphs = this.state.paragraphs;
+    const paragraphs = [...this.state.paragraphs];
     paragraphs.splice(targetIndex, 0, paragraphs.splice(index, 1)[0]);
 
     const moveParaObj = {
@@ -312,10 +315,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .post(`${API_PREFIX}/set_paragraphs/`, {
         body: JSON.stringify(moveParaObj),
       })
-      .then((res) => {
-        this.setState({ paragraphs });
-        this.parseParagraphs();
-      })
+      .then((res) => this.setState({ paragraphs }, this.parseParagraphs))
+      .then((res) => setTimeout(() => window.scrollTo(0, this.state.paraRefs[targetIndex].current.offsetTop), 0))
       .catch((err) => console.error('Move paragraph issue: ', err.body.message));
   };
 
@@ -643,30 +644,32 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                 <Cells>
                   <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
                     {this.state.parsedPara.map((para: ParaType, index: number) => (
-                      <Paragraphs
-                        ref={index === 0 && this.child}
-                        key={'para_' + index.toString()}
-                        para={para}
-                        dateModified={this.state.paragraphs[index]?.dateModified}
-                        index={index}
-                        paraCount={this.state.parsedPara.length}
-                        paragraphSelector={this.paragraphSelector}
-                        paragraphHover={this.paragraphHover}
-                        paragraphHoverReset={this.paragraphHoverReset}
-                        textValueEditor={this.textValueEditor}
-                        handleKeyPress={this.handleKeyPress}
-                        addPara={this.addPara}
-                        DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
-                        deleteVizualization={this.deleteVizualization}
-                        vizualizationEditor={this.vizualizationEditor}
-                        http={this.props.http}
-                        showOutputOnly={this.state.selectedViewId === 'output_only'}
-                        deletePara={this.showDeleteParaModal}
-                        runPara={this.updateRunParagraph}
-                        clonePara={this.cloneParaButton}
-                        savePara={this.savePara}
-                        movePara={this.movePara}
-                      />
+                      <div ref={this.state.paraRefs[index]} key={`para_div_${index}`}>
+                        <Paragraphs
+                          ref={index === 0 && this.child}
+                          key={'para_' + index.toString()}
+                          para={para}
+                          dateModified={this.state.paragraphs[index]?.dateModified}
+                          index={index}
+                          paraCount={this.state.parsedPara.length}
+                          paragraphSelector={this.paragraphSelector}
+                          paragraphHover={this.paragraphHover}
+                          paragraphHoverReset={this.paragraphHoverReset}
+                          textValueEditor={this.textValueEditor}
+                          handleKeyPress={this.handleKeyPress}
+                          addPara={this.addPara}
+                          DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
+                          deleteVizualization={this.deleteVizualization}
+                          vizualizationEditor={this.vizualizationEditor}
+                          http={this.props.http}
+                          showOutputOnly={this.state.selectedViewId === 'output_only'}
+                          deletePara={this.showDeleteParaModal}
+                          runPara={this.updateRunParagraph}
+                          clonePara={this.cloneParaButton}
+                          savePara={this.savePara}
+                          movePara={this.movePara}
+                        />
+                      </div>
                     ))}
                   </PanelWrapper>
                 </Cells>
