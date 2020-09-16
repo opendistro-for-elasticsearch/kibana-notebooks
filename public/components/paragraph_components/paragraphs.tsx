@@ -493,9 +493,13 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                       </EuiFlexGroup>
                     </>
                   }
-                  <EuiHorizontalRule margin='s' />
-                  {props.selectedViewId !== 'input_only' &&
-                    <ParaOutput para={para} />
+                  {props.selectedViewId !== 'input_only' ?
+                    (
+                      <>
+                        <EuiHorizontalRule margin='s' />
+                        <ParaOutput para={para} />
+                      </>
+                    ) : <EuiSpacer size='s' />
                   }
                 </Cell>
               </>
