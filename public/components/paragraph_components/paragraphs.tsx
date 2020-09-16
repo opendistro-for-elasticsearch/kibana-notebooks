@@ -290,7 +290,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
             name: 'Duplicate',
             onClick: () => {
               setIsPopoverOpen(false);
-              props.clonePara(para, index);
+              props.clonePara(para, index + 1);
             },
           },
           {
