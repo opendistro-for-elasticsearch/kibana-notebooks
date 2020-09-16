@@ -368,7 +368,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText color="subdued">
-              {`${type}`}
+              {`${type} `}
               {!isVisualization &&
                 <EuiButtonIcon
                   aria-label="Toggle show input"
