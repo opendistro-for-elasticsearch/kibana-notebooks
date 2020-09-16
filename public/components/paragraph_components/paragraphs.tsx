@@ -485,7 +485,10 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                           <EuiButton size='s' onClick={() => props.runPara(para, index)}>Run</EuiButton>
                         </EuiFlexItem>
                         <EuiFlexItem>
-                          <EuiText color='subdued'>{`Last saved: ${moment(props.dateModified).format(DATE_FORMAT)}`}</EuiText>
+                          {para.out[0] !== '' &&
+                            <EuiText color='subdued'>
+                              {`Output available from ${moment(props.dateModified).format(DATE_FORMAT)}`}
+                            </EuiText>}
                         </EuiFlexItem>
                       </EuiFlexGroup>
                     </>
