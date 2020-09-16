@@ -639,7 +639,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           deleteVizualization={this.deleteVizualization}
                           vizualizationEditor={this.vizualizationEditor}
                           http={this.props.http}
-                          showOutputOnly={this.state.selectedViewId === 'output_only'}
+                          selectedViewId={this.state.selectedViewId}
                           deletePara={this.showDeleteParaModal}
                           runPara={this.updateRunParagraph}
                           clonePara={this.cloneParaButton}
@@ -649,20 +649,22 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                     ))}
                   </PanelWrapper>
                 </Cells>
-                <EuiPopover
-                  panelPaddingSize="none"
-                  withTitle
-                  button={
-                    <EuiButton
-                      iconType='arrowDown'
-                      iconSide='right'
-                      onClick={() => this.setState({ isAddParaPopoverOpen: true })}
-                    >Add paragraph</EuiButton>
-                  }
-                  isOpen={this.state.isAddParaPopoverOpen}
-                  closePopover={() => this.setState({ isAddParaPopoverOpen: false })}>
-                  <EuiContextMenu initialPanelId={0} panels={addParaPanels} />
-                </EuiPopover>
+                {this.state.selectedViewId !== 'output_only' &&
+                  <EuiPopover
+                    panelPaddingSize="none"
+                    withTitle
+                    button={
+                      <EuiButton
+                        iconType='arrowDown'
+                        iconSide='right'
+                        onClick={() => this.setState({ isAddParaPopoverOpen: true })}
+                      >Add paragraph</EuiButton>
+                    }
+                    isOpen={this.state.isAddParaPopoverOpen}
+                    closePopover={() => this.setState({ isAddParaPopoverOpen: false })}>
+                    <EuiContextMenu initialPanelId={0} panels={addParaPanels} />
+                  </EuiPopover>
+                }
               </>
             ) : (
                 // show default paragraph if no paragraphs in this notebook
@@ -682,7 +684,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                   deleteVizualization={undefined}
                   vizualizationEditor={undefined}
                   http={this.props.http}
-                  showOutputOnly={undefined}
+                  selectedViewId={undefined}
                   deletePara={undefined}
                   runPara={undefined}
                   clonePara={undefined}

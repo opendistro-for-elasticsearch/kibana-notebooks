@@ -69,7 +69,7 @@ import { API_PREFIX, ParaType, DATE_FORMAT } from '../../../common';
  * DashboardContainerByValueRenderer - Dashboard container renderer for visualization
  * deleteVizualization - function to delete a para
  * http object - for making API requests
- * showOutputOnly - boolean used to only show output without input and panels
+ * selectedViewId - selected view: view_both, input_only, output_only
  * deletePara - function to delete the selected para
  * runPara - function to run the selected para
  * clonePara - function to clone the selected para
@@ -94,7 +94,7 @@ type ParagraphProps = {
   deleteVizualization: (uniqueId: string) => void;
   vizualizationEditor: (vizContent: string, index: number) => void;
   http: CoreStart['http'];
-  showOutputOnly: boolean;
+  selectedViewId: string;
   deletePara: (para: ParaType, index: number) => void;
   runPara: (para: ParaType, index: number) => void;
   clonePara: (para: ParaType, index: number) => void;
@@ -441,7 +441,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
 
   return (
     <div>
-      {props.showOutputOnly ? (
+      {props.selectedViewId === 'output_only' ? (
         <>
           {!para.isVizualisation ? (
             <ParaOutput para={para} />
@@ -491,7 +491,9 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                     </>
                   }
                   <EuiHorizontalRule margin='s' />
-                  <ParaOutput para={para} />
+                  {props.selectedViewId !== 'input_only' &&
+                    <ParaOutput para={para} />
+                  }
                 </Cell>
               </>
             )}
