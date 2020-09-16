@@ -78,7 +78,8 @@ type NotebookState = {
   toggleInput: boolean; // Hide Inputs toggle
   vizPrefix: string; // prefix for visualizations in Zeppelin Adaptor
   isAddParaPopoverOpen: boolean;
-  isActionsPopoverOpen: boolean;
+  isParaActionsPopoverOpen: boolean;
+  isNoteActionsPopoverOpen: boolean;
   isModalVisible: boolean;
   modalLayout: React.ReactNode;
 };
@@ -98,7 +99,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       toggleInput: true,
       vizPrefix: '',
       isAddParaPopoverOpen: false,
-      isActionsPopoverOpen: false,
+      isParaActionsPopoverOpen: false,
+      isNoteActionsPopoverOpen: false,
       isModalVisible: false,
       modalLayout: <EuiOverlayMask></EuiOverlayMask>,
     };
@@ -472,10 +474,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         ],
       },
     ];
-    const actionsPanels: EuiContextMenuPanelDescriptor[] = [
+    const paraActionsPanels: EuiContextMenuPanelDescriptor[] = [
       {
         id: 0,
-        title: 'Actions',
+        title: 'Paragraph actions',
         items: [
           {
             name: 'Add paragraph to top',
@@ -486,38 +488,24 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             panel: 2,
           },
           {
+            name: 'Run all paragraphs',
+            onClick: () => {
+              this.setState({ isParaActionsPopoverOpen: false });
+              this.runForAllParagraphs(this.updateRunParagraph);
+            },
+          },
+          {
             name: 'Clear all outputs',
             onClick: () => {
-              this.setState({ isActionsPopoverOpen: false });
+              this.setState({ isParaActionsPopoverOpen: false });
               this.showClearOutputsModal();
             },
           },
           {
             name: 'Delete all paragraphs',
             onClick: () => {
-              this.setState({ isActionsPopoverOpen: false });
+              this.setState({ isParaActionsPopoverOpen: false });
               this.showDeleteAllParaModal();
-            },
-          },
-          {
-            name: 'Rename notebook',
-            onClick: () => {
-              this.setState({ isActionsPopoverOpen: false });
-              this.showRenameModal();
-            },
-          },
-          {
-            name: 'Export notebook',
-            onClick: () => {
-              this.setState({ isActionsPopoverOpen: false });
-              this.props.exportNotebook(this.state.path, this.props.openedNoteId);
-            },
-          },
-          {
-            name: 'Delete notebook',
-            onClick: () => {
-              this.setState({ isActionsPopoverOpen: false });
-              this.showDeleteNotebookModal();
             },
           },
         ],
@@ -529,14 +517,14 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           {
             name: 'Markdown',
             onClick: () => {
-              this.setState({ isActionsPopoverOpen: false });
+              this.setState({ isParaActionsPopoverOpen: false });
               this.addPara(0, '', 'CODE');
             },
           },
           {
             name: 'Kibana visualization',
             onClick: () => {
-              this.setState({ isActionsPopoverOpen: false });
+              this.setState({ isParaActionsPopoverOpen: false });
               this.child.current.showAddVisualizationModal(0);
             },
           }
@@ -549,19 +537,48 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           {
             name: 'Markdown',
             onClick: () => {
-              this.setState({ isActionsPopoverOpen: false });
+              this.setState({ isParaActionsPopoverOpen: false });
               this.addPara(this.state.paragraphs.length, '', 'CODE');
             },
           },
           {
             name: 'Kibana visualization',
             onClick: () => {
-              this.setState({ isActionsPopoverOpen: false });
+              this.setState({ isParaActionsPopoverOpen: false });
               this.child.current.showAddVisualizationModal(this.state.paragraphs.length);
             },
           }
         ],
       }
+    ];
+    const noteActionsPanels: EuiContextMenuPanelDescriptor[] = [
+      {
+        id: 0,
+        title: 'Notebook actions',
+        items: [
+          {
+            name: 'Rename notebook',
+            onClick: () => {
+              this.setState({ isNoteActionsPopoverOpen: false });
+              this.showRenameModal();
+            },
+          },
+          {
+            name: 'Export notebook',
+            onClick: () => {
+              this.setState({ isNoteActionsPopoverOpen: false });
+              this.props.exportNotebook(this.state.path, this.props.openedNoteId);
+            },
+          },
+          {
+            name: 'Delete notebook',
+            onClick: () => {
+              this.setState({ isNoteActionsPopoverOpen: false });
+              this.showDeleteNotebookModal();
+            },
+          },
+        ],
+      },
     ];
 
     return (
@@ -602,16 +619,29 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                         <EuiButton
                           iconType='arrowDown'
                           iconSide='right'
-                          onClick={() => this.setState({ isActionsPopoverOpen: true })}
-                        >Actions</EuiButton>
+                          onClick={() => this.setState({ isParaActionsPopoverOpen: true })}
+                        >Paragraph actions</EuiButton>
                       }
-                      isOpen={this.state.isActionsPopoverOpen}
-                      closePopover={() => this.setState({ isActionsPopoverOpen: false })}>
-                      <EuiContextMenu initialPanelId={0} panels={actionsPanels} />
+                      isOpen={this.state.isParaActionsPopoverOpen}
+                      closePopover={() => this.setState({ isParaActionsPopoverOpen: false })}>
+                      <EuiContextMenu initialPanelId={0} panels={paraActionsPanels} />
                     </EuiPopover>
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiButton onClick={() => this.runForAllParagraphs(this.updateRunParagraph)}>Run all paragraphs</EuiButton>
+                    <EuiPopover
+                      panelPaddingSize="none"
+                      withTitle
+                      button={
+                        <EuiButton
+                          iconType='arrowDown'
+                          iconSide='right'
+                          onClick={() => this.setState({ isNoteActionsPopoverOpen: true })}
+                        >Notebook actions</EuiButton>
+                      }
+                      isOpen={this.state.isNoteActionsPopoverOpen}
+                      closePopover={() => this.setState({ isNoteActionsPopoverOpen: false })}>
+                      <EuiContextMenu initialPanelId={0} panels={noteActionsPanels} />
+                    </EuiPopover>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiPageHeaderSection>
