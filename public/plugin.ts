@@ -30,7 +30,7 @@ export class KibanaNotebooksPlugin
       id: 'kibanaNotebooks',
       title: PLUGIN_NAME,
       category: DEFAULT_APP_CATEGORIES.kibana,
-      order: 8041,
+      order: 7995,
       async mount(params: AppMountParameters) {
         // Load application bundle
         const { renderApp } = await import('./application');
