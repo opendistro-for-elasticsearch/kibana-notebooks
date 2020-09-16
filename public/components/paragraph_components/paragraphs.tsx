@@ -74,7 +74,6 @@ import { API_PREFIX, ParaType, DATE_FORMAT } from '../../../common';
  * runPara - function to run the selected para
  * clonePara - function to clone the selected para
  * clearPara - function to clear output of all the paras
- * savePara - function to save code of the selected para
  * movePara - function to move a paragraph at an index to another index
  *
  * Cell component of nteract used as a container for paragraphs in notebook UI.
@@ -99,7 +98,6 @@ type ParagraphProps = {
   deletePara: (para: ParaType, index: number) => void;
   runPara: (para: ParaType, index: number) => void;
   clonePara: (para: ParaType, index: number) => void;
-  savePara: (para: ParaType, index: number) => void;
   movePara: (index: number, targetIndex: number) => void;
 };
 export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
@@ -293,13 +291,6 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
             onClick: () => {
               setIsPopoverOpen(false);
               props.clonePara(para, index);
-            },
-          },
-          {
-            name: 'Save',
-            onClick: () => {
-              setIsPopoverOpen(false);
-              props.savePara(para, index);
             },
           },
           {

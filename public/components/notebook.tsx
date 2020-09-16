@@ -365,29 +365,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .reduce((chain, func) => chain.then(func), Promise.resolve());
   }
 
-  // Backend call to save contents of paragraph
-  savePara = (para: ParaType, index: number) => {
-    this.showParagraphRunning(index);
-    let paragraphs = this.state.paragraphs;
-
-    const paraUpdateObject = {
-      noteId: this.props.openedNoteId,
-      paragraphId: para.uniqueId,
-      paragraphInput: para.inp,
-    };
-
-    this.props.http
-      .put(`${API_PREFIX}/paragraph/`, {
-        body: JSON.stringify(paraUpdateObject),
-      })
-      .then((res) => {
-        paragraphs[index] = res;
-        this.setState({ paragraphs });
-        this.parseParagraphs();
-      })
-      .catch((err) => console.error('save paragraph issue: ', err.body.message));
-  };
-
   // Hanldes Edits in visualization and syncs with paragraph input
   vizualizationEditor = (vizContent: string, index: number) => {
     let parsedPara = this.state.parsedPara;
@@ -666,7 +643,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           deletePara={this.showDeleteParaModal}
                           runPara={this.updateRunParagraph}
                           clonePara={this.cloneParaButton}
-                          savePara={this.savePara}
                           movePara={this.movePara}
                         />
                       </div>
@@ -710,7 +686,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                   deletePara={undefined}
                   runPara={undefined}
                   clonePara={undefined}
-                  savePara={undefined}
                   movePara={undefined}
                 />
               )}
