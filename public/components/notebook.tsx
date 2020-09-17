@@ -44,7 +44,7 @@ import { zeppelinParagraphParser } from './helpers/zeppelin_parser';
 import { defaultParagraphParser } from './helpers/default_parser';
 import moment from 'moment';
 import { PanelWrapper } from './helpers/panel_wrapper';
-import { getDeleteModal, getCustomModal } from './helpers/modal_containers';
+import { getDeleteModal, getCustomModal, DeleteNotebookModal } from './helpers/modal_containers';
 
 /*
  * "Notebook" component is used to display an open notebook
@@ -245,15 +245,18 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
 
   showDeleteNotebookModal = () => {
     this.setState({
-      modalLayout: getDeleteModal(
-        () => this.setState({ isModalVisible: false }),
-        () => {
+      modalLayout: (
+        <DeleteNotebookModal
+          onConfirm={() => {
           this.props.deleteNotebook(this.props.openedNoteId);
           this.setState({ isModalVisible: false });
           window.location.replace(`${this.props.basename}#`);
-        },
-        `Delete notebook "${this.state.path}"`,
-        'Are you sure you want to delete the notebook? The action cannot be undone.')
+        }}
+        onCancel={() => this.setState({ isModalVisible: false })}
+        title={`Delete notebook "${this.state.path}"`}
+        message="Delete notebook will remove all contents in the paragraphs."
+        />
+      )
     });
     this.setState({ isModalVisible: true });
   }

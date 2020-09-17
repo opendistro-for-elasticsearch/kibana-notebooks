@@ -43,7 +43,7 @@ import React, { useEffect, useState, ReactElement } from 'react';
 import { ChromeBreadcrumb } from '../../../../src/core/public';
 import { DATE_FORMAT } from '../../common';
 import { CustomUploadModal } from './helpers/custom_modals/custom_upload_modal';
-import { getCloneModal, getCustomModal, getDeleteModal } from './helpers/modal_containers';
+import { getCloneModal, getCustomModal, DeleteNotebookModal } from './helpers/modal_containers';
 import { NotebookType } from './main';
 
 type NoteTableProps = {
@@ -170,7 +170,14 @@ export function NoteTable(props: NoteTableProps) {
   };
 
   const deleteNote = () => {
-    setModalLayout(getDeleteModal(closeModal, onDelete));
+    setModalLayout(
+      <DeleteNotebookModal
+        onConfirm={onDelete}
+        onCancel={closeModal}
+        title={"Delete selected notebooks"}
+        message="Are you sure you want to delete the selected notebooks?"
+      />
+    );
     showModal();
   };
 
