@@ -40,7 +40,7 @@ export const ParaInput = (props: {
 
   return (
     <Input hidden={para.isInputHidden}>
-      <Prompt counter={para.id} running={para.isRunning} queued={para.inQueue} />
+      <Prompt blank={true} running={para.isRunning} queued={para.inQueue} />
       {/* If the para is selected show the editor else display the code in the paragraph */}
       <Source language={para.lang}>
         {para.isSelected ? (

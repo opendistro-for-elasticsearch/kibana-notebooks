@@ -247,7 +247,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     </EuiOverlayMask>
   );
 
-  const renderParaHeader = (type: string) => {
+  const renderParaHeader = (type: string, index: number) => {
     const isVisualization = type === 'Kibana visualization';
     const panels: EuiContextMenuPanelDescriptor[] = [
       {
@@ -368,7 +368,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText color="subdued">
-              {`${type} `}
+              {`[${index + 1}] ${type} `}
               {!isVisualization &&
                 <EuiButtonIcon
                   aria-label="Toggle show input"
@@ -458,7 +458,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
         </>
       ) : (
           <EuiPanel>
-            {renderParaHeader(para.isVizualisation ? 'Kibana visualization' : 'Markdown')}
+            {renderParaHeader(para.isVizualisation ? 'Kibana visualization' : 'Markdown', index)}
             {/* Render if para contains code */}
             {!para.isVizualisation && (
               <>
