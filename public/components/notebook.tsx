@@ -321,7 +321,11 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         body: JSON.stringify(moveParaObj),
       })
       .then((res) => this.setState({ paragraphs }, this.parseParagraphs))
-      .then((res) => setTimeout(() => window.scrollTo(0, this.state.paraRefs[targetIndex].current.offsetTop), 0))
+      .then((res) => setTimeout(() => window.scrollTo({
+        left: 0,
+        top: this.state.paraRefs[targetIndex].current.offsetTop,
+        behavior: 'smooth'
+      }), 0))
       .catch((err) => console.error('Move paragraph issue: ', err.body.message));
   };
 
