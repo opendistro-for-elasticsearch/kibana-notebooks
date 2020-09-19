@@ -49,14 +49,14 @@ import { NotebookType } from './main';
 type NoteTableProps = {
   fetchNotebooks: () => void;
   notebooks: Array<NotebookType>;
-  setOpenedNotebook: (notebook: NotebookType) => void;
   createNotebook: (newNoteName: string) => void;
   renameNotebook: (newNoteName: string, noteId: string) => void;
   cloneNotebook: (newNoteName: string, noteId: string) => void;
-  deleteNotebook: (noteId: string) => void;
+  deleteNotebook: (noteId: string, noteName?: string, showToast?: boolean) => void;
   exportNotebook: (noteName: string, noteId: string) => void;
   importNotebook: (fileObj: any) => void;
   setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
+  setToast: (title: string, color?: string, text?: string) => void;
 };
 
 export function NoteTable(props: NoteTableProps) {
@@ -108,7 +108,11 @@ export function NoteTable(props: NoteTableProps) {
   };
 
   const onDelete = async () => {
-    selectedNotebooks.forEach((notebook) => deleteNotebook(notebook.id));
+    const toastMessage = `Notebook${selectedNotebooks.length > 1 ?
+      's' : ' ' + selectedNotebooks[0].path} successfully deleted!`;
+    Promise.all(selectedNotebooks.map((notebook) => deleteNotebook(notebook.id, undefined, false)))
+      .then(() => props.setToast(toastMessage))
+      .catch((error) => props.setToast('Issue in deleting notebooks' + error.body.message, 'danger'));
     closeModal();
   };
 
@@ -124,7 +128,7 @@ export function NoteTable(props: NoteTableProps) {
         fileObject = JSON.parse(e.target.result.toString());
         importNotebook(fileObject);
       } catch {
-        console.error('Imported file not valid json');
+        props.setToast('Imported file not valid json', 'danger');
       }
     };
 

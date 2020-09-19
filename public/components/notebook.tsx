@@ -62,8 +62,9 @@ type NotebookProps = {
   http: CoreStart['http'];
   setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
   renameNotebook: (newNoteName: string, noteId: string) => void;
-  deleteNotebook: (noteId: string) => void;
+  deleteNotebook: (noteId: string, noteName?: string, showToast?: boolean) => void;
   exportNotebook: (noteName: string, noteId: string) => void;
+  setToast: (title: string, color?: string, text?: string) => void;
 };
 
 type NotebookState = {
@@ -176,6 +177,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         .then((res) => {
           this.setState({ paragraphs: res.paragraphs });
           this.parseParagraphs();
+          this.props.setToast('Paragraph successfully deleted!');
         })
         .catch((err) => console.error('Delete paragraph issue: ', err.body.message));
     }
@@ -248,13 +250,13 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       modalLayout: (
         <DeleteNotebookModal
           onConfirm={() => {
-          this.props.deleteNotebook(this.props.openedNoteId);
-          this.setState({ isModalVisible: false });
-          window.location.replace(`${this.props.basename}#`);
-        }}
-        onCancel={() => this.setState({ isModalVisible: false })}
-        title={`Delete notebook "${this.state.path}"`}
-        message="Delete notebook will remove all contents in the paragraphs."
+            this.props.deleteNotebook(this.props.openedNoteId, this.state.path);
+            this.setState({ isModalVisible: false });
+            window.location.replace(`${this.props.basename}#`);
+          }}
+          onCancel={() => this.setState({ isModalVisible: false })}
+          title={`Delete notebook "${this.state.path}"`}
+          message="Delete notebook will remove all contents in the paragraphs."
         />
       )
     });

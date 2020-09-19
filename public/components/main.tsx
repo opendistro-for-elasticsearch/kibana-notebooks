@@ -99,7 +99,7 @@ export class Main extends React.Component<MainProps, MainState> {
       name: newNoteName,
     };
 
-    this.props.http
+    return this.props.http
       .post(`${API_PREFIX}/note`, {
         body: JSON.stringify(newNoteObject),
       })
@@ -112,17 +112,24 @@ export class Main extends React.Component<MainProps, MainState> {
 
   // Renames an existing notebook
   renameNotebook = (editedNoteName: string, editedNoteID: string) => {
+    if (editedNoteName.length >= 50 || editedNoteName.length === 0) {
+      this.setToast('Invalid notebook name', 'danger');
+      return;
+    }
     const renameNoteObject = {
       name: editedNoteName,
       noteId: editedNoteID,
     };
 
-    this.props.http
+    return this.props.http
       .put(`${API_PREFIX}/note/rename`, {
         body: JSON.stringify(renameNoteObject),
       })
-      .then((res) => this.fetchNotebooks())
-      .catch((err) => console.error('Issue in renaming the notebook', err.body.message));
+      .then((res) => {
+        this.fetchNotebooks();
+        this.setToast(`Notebook successfully renamed into "${editedNoteName}"`);
+      })
+      .catch((err) => this.setToast('Issue in renaming the notebook ' + err.body.message, 'danger'));
   };
 
   // Clones an existing notebook
@@ -132,25 +139,32 @@ export class Main extends React.Component<MainProps, MainState> {
       noteId: clonedNoteID,
     };
 
-    this.props.http
+    return this.props.http
       .post(`${API_PREFIX}/note/clone`, {
         body: JSON.stringify(cloneNoteObject),
       })
-      .then((res) => this.fetchNotebooks())
-      .catch((err) => console.error('Issue in cloning the notebook', err.body.message));
+      .then((res) => {
+        this.fetchNotebooks();
+        this.setToast(`Notebook "${clonedNoteName}" successfully created!`);
+      })
+      .catch((err) => this.setToast('Issue in cloning the notebook ' + err.body.message, 'danger'));
   };
 
   // Deletes an existing notebook
-  deleteNotebook = (clonedNoteID: string) => {
-    this.props.http
-      .delete(`${API_PREFIX}/note/` + clonedNoteID)
-      .then((res) => this.fetchNotebooks())
-      .catch((err) => console.error('Issue in deleting the notebook', err.body.message));
+  deleteNotebook = (notebookId: string, notebookName?: string, showToast = true) => {
+    return this.props.http
+      .delete(`${API_PREFIX}/note/` + notebookId)
+      .then((res) => {
+        this.fetchNotebooks();
+        if (showToast)
+          this.setToast(`Notebook "${notebookName}" successfully deleted!`);
+      })
+      .catch((err) => this.setToast('Issue in deleting the notebook ' + err.body.message, 'danger'));
   };
 
   // Exports an existing notebook
   exportNotebook = (exportNoteName: string, exportNoteId: string) => {
-    this.props.http
+    return this.props.http
       .get(`${API_PREFIX}/note/export/` + exportNoteId)
       .then((res) => {
         onDownload(res, exportNoteName + '.json');
@@ -163,10 +177,13 @@ export class Main extends React.Component<MainProps, MainState> {
     const importObject = {
       noteObj: noteObject,
     };
-    this.props.http
+    return this.props.http
       .post(`${API_PREFIX}/note/import`, { body: JSON.stringify(importObject) })
-      .then((res) => this.fetchNotebooks())
-      .catch((err) => console.error('Issue in importing the notebook', err.body.message));
+      .then((res) => {
+        this.fetchNotebooks();
+        this.setToast(`Notebook successfully imported!`);
+      })
+      .catch((err) => this.setToast('Issue in importing the notebook' + err.body.message, 'danger'));
   };
 
   render() {
@@ -195,6 +212,7 @@ export class Main extends React.Component<MainProps, MainState> {
                   renameNotebook={this.renameNotebook}
                   deleteNotebook={this.deleteNotebook}
                   exportNotebook={this.exportNotebook}
+                  setToast={this.setToast}
                 />
               }
             />
@@ -211,6 +229,7 @@ export class Main extends React.Component<MainProps, MainState> {
                   exportNotebook={this.exportNotebook}
                   importNotebook={this.importNotebook}
                   setBreadcrumbs={this.props.setBreadcrumbs}
+                  setToast={this.setToast}
                 />
               }
             />
