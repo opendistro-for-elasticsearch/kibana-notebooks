@@ -32,29 +32,6 @@ export class DefaultBackend implements NotebookAdaptor {
   createNewNotebook = (newNotebookName: string) => {
     const noteId = 'note_' + uuid();
 
-    const inputObject: DefaultInput = {
-      inputType: 'MARKDOWN',
-      inputText: '# Type your input here',
-    };
-
-    const outputObjects: Array<DefaultOutput> = [
-      {
-        outputType: 'MARKDOWN',
-        result: '# Type your input here',
-        execution_time: '0s',
-      },
-    ];
-
-    const paragraphObjects: Array<DefaultParagraph> = [
-      {
-        id: 'paragraph_' + uuid(),
-        dateCreated: new Date().toISOString(),
-        dateModified: new Date().toISOString(),
-        input: inputObject,
-        output: outputObjects,
-      },
-    ];
-
     const noteObject: DefaultNotebooks = {
       id: noteId,
       dateCreated: new Date().toISOString(),
@@ -62,7 +39,7 @@ export class DefaultBackend implements NotebookAdaptor {
       dateModified: new Date().toISOString(),
       pluginVersion: '7.9.0',
       backend: 'Default',
-      paragraphs: paragraphObjects,
+      paragraphs: [],
     };
 
     return {

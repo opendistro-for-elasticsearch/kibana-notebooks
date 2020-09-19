@@ -24,6 +24,8 @@ import { API_PREFIX } from '../../common';
 import { NoteTable } from './note_table';
 import { HashRouter } from 'react-router-dom';
 import { Switch, Route } from 'react-router';
+import { EuiGlobalToastList } from '@elastic/eui';
+import { Toast } from '@elastic/eui/src/components/toast/global_toast_list';
 
 /*
  * "Main" component renders the whole Notebooks as a single page application
@@ -46,6 +48,7 @@ type MainProps = {
 type MainState = {
   data: Array<NotebookType>;
   openedNotebook: NotebookType;
+  toasts: Toast[];
 };
 
 export type NotebookType = {
@@ -61,17 +64,24 @@ export class Main extends React.Component<MainProps, MainState> {
     this.state = {
       data: [],
       openedNotebook: undefined,
+      toasts: [],
     };
-    this.setOpenedNotebook = this.setOpenedNotebook.bind(this);
   }
 
-  setOpenedNotebook(notebook: NotebookType) {
-    this.setState({ openedNotebook: notebook });
+  setToast = (title: string, color = 'success', text = '') => {
+    this.setState({
+      toasts: [{
+        id: new Date().toISOString(),
+        title,
+        text,
+        color,
+      }]
+    })
   }
 
   // Fetches path and id for all stored notebooks
   fetchNotebooks = () => {
-    this.props.http
+    return this.props.http
       .get(`${API_PREFIX}/`)
       .then((res) => this.setState(res))
       .catch((err) => {
@@ -81,6 +91,10 @@ export class Main extends React.Component<MainProps, MainState> {
 
   // Creates a new notebook
   createNotebook = (newNoteName: string) => {
+    if (newNoteName.length >= 50 || newNoteName.length === 0) {
+      this.setToast('Invalid notebook name', 'danger');
+      return;
+    }
     const newNoteObject = {
       name: newNoteName,
     };
@@ -89,8 +103,11 @@ export class Main extends React.Component<MainProps, MainState> {
       .post(`${API_PREFIX}/note`, {
         body: JSON.stringify(newNoteObject),
       })
-      .then((res) => this.fetchNotebooks())
-      .catch((err) => console.error('Issue in creating a notebook', err.body.message));
+      .then(async (res) => {
+        this.setToast(`Notebook "${newNoteName}" successfully created!`);
+        window.location.assign(`${this.props.basename}#${res.body}`);
+      })
+      .catch((err) => this.setToast('Issue in creating a notebook ' + err.body.message, 'danger'));
   };
 
   // Renames an existing notebook
@@ -156,6 +173,15 @@ export class Main extends React.Component<MainProps, MainState> {
     return (
       <HashRouter basename={this.props.basename}>
         <>
+          <EuiGlobalToastList
+            toasts={this.state.toasts}
+            dismissToast={removedToast => {
+              this.setState({
+                toasts: this.state.toasts.filter(toast => toast.id !== removedToast.id)
+              })
+            }}
+            toastLifeTimeMs={6000}
+          />
           <Switch>
             <Route
               path='/:id'
@@ -178,7 +204,6 @@ export class Main extends React.Component<MainProps, MainState> {
                 <NoteTable
                   fetchNotebooks={this.fetchNotebooks}
                   notebooks={this.state.data}
-                  setOpenedNotebook={this.setOpenedNotebook}
                   createNotebook={this.createNotebook}
                   renameNotebook={this.renameNotebook}
                   cloneNotebook={this.cloneNotebook}
