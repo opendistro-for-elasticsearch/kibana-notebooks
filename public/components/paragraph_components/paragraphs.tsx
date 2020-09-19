@@ -486,12 +486,10 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                       <ParaInput
                         para={para}
                         index={index}
+                        runParaError={runParaError}
                         textValueEditor={textValueEditor}
                         handleKeyPress={handleKeyPress}
                       />
-                      {runParaError &&
-                        <EuiText color="danger" size="s" style={{ marginLeft: 16 }}>Input is required.</EuiText>
-                      }
                       <EuiSpacer size='m' />
                       <EuiFlexGroup alignItems='center' style={{ marginLeft: 4 }}>
                         <EuiFlexItem grow={false}>

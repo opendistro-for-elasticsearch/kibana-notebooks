@@ -655,10 +655,9 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                 <Cells>
                   <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
                     {this.state.parsedPara.map((para: ParaType, index: number) => (
-                      <div ref={this.state.paraRefs[index]} key={`para_div_${index}`}>
+                      <div ref={this.state.paraRefs[index]} key={`para_div_${para.uniqueId}`}>
                         <Paragraphs
                           ref={index === 0 && this.child}
-                          key={'para_' + index.toString()}
                           para={para}
                           dateModified={this.state.paragraphs[index]?.dateModified}
                           index={index}

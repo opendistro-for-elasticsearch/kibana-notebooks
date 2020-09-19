@@ -17,7 +17,7 @@ import React from 'react';
 import { Input, Prompt, Source } from '@nteract/presentational-components';
 
 import { ParaType } from '../../../common';
-import { EuiTextArea } from '@elastic/eui';
+import { EuiText, EuiTextArea } from '@elastic/eui';
 
 /*
  * "ParaInput" component is used by notebook to populate paragraph inputs for an open notebook.
@@ -34,10 +34,11 @@ import { EuiTextArea } from '@elastic/eui';
 export const ParaInput = (props: {
   para: ParaType;
   index: number;
+  runParaError: boolean;
   textValueEditor: (evt: React.ChangeEvent<HTMLTextAreaElement>, index: number) => void;
   handleKeyPress: (evt: React.KeyboardEvent<Element>, para: any, index: number) => void;
 }) => {
-  const { para, index, textValueEditor, handleKeyPress } = props;
+  const { para, index, runParaError, textValueEditor, handleKeyPress } = props;
 
   return (
     <Input hidden={para.isInputHidden}>
@@ -45,17 +46,23 @@ export const ParaInput = (props: {
       {/* If the para is selected show the editor else display the code in the paragraph */}
       <Source language={para.lang}>
         {para.isSelected ? (
-          <EuiTextArea
-            className="editorArea"
-            fullWidth
-            onChange={(evt) => textValueEditor(evt, index)}
-            onKeyPress={(evt) => handleKeyPress(evt, para, index)}
-            value={para.inp}
-            autoFocus
-          />
+          <>
+            <EuiTextArea
+              className="editorArea"
+              fullWidth
+              isInvalid={runParaError}
+              onChange={(evt) => textValueEditor(evt, index)}
+              onKeyPress={(evt) => handleKeyPress(evt, para, index)}
+              value={para.inp}
+              autoFocus
+            />
+            {runParaError &&
+              <EuiText color="danger" size="s" style={{ marginLeft: 16 }}>Input is required.</EuiText>
+            }
+          </>
         ) : (
-          para.inp
-        )}
+            para.inp
+          )}
       </Source>
     </Input>
   );
