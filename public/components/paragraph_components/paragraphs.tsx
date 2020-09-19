@@ -121,6 +121,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     vizualizationEditor,
     http,
   } = props;
+  const outputExists = para?.out[0] !== '';
 
   useImperativeHandle(ref, () => ({
     showAddVisualizationModal(index: number) {
@@ -478,14 +479,15 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                         textValueEditor={textValueEditor}
                         handleKeyPress={handleKeyPress}
                       />
-                      <EuiSpacer size='s' />
-                      <EuiFlexGroup alignItems='center'>
-                        <EuiFlexItem grow={false} />
+                      <EuiSpacer size='m' />
+                      <EuiFlexGroup alignItems='center' style={{marginLeft: 4}}>
                         <EuiFlexItem grow={false}>
-                          <EuiButton size='s' onClick={() => props.runPara(para, index)}>Run</EuiButton>
+                          <EuiButton onClick={() => props.runPara(para, index)}>
+                            {outputExists ? 'Refresh' : 'Run'}
+                          </EuiButton>
                         </EuiFlexItem>
                         <EuiFlexItem>
-                          {para.out[0] !== '' &&
+                          {outputExists &&
                             <EuiText color='subdued'>
                               {`Output available from ${moment(props.dateModified).format(DATE_FORMAT)}`}
                             </EuiText>}
@@ -494,11 +496,11 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                       <EuiSpacer size='m' />
                     </>
                   }
-                  {props.selectedViewId !== 'input_only' &&
-                      <>
-                        <EuiHorizontalRule margin='none' />
-                        <ParaOutput para={para} />
-                      </>
+                  {props.selectedViewId !== 'input_only' && outputExists &&
+                    <>
+                      <EuiHorizontalRule margin='none' />
+                      <ParaOutput para={para} />
+                    </>
                   }
                 </Cell>
               </>
