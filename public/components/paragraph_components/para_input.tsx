@@ -17,6 +17,7 @@ import React from 'react';
 import { Input, Prompt, Source } from '@nteract/presentational-components';
 
 import { ParaType } from '../../../common';
+import { EuiTextArea } from '@elastic/eui';
 
 /*
  * "ParaInput" component is used by notebook to populate paragraph inputs for an open notebook.
@@ -44,8 +45,9 @@ export const ParaInput = (props: {
       {/* If the para is selected show the editor else display the code in the paragraph */}
       <Source language={para.lang}>
         {para.isSelected ? (
-          <textarea
+          <EuiTextArea
             className="editorArea"
+            fullWidth
             onChange={(evt) => textValueEditor(evt, index)}
             onKeyPress={(evt) => handleKeyPress(evt, para, index)}
             value={para.inp}
