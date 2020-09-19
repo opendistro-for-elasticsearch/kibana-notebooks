@@ -106,6 +106,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   const [currentPara, setCurrentPara] = useState(0); // set current paragraph
   const [showInput, setShowInput] = useState(true);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [runParaError, setRunParaError] = useState(false);
 
   const {
     para,
@@ -184,6 +185,15 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     const newVizObject = createNewVizObject(optedViz[0].key);
     addPara(currentPara, JSON.stringify(newVizObject), 'VISUALIZATION');
   };
+
+  const onRunPara = () => {
+    if (!para.inp) {
+      setRunParaError(true);
+      return;
+    }
+    setRunParaError(false);
+    props.runPara(para, index);
+  }
 
   // Shows modal with all saved visualizations for the users
   const showModal = async (index: number) => {
@@ -358,7 +368,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
           name: 'Run input',
           onClick: () => {
             setIsPopoverOpen(false);
-            props.runPara(para, index);
+            onRunPara();
           },
         },
       )
@@ -479,10 +489,13 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                         textValueEditor={textValueEditor}
                         handleKeyPress={handleKeyPress}
                       />
+                      {runParaError &&
+                        <EuiText color="danger" size="s" style={{ marginLeft: 16 }}>Input is required.</EuiText>
+                      }
                       <EuiSpacer size='m' />
-                      <EuiFlexGroup alignItems='center' style={{marginLeft: 4}}>
+                      <EuiFlexGroup alignItems='center' style={{ marginLeft: 4 }}>
                         <EuiFlexItem grow={false}>
-                          <EuiButton onClick={() => props.runPara(para, index)}>
+                          <EuiButton onClick={() => onRunPara()}>
                             {outputExists ? 'Refresh' : 'Run'}
                           </EuiButton>
                         </EuiFlexItem>
