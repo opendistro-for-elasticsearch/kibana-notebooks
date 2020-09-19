@@ -293,6 +293,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         paragraphs.splice(index, 0, res);
         this.setState({ paragraphs });
         this.parseParagraphs();
+        this.paragraphSelector(index);
       })
       .catch((err) => console.error('Add paragraph issue: ', err.body.message));
   };
