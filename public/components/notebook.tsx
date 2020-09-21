@@ -75,6 +75,7 @@ type NotebookState = {
   paragraphs: any; // notebook paragraphs fetched from API
   parsedPara: Array<ParaType>; // paragraphs parsed to a common format
   paraRefs: Array<RefObject<HTMLDivElement>>; // paragraph refs for auto scrolling after moved
+  paraShowInput: boolean[]; // should display input or not per paragraph
   toggleOutput: boolean; // Hide Outputs toggle
   toggleInput: boolean; // Hide Inputs toggle
   vizPrefix: string; // prefix for visualizations in Zeppelin Adaptor
@@ -96,6 +97,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       paragraphs: [],
       parsedPara: [],
       paraRefs: [],
+      paraShowInput: [],
       toggleOutput: true,
       toggleInput: true,
       vizPrefix: '',
@@ -119,7 +121,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         parsedPara = defaultParagraphParser(this.state.paragraphs);
       }
       const paraRefs = parsedPara.map(() => React.createRef());
-      this.setState({ parsedPara, paraRefs });
+      const paraShowInput = parsedPara.map(() => this.state.selectedViewId === 'input_only');
+      this.setState({ parsedPara, paraRefs, paraShowInput });
     } catch (error) {
       console.error('Parsing paragraph has some issue', error);
       this.setState({ parsedPara: [], paraRefs: [] });
@@ -293,6 +296,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         paragraphs.splice(index, 0, res);
         this.setState({ paragraphs });
         this.parseParagraphs();
+        this.setShowInput(index, true);
         this.paragraphSelector(index);
       })
       .catch((err) => console.error('Add paragraph issue: ', err.body.message));
@@ -409,14 +413,16 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     else if (viewId === 'output_only')
       hideInput = true;
 
-    let parsedPara = this.state.parsedPara;
+    let parsedPara = [...this.state.parsedPara];
     this.state.parsedPara.map(
       (para: ParaType, index: number) => {
         parsedPara[index].isInputHidden = hideInput;
         parsedPara[index].isOutputHidden = hideOutput;
       }
     );
-    this.setState({ parsedPara });
+    const paraShowInput = parsedPara.map(() => viewId === 'input_only');
+    this.paragraphSelector(-1);
+    this.setState({ parsedPara, paraShowInput });
   };
 
   loadNotebook = () => {
@@ -431,6 +437,12 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.setState({ toggleInput: true });
     this.setState({ toggleOutput: true });
   };
+
+  setShowInput(index: number, shouldShowInput: boolean) {
+    const paraShowInput = [...this.state.paraShowInput];
+    paraShowInput[index] = shouldShowInput;
+    this.setState({ paraShowInput });
+  }
 
   setBreadcrumbs(path: string) {
     this.props.setBreadcrumbs([
@@ -664,6 +676,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           para={para}
                           dateModified={this.state.paragraphs[index]?.dateModified}
                           index={index}
+                          showInput={this.state.paraShowInput[index]}
+                          setShowInput={(shouldShowInput: boolean) => this.setShowInput(index, shouldShowInput)}
                           paraCount={this.state.parsedPara.length}
                           paragraphSelector={this.paragraphSelector}
                           paragraphHover={this.paragraphHover}
@@ -710,6 +724,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                     para={undefined}
                     dateModified={undefined}
                     index={undefined}
+                    showInput={undefined}
+                    setShowInput={undefined}
                     paraCount={undefined}
                     paragraphSelector={undefined}
                     paragraphHover={undefined}

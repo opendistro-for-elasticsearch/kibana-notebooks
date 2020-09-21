@@ -83,6 +83,8 @@ type ParagraphProps = {
   para: ParaType;
   dateModified: string;
   index: number;
+  showInput: boolean;
+  setShowInput: (shouldShowInput: boolean) => void;
   paraCount: number;
   paragraphSelector: (index: number) => void;
   paragraphHover: (para: ParaType) => void;
@@ -105,6 +107,8 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   const {
     para,
     index,
+    showInput,
+    setShowInput,
     paragraphSelector,
     paragraphHover,
     paragraphHoverReset,
@@ -124,7 +128,6 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   const [isModalVisible, setIsModalVisible] = useState(false); // Boolean for showing visualization modal
   const [options, setOptions] = useState([]); // options for loading saved visualizations
   const [currentPara, setCurrentPara] = useState(0); // set current paragraph
-  const [showInput, setShowInput] = useState(true);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [runParaError, setRunParaError] = useState(false);
   const [selectedVisOption, setSelectedVisOption] = useState([]);
@@ -204,6 +207,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
       inputTemp.timeRange = newTimeRange;
       setVisInput(inputTemp);
       vizualizationEditor(JSON.stringify(inputTemp), para.id - 1);
+      setShowInput(false);
       return;
     }
 
@@ -213,6 +217,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     }
     setRunParaError(false);
     props.runPara(para, index);
+    setShowInput(false);
   };
 
   // Shows modal with all saved visualizations for the users
