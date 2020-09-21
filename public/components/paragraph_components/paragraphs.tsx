@@ -201,17 +201,17 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
       inputTemp.timeRange = newTimeRange;
       setVisInput(inputTemp);
       vizualizationEditor(JSON.stringify(inputTemp), para.id - 1);
+    } else {
+      if (!para.inp) {
+        setRunParaError(true);
+        return;
+      }
+      setRunParaError(false);
+      props.runPara(para, index);
+    }
+    if (props.selectedViewId !== 'input_only') {
       setShowInput(false);
-      return;
     }
-
-    if (!para.inp) {
-      setRunParaError(true);
-      return;
-    }
-    setRunParaError(false);
-    props.runPara(para, index);
-    setShowInput(false);
   };
 
   // Shows modal with all saved visualizations for the users
@@ -466,7 +466,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
         >
           {showInput &&
             <>
-            <EuiSpacer size='s' />
+              <EuiSpacer size='s' />
               <ParaInput
                 para={para}
                 index={index}
