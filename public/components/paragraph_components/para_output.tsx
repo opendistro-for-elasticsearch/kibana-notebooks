@@ -19,7 +19,9 @@ import { Media } from '@nteract/outputs';
 import MarkdownRender from '@nteract/markdown';
 import { EuiText } from '@elastic/eui';
 
-import { ParaType } from '../../../common';
+import { DATE_FORMAT, ParaType } from '../../../common';
+import { DashboardContainerInput, DashboardStart } from '../../../../../src/plugins/dashboard/public';
+import moment from 'moment';
 
 /*
  * "ParaOutput" component is used by notebook to populate paragraph outputs for an open notebook.
@@ -30,7 +32,12 @@ import { ParaType } from '../../../common';
  * Outputs component of nteract used as a container for notebook UI.
  * https://components.nteract.io/#outputs
  */
-export const ParaOutput = (props: { para: ParaType }) => {
+export const ParaOutput = (props: {
+  para: ParaType;
+  visInput: DashboardContainerInput;
+  setVisInput: (input: DashboardContainerInput) => void;
+  DashboardContainerByValueRenderer: DashboardStart['DashboardContainerByValueRenderer'];
+}) => {
   const outputBody = (tIdx: number, typeOut: string, val: string) => {
     /* Returns a component to render paragraph outputs using the para.typeOut property
      * Currently supports HTML, TABLE, IMG
@@ -44,6 +51,15 @@ export const ParaOutput = (props: { para: ParaType }) => {
             <EuiText key={tIdx + '_paraOutput'}>
               <MarkdownRender source={val} />
             </EuiText>
+          );
+        case 'VISUALIZATION':
+          return (
+            <>
+              <EuiText>
+                {moment(visInput.timeRange.from).format(DATE_FORMAT) + ' - ' + moment(visInput.timeRange.to).format(DATE_FORMAT)}
+              </EuiText>
+              <DashboardContainerByValueRenderer key={tIdx + '_paraOutput'} input={visInput} onInputUpdated={setVisInput} />
+            </>
           );
         case 'HTML':
           return (
@@ -64,7 +80,7 @@ export const ParaOutput = (props: { para: ParaType }) => {
     }
   };
 
-  const { para } = props;
+  const { para, DashboardContainerByValueRenderer, visInput, setVisInput } = props;
 
   return (
     <Outputs hidden={para.isOutputHidden}>

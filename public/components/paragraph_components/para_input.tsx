@@ -17,7 +17,7 @@ import React from 'react';
 import { Input, Prompt, Source } from '@nteract/presentational-components';
 
 import { ParaType } from '../../../common';
-import { EuiDatePicker, EuiDatePickerRange, EuiForm, EuiFormRow, EuiSuperDatePicker, EuiTextArea } from '@elastic/eui';
+import { EuiForm, EuiFormRow, EuiSuperDatePicker, EuiTextArea } from '@elastic/eui';
 
 /*
  * "ParaInput" component is used by notebook to populate paragraph inputs for an open notebook.
@@ -37,35 +37,12 @@ export const ParaInput = (props: {
   runParaError: boolean;
   textValueEditor: (evt: React.ChangeEvent<HTMLTextAreaElement>, index: number) => void;
   handleKeyPress: (evt: React.KeyboardEvent<Element>, para: any, index: number) => void;
+  startTime: string;
+  setStartTime: (startTime: string) => void;
+  endTime: string;
+  setEndTime: (endTime: string) => void;
 }) => {
   const { para, index, runParaError, textValueEditor, handleKeyPress } = props;
-
-  const datePicker = (
-    <EuiDatePickerRange
-      startDateControl={
-        <EuiDatePicker
-          selected={props.startTime}
-          onChange={props.setStartTime}
-          startDate={props.startTime}
-          endDate={props.endTime}
-          isInvalid={props.startTime > props.endTime}
-          aria-label="Start date"
-          showTimeSelect
-        />
-      }
-      endDateControl={
-        <EuiDatePicker
-          selected={props.endTime}
-          onChange={props.setEndTime}
-          startDate={props.startTime}
-          endDate={props.endTime}
-          isInvalid={props.startTime > props.endTime}
-          aria-label="End date"
-          showTimeSelect
-        />
-      }
-    />
-  );
 
   const renderParaInput = () => {
     return (
@@ -92,9 +69,8 @@ export const ParaInput = (props: {
     return (
       <div style={{ margin: 16, marginBottom: 0 }}>
         <EuiForm>
-          <EuiFormRow label="Date range">
-            {datePicker}
-            {/* <EuiSuperDatePicker
+          <EuiFormRow label="Date range" fullWidth>
+            <EuiSuperDatePicker
               start={props.startTime}
               end={props.endTime}
               showUpdateButton={false}
@@ -102,7 +78,7 @@ export const ParaInput = (props: {
                 props.setStartTime(e.start);
                 props.setEndTime(e.end);
               }}
-            /> */}
+            />
           </EuiFormRow>
         </EuiForm>
       </div>

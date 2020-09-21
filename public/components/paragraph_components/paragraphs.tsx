@@ -51,7 +51,6 @@ import { CoreStart } from '../../../../../src/core/public';
 
 import { ParaOutput } from './para_output';
 import { ParaInput } from './para_input';
-import { ParaVisualization } from './para_vizualizations';
 import { API_PREFIX, ParaType, DATE_FORMAT } from '../../../common';
 
 /*
@@ -118,8 +117,8 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     http,
   } = props;
 
-  const outputExists = para?.out[0] !== '' || para.vizObjectInput !== '';
-  const loadedVizObject: DashboardContainerInput = para && para.isVizualisation ? JSON.parse(para.vizObjectInput) : {};
+  const outputExists = para?.out[0] !== '' || para?.vizObjectInput !== '';
+  const loadedVizObject: DashboardContainerInput = para?.isVizualisation ? JSON.parse(para.vizObjectInput) : {};
   loadedVizObject.viewMode = ViewMode.VIEW;
 
   const [isModalVisible, setIsModalVisible] = useState(false); // Boolean for showing visualization modal
@@ -130,8 +129,8 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   const [runParaError, setRunParaError] = useState(false);
   const [selectedVisOption, setSelectedVisOption] = useState([]);
   const [visInput, setVisInput] = useState(loadedVizObject);
-  const [startTime, setStartTime] = useState(moment(loadedVizObject?.timeRange?.from));
-  const [endTime, setEndTime] = useState(moment(loadedVizObject?.timeRange?.to));
+  const [startTime, setStartTime] = useState(loadedVizObject?.timeRange?.from);
+  const [endTime, setEndTime] = useState(loadedVizObject?.timeRange?.to);
   const [toggleVisEdit, setToggleVisEdit] = useState(false);
 
   useImperativeHandle(ref, () => ({
@@ -263,12 +262,18 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   );
 
   const renderParaHeader = (type: string, index: number) => {
-    const isVisualization = type === 'Kibana visualization';
     const panels: EuiContextMenuPanelDescriptor[] = [
       {
         id: 0,
         title: 'Paragraph actions',
         items: [
+          {
+            name: 'Run input',
+            onClick: () => {
+              setIsPopoverOpen(false);
+              onRunPara();
+            },
+          },
           {
             name: 'Move up',
             disabled: index === 0,
@@ -366,17 +371,6 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
         ],
       },
     ];
-    if (!isVisualization) {
-      panels[0].items.unshift(
-        {
-          name: 'Run input',
-          onClick: () => {
-            setIsPopoverOpen(false);
-            onRunPara();
-          },
-        },
-      )
-    }
 
     return (
       <>
@@ -384,12 +378,11 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
           <EuiFlexItem>
             <EuiText color="subdued">
               {`[${index + 1}] ${type} `}
-              {!isVisualization &&
-                <EuiButtonIcon
-                  aria-label="Toggle show input"
-                  iconType={showInput ? "arrowUp" : "arrowDown"}
-                  onClick={() => setShowInput(!showInput)}
-                />}
+              <EuiButtonIcon
+                aria-label="Toggle show input"
+                iconType={showInput ? "arrowUp" : "arrowDown"}
+                onClick={() => setShowInput(!showInput)}
+              />
             </EuiText>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
@@ -456,22 +449,12 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
 
   // do not show input and EuiPanel if view mode is output_only
   if (props.selectedViewId === 'output_only') {
-    return (
-      <>
-        {!para.isVizualisation ? (
-          <ParaOutput para={para} />
-        ) : (
-            <ParaVisualization
-              DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
-              vizContent={para.vizObjectInput}
-              deleteVizualization={deleteVizualization}
-              para={para}
-              vizualizationEditor={vizualizationEditor}
-            />
-          )
-        }
-      </>
-    );
+    return <ParaOutput
+      para={para}
+      visInput={visInput}
+      setVisInput={setVisInput}
+      DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
+    />;
   }
 
   return (
@@ -494,14 +477,10 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                 runParaError={runParaError}
                 textValueEditor={textValueEditor}
                 handleKeyPress={handleKeyPress}
-                visInput={visInput}
-                setVisInput={setVisInput}
                 startTime={startTime}
                 setStartTime={setStartTime}
                 endTime={endTime}
                 setEndTime={setEndTime}
-                toggleVisEdit={toggleVisEdit}
-                setToggleVisEdit={setToggleVisEdit}
               />
               {runParaError &&
                 <EuiText color="danger" size="s" style={{ marginLeft: 16 }}>Input is required.</EuiText>
@@ -527,18 +506,18 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
           {props.selectedViewId !== 'input_only' && outputExists &&
             <>
               <EuiHorizontalRule margin='none' />
-              {para.isVizualisation ?
-                  <DashboardContainerByValueRenderer input={visInput} onInputUpdated={setVisInput} />
-                :
-                <ParaOutput para={para} />
-              }
+              <ParaOutput
+                para={para}
+                visInput={visInput}
+                setVisInput={setVisInput}
+                DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
+              />
             </>
           }
         </Cell>
-        <EuiButton onClick={() => console.log(visInput)}>TEST</EuiButton>
       </EuiPanel>
 
-      { isModalVisible && modalLayout}
+      {isModalVisible && modalLayout}
     </>
   );
 });
