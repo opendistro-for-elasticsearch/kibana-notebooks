@@ -157,21 +157,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.setState({ parsedPara });
   };
 
-  // Resets all paragraphs state to hover:false
-  paragraphHoverReset = () => {
-    let parsedPara = this.state.parsedPara;
-    this.state.parsedPara.map((_: ParaType, index: number) => {
-      parsedPara[index].ishovered = false;
-    });
-    this.setState({ parsedPara });
-  };
-
-  // Sets boolean on hovering over a paragraph
-  paragraphHover = (para: ParaType) => {
-    this.paragraphHoverReset();
-    if (!para.isSelected) para.ishovered = true;
-  };
-
   // Function for delete a Notebook button
   deleteParagraphButton = (para: ParaType, index: number) => {
     if (index !== -1) {
@@ -680,8 +665,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           setShowInput={(shouldShowInput: boolean) => this.setShowInput(index, shouldShowInput)}
                           paraCount={this.state.parsedPara.length}
                           paragraphSelector={this.paragraphSelector}
-                          paragraphHover={this.paragraphHover}
-                          paragraphHoverReset={this.paragraphHoverReset}
                           textValueEditor={this.textValueEditor}
                           handleKeyPress={this.handleKeyPress}
                           addPara={this.addPara}
@@ -728,8 +711,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                     setShowInput={undefined}
                     paraCount={undefined}
                     paragraphSelector={undefined}
-                    paragraphHover={undefined}
-                    paragraphHoverReset={undefined}
                     textValueEditor={undefined}
                     handleKeyPress={undefined}
                     addPara={this.addPara}

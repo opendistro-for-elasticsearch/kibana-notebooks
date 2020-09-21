@@ -61,8 +61,6 @@ import { API_PREFIX, ParaType, DATE_FORMAT } from '../../../common';
  * dateModified - last modified time of paragraph
  * index - index of paragraph in the notebook
  * paragraphSelector - function used to select a para on click
- * paragraphHover - function used to highlight a para on hover
- * paragraphHoverReset - function used to reset all hover-highlighted paras
  * textValueEditor - function for handling input in textarea
  * handleKeyPress - function for handling key press like "Shift-key+Enter" to run paragraph
  * addPara - function to add a new para onclick - "Add Para" Div
@@ -87,8 +85,6 @@ type ParagraphProps = {
   setShowInput: (shouldShowInput: boolean) => void;
   paraCount: number;
   paragraphSelector: (index: number) => void;
-  paragraphHover: (para: ParaType) => void;
-  paragraphHoverReset: () => void;
   textValueEditor: (evt: React.ChangeEvent<HTMLTextAreaElement>, index: number) => void;
   handleKeyPress: (evt: React.KeyboardEvent<Element>, para: ParaType, index: number) => void;
   addPara: (index: number, newParaContent: string, inputType: string) => void;
@@ -110,8 +106,6 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     showInput,
     setShowInput,
     paragraphSelector,
-    paragraphHover,
-    paragraphHoverReset,
     textValueEditor,
     handleKeyPress,
     addPara,
@@ -468,11 +462,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
         {renderParaHeader(para.isVizualisation ? 'Kibana visualization' : 'Markdown', index)}
         <Cell
           key={index}
-          _hovered={para.ishovered}
-          isSelected={para.isSelected && showInput}
           onClick={() => paragraphSelector(index)}
-          onMouseEnter={() => paragraphHover(para)}
-          onMouseLeave={() => paragraphHoverReset()}
         >
           {showInput &&
             <>
