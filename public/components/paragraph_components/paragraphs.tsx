@@ -38,6 +38,7 @@ import {
   EuiButton,
   EuiContextMenuPanelDescriptor,
   EuiIcon,
+  EuiComboBox,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui/lib/services';
 
@@ -107,6 +108,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   const [showInput, setShowInput] = useState(true);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [runParaError, setRunParaError] = useState(false);
+  const [selectedVisOption, setSelectedVisOption] = useState([]);
 
   const {
     para,
@@ -175,14 +177,13 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
 
   const closeModal = () => {
     setIsModalVisible(false);
+    setSelectedVisOption([]);
   };
 
   // Function to add visualization to the notebook
-  const onSelectViz = (newOptions) => {
-    setOptions(newOptions);
-    const optedViz = newOptions.filter(filterObj);
+  const onSelectViz = () => {
+    const newVizObject = createNewVizObject(selectedVisOption[0].key);
     closeModal();
-    const newVizObject = createNewVizObject(optedViz[0].key);
     addPara(currentPara, JSON.stringify(newVizObject), 'VISUALIZATION');
   };
 
@@ -193,7 +194,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     }
     setRunParaError(false);
     props.runPara(para, index);
-  }
+  };
 
   // Shows modal with all saved visualizations for the users
   const showModal = async (index: number) => {
@@ -211,48 +212,31 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
       .catch((err) => console.error('Fetching visualization issue', err.body.message));
   };
 
-  const filterObj = (vObj: { checked: string }) => {
-    if (vObj.checked === 'on') {
-      return vObj;
-    }
-  };
-
-  // Visualizations searchable form for modal
-  const formSample = (
-    <EuiForm>
-      <Fragment>
-        <EuiSelectable
-          aria-label="Searchable Visualizations"
-          searchable
-          searchProps={{
-            'data-test-subj': 'selectableSearchHere',
-          }}
-          options={options}
-          onChange={(newOptions) => onSelectViz(newOptions)}
-        >
-          {(list, search) => (
-            <Fragment>
-              {search}
-              {list}
-            </Fragment>
-          )}
-        </EuiSelectable>
-      </Fragment>
-    </EuiForm>
-  );
-
   // Modal layout if a user wants add Visualizations
   const modalLayout = (
     <EuiOverlayMask>
       <EuiModal onClose={closeModal}>
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Saved Visualizations</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>Select a Kibana visualization</EuiModalHeaderTitle>
         </EuiModalHeader>
 
-        <EuiModalBody>{formSample}</EuiModalBody>
+        <EuiModalBody>
+          <EuiForm>
+            <Fragment>
+              <EuiComboBox
+                placeholder="Find Kibana visualization"
+                singleSelection={{ asPlainText: true }}
+                options={options}
+                selectedOptions={selectedVisOption}
+                onChange={(newOptions) => setSelectedVisOption(newOptions)}
+              />
+            </Fragment>
+          </EuiForm>
+        </EuiModalBody>
 
         <EuiModalFooter>
           <EuiButtonEmpty onClick={closeModal}>Cancel</EuiButtonEmpty>
+          <EuiButton onClick={() => onSelectViz()} fill>Select</EuiButton>
         </EuiModalFooter>
       </EuiModal>
     </EuiOverlayMask>
