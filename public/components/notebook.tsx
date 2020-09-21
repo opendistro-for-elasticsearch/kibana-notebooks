@@ -375,12 +375,14 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   runForAllParagraphs = (reducer: (para: ParaType, index: number) => Promise<any>) => {
     this.state.parsedPara.map((para: ParaType, index: number) => () => reducer(para, index))
       .reduce((chain, func) => chain.then(func), Promise.resolve());
-  }
+  };
 
   // Hanldes Edits in visualization and syncs with paragraph input
   vizualizationEditor = (vizContent: string, index: number) => {
+    // console.log('viseditor', vizContent, index)
     let parsedPara = this.state.parsedPara;
     parsedPara[index].inp = this.state.vizPrefix + vizContent; // "%sh check"
+    // console.log('parsedpara', parsedPara[index].inp)
     this.setState({ parsedPara });
   };
 
@@ -415,7 +417,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       }
     );
     this.setState({ parsedPara });
-  }
+  };
 
   loadNotebook = () => {
     this.showParagraphRunning('queue');
@@ -428,7 +430,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .catch((err) => console.error('Fetching notebook issue: ', err.body.message));
     this.setState({ toggleInput: true });
     this.setState({ toggleOutput: true });
-  }
+  };
 
   setBreadcrumbs(path: string) {
     this.props.setBreadcrumbs([

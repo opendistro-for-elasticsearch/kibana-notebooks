@@ -50,6 +50,7 @@ export const ParaVisualization = ({
   deleteVizualization,
   vizualizationEditor,
   para,
+  visInput,
 }: ParaVisualizationProps) => {
   let loadedVizObject: DashboardContainerInput = JSON.parse(vizContent);
   loadedVizObject.viewMode = ViewMode.VIEW;
@@ -59,11 +60,11 @@ export const ParaVisualization = ({
   const [endDate, setEndDate] = useState(moment(loadedVizObject.timeRange.to)); // time 'to' synced with datepicker
   const [toggleEdit, onToggleEdit] = useState(false); // toggle for editing gridsize of visualization
 
-  useEffect(() => {
-    if (Object.keys(input.panels).length === 0 && input.panels.constructor === Object) {
-      deleteVizualization(para.uniqueId);
-    }
-  }, [input]);
+  // useEffect(() => {
+  //   if (Object.keys(input.panels).length === 0 && input.panels.constructor === Object) {
+  //     deleteVizualization(para.uniqueId);
+  //   }
+  // }, [input]);
 
   // Refresh Visualization Object with new time range from Date Picker
   const refreshVizObject = () => {
@@ -74,7 +75,10 @@ export const ParaVisualization = ({
     };
     inputTemp.timeRange = newTimeRange;
     setInput(inputTemp);
+    console.log('inputtemp', inputTemp)
+    console.log('visinput', visInput)
     vizualizationEditor(JSON.stringify(inputTemp), para.id - 1);
+    vizualizationEditor(JSON.stringify(visInput), para.id - 1);
   };
 
   // Toggle to "view" or "edit" mode based on pin button state
@@ -119,10 +123,10 @@ export const ParaVisualization = ({
 
   return (
     <div>
-      <Input hidden={para.isInputHidden}>
+      {/* <Input hidden={para.isInputHidden}>
         <Prompt counter={para.id} running={para.isRunning} queued={para.inQueue} />
         <Source>visualization</Source>
-      </Input>
+      </Input> */}
       <div>
         <table>
           <tbody>
@@ -150,7 +154,7 @@ export const ParaVisualization = ({
             </tr>
           </tbody>
         </table>
-        <DashboardContainerByValueRenderer input={input} onInputUpdated={setInput} />
+        <DashboardContainerByValueRenderer input={visInput} onInputUpdated={setInput} />
       </div>
     </div>
   );

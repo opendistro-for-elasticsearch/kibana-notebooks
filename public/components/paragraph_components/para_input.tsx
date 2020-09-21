@@ -17,7 +17,7 @@ import React from 'react';
 import { Input, Prompt, Source } from '@nteract/presentational-components';
 
 import { ParaType } from '../../../common';
-import { EuiText, EuiTextArea } from '@elastic/eui';
+import { EuiDatePicker, EuiDatePickerRange, EuiForm, EuiFormRow, EuiSuperDatePicker, EuiTextArea } from '@elastic/eui';
 
 /*
  * "ParaInput" component is used by notebook to populate paragraph inputs for an open notebook.
@@ -40,27 +40,79 @@ export const ParaInput = (props: {
 }) => {
   const { para, index, runParaError, textValueEditor, handleKeyPress } = props;
 
-  return (
-    <Input hidden={para.isInputHidden}>
-      <Prompt blank={true} running={para.isRunning} queued={para.inQueue} />
-      {/* If the para is selected show the editor else display the code in the paragraph */}
+  const datePicker = (
+    <EuiDatePickerRange
+      startDateControl={
+        <EuiDatePicker
+          selected={props.startTime}
+          onChange={props.setStartTime}
+          startDate={props.startTime}
+          endDate={props.endTime}
+          isInvalid={props.startTime > props.endTime}
+          aria-label="Start date"
+          showTimeSelect
+        />
+      }
+      endDateControl={
+        <EuiDatePicker
+          selected={props.endTime}
+          onChange={props.setEndTime}
+          startDate={props.startTime}
+          endDate={props.endTime}
+          isInvalid={props.startTime > props.endTime}
+          aria-label="End date"
+          showTimeSelect
+        />
+      }
+    />
+  );
+
+  const renderParaInput = () => {
+    return (
       <Source language={para.lang}>
+        {/* If the para is selected show the editor else display the code in the paragraph */}
         {para.isSelected ? (
-          <>
-            <EuiTextArea
-              className="editorArea"
-              fullWidth
-              isInvalid={runParaError}
-              onChange={(evt) => textValueEditor(evt, index)}
-              onKeyPress={(evt) => handleKeyPress(evt, para, index)}
-              value={para.inp}
-              autoFocus
-            />
-          </>
+          <EuiTextArea
+            className="editorArea"
+            fullWidth
+            isInvalid={runParaError}
+            onChange={(evt) => textValueEditor(evt, index)}
+            onKeyPress={(evt) => handleKeyPress(evt, para, index)}
+            value={para.inp}
+            autoFocus
+          />
         ) : (
             para.inp
           )}
       </Source>
+    );
+  };
+
+  const renderVisInput = () => {
+    return (
+      <div style={{ margin: 16, marginBottom: 0 }}>
+        <EuiForm>
+          <EuiFormRow label="Date range">
+            {datePicker}
+            {/* <EuiSuperDatePicker
+              start={props.startTime}
+              end={props.endTime}
+              showUpdateButton={false}
+              onTimeChange={(e) => {
+                props.setStartTime(e.start);
+                props.setEndTime(e.end);
+              }}
+            /> */}
+          </EuiFormRow>
+        </EuiForm>
+      </div>
+    );
+  };
+
+  return (
+    <Input hidden={para.isInputHidden}>
+      <Prompt blank={true} running={para.isRunning} queued={para.inQueue} />
+      {para.isVizualisation ? renderVisInput() : renderParaInput()}
     </Input>
   );
 };
