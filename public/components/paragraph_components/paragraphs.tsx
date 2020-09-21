@@ -466,6 +466,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
         >
           {showInput &&
             <>
+            <EuiSpacer size='s' />
               <ParaInput
                 para={para}
                 index={index}
@@ -478,10 +479,10 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                 setEndTime={setEndTime}
               />
               {runParaError &&
-                <EuiText color="danger" size="s" style={{ marginLeft: 16 }}>Input is required.</EuiText>
+                <EuiText color="danger" size="s">Input is required.</EuiText>
               }
               <EuiSpacer size='m' />
-              <EuiFlexGroup alignItems='center' style={{ marginLeft: 4 }}>
+              <EuiFlexGroup alignItems='center'>
                 <EuiFlexItem grow={false}>
                   <EuiButton onClick={() => onRunPara()}>
                     {outputExists ? 'Refresh' : 'Run'}

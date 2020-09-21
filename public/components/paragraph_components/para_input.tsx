@@ -67,7 +67,7 @@ export const ParaInput = (props: {
 
   const renderVisInput = () => {
     return (
-      <div style={{ margin: 16, marginBottom: 0 }}>
+      <>
         <EuiForm>
           <EuiFormRow label="Date range" fullWidth>
             <EuiSuperDatePicker
@@ -81,7 +81,7 @@ export const ParaInput = (props: {
             />
           </EuiFormRow>
         </EuiForm>
-      </div>
+      </>
     );
   };
 
