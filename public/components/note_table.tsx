@@ -42,7 +42,6 @@ import moment from 'moment';
 import React, { useEffect, useState, ReactElement } from 'react';
 import { ChromeBreadcrumb } from '../../../../src/core/public';
 import { DATE_FORMAT } from '../../common';
-import { CustomUploadModal } from './helpers/custom_modals/custom_upload_modal';
 import { getCloneModal, getCustomModal, DeleteNotebookModal } from './helpers/modal_containers';
 import { NotebookType } from './main';
 
@@ -54,7 +53,6 @@ type NoteTableProps = {
   cloneNotebook: (newNoteName: string, noteId: string) => void;
   deleteNotebook: (noteId: string, noteName?: string, showToast?: boolean) => void;
   exportNotebook: (noteName: string, noteId: string) => void;
-  importNotebook: (fileObj: any) => void;
   setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
   setToast: (title: string, color?: string, text?: string) => void;
 };
@@ -72,7 +70,6 @@ export function NoteTable(props: NoteTableProps) {
     cloneNotebook,
     deleteNotebook,
     exportNotebook,
-    importNotebook,
   } = props;
 
   useEffect(() => {
@@ -118,22 +115,6 @@ export function NoteTable(props: NoteTableProps) {
 
   const onExport = async () => {
     exportNotebook(selectedNotebooks[0].path, selectedNotebooks[0].id);
-  };
-
-  const onImport = async (file: FileList) => {
-    const fr = new FileReader();
-    let fileObject = {};
-    fr.onload = function (e: ProgressEvent<FileReader>) {
-      try {
-        fileObject = JSON.parse(e.target.result.toString());
-        importNotebook(fileObject);
-      } catch {
-        props.setToast('Imported file not valid json', 'danger');
-      }
-    };
-
-    fr.readAsText(file[0]);
-    closeModal();
   };
 
   const createNote = () => {
@@ -185,11 +166,6 @@ export function NoteTable(props: NoteTableProps) {
     showModal();
   };
 
-  const importNote = () => {
-    setModalLayout(<CustomUploadModal runModal={onImport} closeModal={closeModal} />);
-    showModal();
-  };
-
   const popoverButton = (
     <EuiButton iconType="arrowDown" iconSide="right" onClick={() => setIsActionsPopoverOpen(!isActionsPopoverOpen)}>
       Actions
@@ -197,15 +173,6 @@ export function NoteTable(props: NoteTableProps) {
   );
 
   const popoverItems: ReactElement[] = [
-    // show `Import from JSON` only if no notebooks are selected
-    selectedNotebooks.length === 0 ? <EuiContextMenuItem
-      key="import_from_json"
-      onClick={() => {
-        setIsActionsPopoverOpen(false);
-        importNote();
-      }}>
-      <EuiText className="eui-color-primary">Import from JSON</EuiText>
-    </EuiContextMenuItem> : null,
     <EuiContextMenuItem
       key="rename"
       disabled={selectedNotebooks.length !== 1}
@@ -298,7 +265,7 @@ export function NoteTable(props: NoteTableProps) {
                       button={popoverButton}
                       isOpen={isActionsPopoverOpen}
                       closePopover={() => setIsActionsPopoverOpen(false)}>
-                      <EuiContextMenuPanel items={popoverItems.filter((item) => item)} />
+                      <EuiContextMenuPanel items={popoverItems} />
                     </EuiPopover>
                   </EuiFlexItem>
                   <EuiFlexItem>

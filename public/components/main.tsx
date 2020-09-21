@@ -172,20 +172,6 @@ export class Main extends React.Component<MainProps, MainState> {
       .catch((err) => console.error('Issue in exporting the notebook', err.body.message));
   };
 
-  // Imports a new notebook
-  importNotebook = (noteObject: any) => {
-    const importObject = {
-      noteObj: noteObject,
-    };
-    return this.props.http
-      .post(`${API_PREFIX}/note/import`, { body: JSON.stringify(importObject) })
-      .then((res) => {
-        this.fetchNotebooks();
-        this.setToast(`Notebook successfully imported!`);
-      })
-      .catch((err) => this.setToast('Issue in importing the notebook' + err.body.message, 'danger'));
-  };
-
   render() {
     return (
       <HashRouter basename={this.props.basename}>
@@ -227,7 +213,6 @@ export class Main extends React.Component<MainProps, MainState> {
                   cloneNotebook={this.cloneNotebook}
                   deleteNotebook={this.deleteNotebook}
                   exportNotebook={this.exportNotebook}
-                  importNotebook={this.importNotebook}
                   setBreadcrumbs={this.props.setBreadcrumbs}
                   setToast={this.setToast}
                 />

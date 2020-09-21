@@ -202,33 +202,4 @@ export function NoteRouter(router: IRouter) {
       }
     }
   );
-
-  // Import a notebook
-  router.post(
-    {
-      path: `${API_PREFIX}/note/import`,
-      validate: {
-        body: schema.object({
-          noteObj: schema.any(),
-        }),
-      },
-    },
-    async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
-      try {
-        const importResponse = await BACKEND.importNote(
-          context,
-          request.body.noteObj,
-          wreckOptions
-        );
-        return response.ok({
-          body: importResponse,
-        });
-      } catch (error) {
-        return response.custom({
-          statusCode: error.statusCode || 500,
-          body: error.message,
-        });
-      }
-    }
-  );
 }
