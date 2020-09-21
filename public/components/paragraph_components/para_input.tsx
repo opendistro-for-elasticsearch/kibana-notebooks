@@ -56,9 +56,6 @@ export const ParaInput = (props: {
               value={para.inp}
               autoFocus
             />
-            {runParaError &&
-              <EuiText color="danger" size="s" style={{ marginLeft: 16 }}>Input is required.</EuiText>
-            }
           </>
         ) : (
             para.inp
