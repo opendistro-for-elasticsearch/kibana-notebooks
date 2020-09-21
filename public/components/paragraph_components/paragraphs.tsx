@@ -78,25 +78,25 @@ import { API_PREFIX, ParaType, DATE_FORMAT } from '../../../common';
  * https://components.nteract.io/#cell
  */
 type ParagraphProps = {
-  para: ParaType;
-  dateModified: string;
-  index: number;
-  showInput: boolean;
-  setShowInput: (shouldShowInput: boolean) => void;
-  paraCount: number;
-  paragraphSelector: (index: number) => void;
-  textValueEditor: (evt: React.ChangeEvent<HTMLTextAreaElement>, index: number) => void;
-  handleKeyPress: (evt: React.KeyboardEvent<Element>, para: ParaType, index: number) => void;
+  para?: ParaType;
+  dateModified?: string;
+  index?: number;
+  showInput?: boolean;
+  setShowInput?: (shouldShowInput: boolean) => void;
+  paraCount?: number;
+  paragraphSelector?: (index: number) => void;
+  textValueEditor?: (evt: React.ChangeEvent<HTMLTextAreaElement>, index: number) => void;
+  handleKeyPress?: (evt: React.KeyboardEvent<Element>, para: ParaType, index: number) => void;
   addPara: (index: number, newParaContent: string, inputType: string) => void;
-  DashboardContainerByValueRenderer: DashboardStart['DashboardContainerByValueRenderer'];
-  deleteVizualization: (uniqueId: string) => void;
-  vizualizationEditor: (vizContent: string, index: number) => void;
+  DashboardContainerByValueRenderer?: DashboardStart['DashboardContainerByValueRenderer'];
+  deleteVizualization?: (uniqueId: string) => void;
+  vizualizationEditor?: (vizContent: string, index: number) => void;
   http: CoreStart['http'];
-  selectedViewId: string;
-  deletePara: (para: ParaType, index: number) => void;
-  runPara: (para: ParaType, index: number) => void;
-  clonePara: (para: ParaType, index: number) => void;
-  movePara: (index: number, targetIndex: number) => void;
+  selectedViewId?: string;
+  deletePara?: (para: ParaType, index: number) => void;
+  runPara?: (para: ParaType, index: number) => void;
+  clonePara?: (para: ParaType, index: number) => void;
+  movePara?: (index: number, targetIndex: number) => void;
 };
 
 export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {

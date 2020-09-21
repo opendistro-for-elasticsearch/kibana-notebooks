@@ -704,25 +704,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                   {/* show default paragraph if no paragraphs in this notebook */}
                   <Paragraphs
                     ref={this.child}
-                    para={undefined}
-                    dateModified={undefined}
-                    index={undefined}
-                    showInput={undefined}
-                    setShowInput={undefined}
-                    paraCount={undefined}
-                    paragraphSelector={undefined}
-                    textValueEditor={undefined}
-                    handleKeyPress={undefined}
                     addPara={this.addPara}
-                    DashboardContainerByValueRenderer={undefined}
-                    deleteVizualization={undefined}
-                    vizualizationEditor={undefined}
                     http={this.props.http}
-                    selectedViewId={undefined}
-                    deletePara={undefined}
-                    runPara={undefined}
-                    clonePara={undefined}
-                    movePara={undefined}
                   />
                 </Cells>
               )}
