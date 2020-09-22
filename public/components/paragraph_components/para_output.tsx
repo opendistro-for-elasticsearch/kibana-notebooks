@@ -38,7 +38,7 @@ export const ParaOutput = (props: {
   setVisInput: (input: DashboardContainerInput) => void;
   DashboardContainerByValueRenderer: DashboardStart['DashboardContainerByValueRenderer'];
 }) => {
-  const outputBody = (tIdx: number, typeOut: string, val: string) => {
+  const outputBody = (key: string, typeOut: string, val: string) => {
     /* Returns a component to render paragraph outputs using the para.typeOut property
      * Currently supports HTML, TABLE, IMG
      * TODO: add table rendering
@@ -48,7 +48,7 @@ export const ParaOutput = (props: {
       switch (typeOut) {
         case 'MARKDOWN':
           return (
-            <EuiText key={tIdx + '_paraOutput'}>
+            <EuiText key={key}>
               <MarkdownRender source={val} />
             </EuiText>
           );
@@ -58,21 +58,21 @@ export const ParaOutput = (props: {
               <EuiText>
                 {moment(visInput.timeRange.from).format(DATE_FORMAT) + ' - ' + moment(visInput.timeRange.to).format(DATE_FORMAT)}
               </EuiText>
-              <DashboardContainerByValueRenderer key={tIdx + '_paraOutput'} input={visInput} onInputUpdated={setVisInput} />
+              <DashboardContainerByValueRenderer key={key} input={visInput} onInputUpdated={setVisInput} />
             </>
           );
         case 'HTML':
           return (
-            <EuiText key={tIdx + '_paraOutput'}>
+            <EuiText key={key}>
               <Media.HTML data={val} />
             </EuiText>
           );
         case 'TABLE':
-          return <pre key={tIdx + '_paraOutput'}>{val}</pre>;
+          return <pre key={key}>{val}</pre>;
         case 'IMG':
-          return <img alt="" src={'data:image/gif;base64,' + val} key={tIdx + '_paraOutput'} />;
+          return <img alt="" src={'data:image/gif;base64,' + val} key={key} />;
         default:
-          return <pre key={tIdx + '_paraOutput'}>{val}</pre>;
+          return <pre key={key}>{val}</pre>;
       }
     } else {
       console.log('output not supported', typeOut);
@@ -85,7 +85,7 @@ export const ParaOutput = (props: {
   return (
     <Outputs hidden={para.isOutputHidden}>
       {para.typeOut.map((typeOut: string, tIdx: number) =>
-        outputBody(tIdx, typeOut, para.out[tIdx])
+        outputBody(para.uniqueId + '_paraOutputBody', typeOut, para.out[tIdx])
       )}
     </Outputs>
   );

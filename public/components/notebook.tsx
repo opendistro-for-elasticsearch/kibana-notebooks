@@ -368,10 +368,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
 
   // Hanldes Edits in visualization and syncs with paragraph input
   vizualizationEditor = (vizContent: string, index: number) => {
-    // console.log('viseditor', vizContent, index)
     let parsedPara = this.state.parsedPara;
     parsedPara[index].inp = this.state.vizPrefix + vizContent; // "%sh check"
-    // console.log('parsedpara', parsedPara[index].inp)
     this.setState({ parsedPara });
   };
 

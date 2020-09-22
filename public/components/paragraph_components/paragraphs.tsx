@@ -449,6 +449,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   // do not show input and EuiPanel if view mode is output_only
   if (props.selectedViewId === 'output_only') {
     return <ParaOutput
+      key={para.uniqueId}
       para={para}
       visInput={visInput}
       setVisInput={setVisInput}
@@ -503,6 +504,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
             <>
               <EuiHorizontalRule margin='none' />
               <ParaOutput
+                key={para.uniqueId}
                 para={para}
                 visInput={visInput}
                 setVisInput={setVisInput}
