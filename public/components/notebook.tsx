@@ -128,8 +128,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       if (this.state.paraOutputStale.length === 0)
         this.setState({ paraOutputStale: parsedPara.map(() => false) });
 
-      const paraRefs = parsedPara.map(() => React.createRef());
-      this.setState({ parsedPara, paraRefs });
+      this.setState({ parsedPara, paraRefs: parsedPara.map(() => React.createRef()) });
     } catch (error) {
       console.error('Parsing paragraph has some issue', error);
       this.setState({ parsedPara: [], paraRefs: [], paraOutputStale: [] });
@@ -321,8 +320,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         paraInputExpanded.splice(index, 0, true);
         const paraOutputStale = [...this.state.paraOutputStale];
         paraOutputStale.splice(index, 0, false);
+        const paraRefs = [...this.state.paraRefs];
+        paraRefs.splice(index, 0, React.createRef());
 
-        this.setState({ paragraphs, parsedPara, paraInputExpanded, paraOutputStale });
+        this.setState({ paragraphs, parsedPara, paraInputExpanded, paraOutputStale, paraRefs });
         this.setParaInputExpanded(index, true);
         this.paragraphSelector(index);
       })
