@@ -538,13 +538,15 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
           {props.selectedViewId !== 'input_only' && outputExists &&
             <>
               <EuiHorizontalRule margin='none' />
-              <ParaOutput
-                key={para.uniqueId}
-                para={para}
-                visInput={visInput}
-                setVisInput={setVisInput}
-                DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
-              />
+              <div style={{ opacity: props.isOutputStale ? 0.5 : 1 }}>
+                <ParaOutput
+                  key={para.uniqueId}
+                  para={para}
+                  visInput={visInput}
+                  setVisInput={setVisInput}
+                  DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
+                />
+              </div>
             </>
           }
         </Cell>
