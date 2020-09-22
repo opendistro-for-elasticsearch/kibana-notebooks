@@ -162,16 +162,6 @@ export class Main extends React.Component<MainProps, MainState> {
       .catch((err) => this.setToast('Issue in deleting the notebook ' + err.body.message, 'danger'));
   };
 
-  // Exports an existing notebook
-  exportNotebook = (exportNoteName: string, exportNoteId: string) => {
-    return this.props.http
-      .get(`${API_PREFIX}/note/export/` + exportNoteId)
-      .then((res) => {
-        onDownload(res, exportNoteName + '.json');
-      })
-      .catch((err) => console.error('Issue in exporting the notebook', err.body.message));
-  };
-
   render() {
     return (
       <HashRouter basename={this.props.basename}>
@@ -197,7 +187,6 @@ export class Main extends React.Component<MainProps, MainState> {
                   setBreadcrumbs={this.props.setBreadcrumbs}
                   renameNotebook={this.renameNotebook}
                   deleteNotebook={this.deleteNotebook}
-                  exportNotebook={this.exportNotebook}
                   setToast={this.setToast}
                 />
               }
@@ -212,7 +201,6 @@ export class Main extends React.Component<MainProps, MainState> {
                   renameNotebook={this.renameNotebook}
                   cloneNotebook={this.cloneNotebook}
                   deleteNotebook={this.deleteNotebook}
-                  exportNotebook={this.exportNotebook}
                   setBreadcrumbs={this.props.setBreadcrumbs}
                   setToast={this.setToast}
                 />

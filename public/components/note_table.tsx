@@ -52,7 +52,6 @@ type NoteTableProps = {
   renameNotebook: (newNoteName: string, noteId: string) => void;
   cloneNotebook: (newNoteName: string, noteId: string) => void;
   deleteNotebook: (noteId: string, noteName?: string, showToast?: boolean) => void;
-  exportNotebook: (noteName: string, noteId: string) => void;
   setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
   setToast: (title: string, color?: string, text?: string) => void;
 };
@@ -69,7 +68,6 @@ export function NoteTable(props: NoteTableProps) {
     renameNotebook,
     cloneNotebook,
     deleteNotebook,
-    exportNotebook,
   } = props;
 
   useEffect(() => {
@@ -111,10 +109,6 @@ export function NoteTable(props: NoteTableProps) {
       .then(() => props.setToast(toastMessage))
       .catch((error) => props.setToast('Issue in deleting notebooks' + error.body.message, 'danger'));
     closeModal();
-  };
-
-  const onExport = async () => {
-    exportNotebook(selectedNotebooks[0].path, selectedNotebooks[0].id);
   };
 
   const createNote = () => {
@@ -190,15 +184,6 @@ export function NoteTable(props: NoteTableProps) {
         cloneNote();
       }}>
       Duplicate
-    </EuiContextMenuItem>,
-    <EuiContextMenuItem
-      key="export_json"
-      disabled={selectedNotebooks.length !== 1}
-      onClick={() => {
-        setIsActionsPopoverOpen(false);
-        onExport();
-      }}>
-      Export JSON
     </EuiContextMenuItem>,
     <EuiContextMenuItem
       key="delete"

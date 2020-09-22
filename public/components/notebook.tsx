@@ -63,7 +63,6 @@ type NotebookProps = {
   setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
   renameNotebook: (newNoteName: string, noteId: string) => void;
   deleteNotebook: (noteId: string, noteName?: string, showToast?: boolean) => void;
-  exportNotebook: (noteName: string, noteId: string) => void;
   setToast: (title: string, color?: string, text?: string) => void;
 };
 
@@ -568,13 +567,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             onClick: () => {
               this.setState({ isNoteActionsPopoverOpen: false });
               this.showRenameModal();
-            },
-          },
-          {
-            name: 'Export notebook',
-            onClick: () => {
-              this.setState({ isNoteActionsPopoverOpen: false });
-              this.props.exportNotebook(this.state.path, this.props.openedNoteId);
             },
           },
           {

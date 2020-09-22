@@ -173,33 +173,4 @@ export function NoteRouter(router: IRouter) {
       }
     }
   );
-
-  // Export a notebook
-  router.get(
-    {
-      path: `${API_PREFIX}/note/export/{noteid}`,
-      validate: {
-        params: schema.object({
-          noteid: schema.string(),
-        }),
-      },
-    },
-    async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
-      try {
-        const exportResponse = await BACKEND.exportNote(
-          context,
-          request.params.noteid,
-          wreckOptions
-        );
-        return response.ok({
-          body: exportResponse.body,
-        });
-      } catch (error) {
-        return response.custom({
-          statusCode: error.statusCode || 500,
-          body: error.message,
-        });
-      }
-    }
-  );
 }
