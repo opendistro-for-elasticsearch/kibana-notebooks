@@ -111,42 +111,30 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.child = React.createRef();
   }
 
+  parseAllParagraphs = () => {
+    let parsedPara = this.parseParagraphs(this.state.paragraphs);
+    // set default state for displaying input and output stale
+    if (this.state.paraInputExpanded.length === 0)
+      this.setState({ paraInputExpanded: parsedPara.map(() => this.state.selectedViewId === 'input_only') });
+    if (this.state.paraOutputStale.length === 0)
+      this.setState({ paraOutputStale: parsedPara.map(() => false) });
+    this.setState({ parsedPara, paraRefs: parsedPara.map(() => React.createRef()) });
+  };
+
   // parse paragraphs based on backend
-  parseParagraphs = () => {
+  parseParagraphs = (paragraphs: any[]) => {
     try {
       let parsedPara;
       if (SELECTED_BACKEND === 'ZEPPELIN') {
-        parsedPara = zeppelinParagraphParser(this.state.paragraphs);
+        parsedPara = zeppelinParagraphParser(paragraphs);
         this.setState({ vizPrefix: '%sh #vizobject:' });
       } else {
-        parsedPara = defaultParagraphParser(this.state.paragraphs);
+        parsedPara = defaultParagraphParser(paragraphs);
       }
-
-      // set default state for displaying input and output stale
-      if (this.state.paraInputExpanded.length === 0)
-        this.setState({ paraInputExpanded: parsedPara.map(() => this.state.selectedViewId === 'input_only') });
-      if (this.state.paraOutputStale.length === 0)
-        this.setState({ paraOutputStale: parsedPara.map(() => false) });
-
-      this.setState({ parsedPara, paraRefs: parsedPara.map(() => React.createRef()) });
+      return parsedPara;
     } catch (error) {
       console.error('Parsing paragraph has some issue', error);
       this.setState({ parsedPara: [], paraRefs: [], paraOutputStale: [] });
-    }
-  };
-
-  parseOneParagraph = (paragraph: any) => {
-    try {
-      let parsedPara;
-      if (SELECTED_BACKEND === 'ZEPPELIN') {
-        parsedPara = zeppelinParagraphParser([paragraph]);
-        this.setState({ vizPrefix: '%sh #vizobject:' });
-      } else {
-        parsedPara = defaultParagraphParser([paragraph]);
-      }
-      return parsedPara[0];
-    } catch (error) {
-      console.error('Parsing paragraph has some issue', error);
     }
   };
 
@@ -223,7 +211,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
               .delete(`${API_PREFIX}/paragraph/${this.props.openedNoteId}/${para.uniqueId}`)
               .then((res) => {
                 this.setState({ paragraphs: res.paragraphs });
-                this.parseParagraphs();
+                this.parseAllParagraphs();
               })
               .catch((err) => console.error('Delete paragraph issue: ', err.body.message));
           });
@@ -293,7 +281,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .delete(`${API_PREFIX}/paragraph/` + this.props.openedNoteId + '/' + uniqueId)
       .then((res) => {
         this.setState({ paragraphs: res.paragraphs });
-        this.parseParagraphs();
+        this.parseAllParagraphs();
       })
       .catch((err) => console.error('Delete vizualization issue: ', err.body.message));
   };
@@ -315,7 +303,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         const paragraphs = [...this.state.paragraphs];
         paragraphs.splice(index, 0, res);
         const parsedPara = [...this.state.parsedPara];
-        parsedPara.splice(index, 0, this.parseOneParagraph(res));
+        parsedPara.splice(index, 0, this.parseParagraphs([res])[0]);
         const paraInputExpanded = [...this.state.paraInputExpanded];
         paraInputExpanded.splice(index, 0, true);
         const paraOutputStale = [...this.state.paraOutputStale];
@@ -324,7 +312,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         paraRefs.splice(index, 0, React.createRef());
 
         this.setState({ paragraphs, parsedPara, paraInputExpanded, paraOutputStale, paraRefs });
-        this.setParaInputExpanded(index, true);
         this.paragraphSelector(index);
       })
       .catch((err) => console.error('Add paragraph issue: ', err.body.message));
@@ -388,7 +375,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       })
       .then((res) => {
         this.setState({ paragraphs: res.paragraphs });
-        this.parseParagraphs();
+        this.parseAllParagraphs();
       })
       .catch((err) => console.error('clear paragraph issue: ', err.body.message));
   };
@@ -411,7 +398,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         const paragraphs = this.state.paragraphs;
         paragraphs[index] = res;
         const parsedPara = [...this.state.parsedPara];
-        parsedPara[index] = this.parseOneParagraph(res);
+        parsedPara[index] = this.parseParagraphs([res])[0];
         const paraOutputStale = [...this.state.paraOutputStale];
         paraOutputStale[index] = false;
         this.setState({ paragraphs, parsedPara, paraOutputStale });
@@ -466,13 +453,12 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       hideInput = true;
 
     let parsedPara = [...this.state.parsedPara];
-    this.state.parsedPara.map(
-      (para: ParaType, index: number) => {
-        parsedPara[index].isInputHidden = hideInput;
-        parsedPara[index].isOutputHidden = hideOutput;
-      }
-    );
+    this.state.parsedPara.map((para: ParaType, index: number) => {
+      parsedPara[index].isInputHidden = hideInput;
+      parsedPara[index].isOutputHidden = hideOutput;
+    });
     this.setState({ parsedPara });
+
     const paraInputExpanded = parsedPara.map(() => viewId === 'input_only');
     if (scrollToIndex !== undefined) {
       paraInputExpanded[scrollToIndex] = true;
@@ -488,7 +474,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .get(`${API_PREFIX}/note/` + this.props.openedNoteId)
       .then((res) => {
         this.setBreadcrumbs(res.path);
-        this.setState(res, this.parseParagraphs);
+        this.setState(res, this.parseAllParagraphs);
       })
       .catch((err) => console.error('Fetching notebook issue: ', err.body.message));
     this.setState({ toggleInput: true });
