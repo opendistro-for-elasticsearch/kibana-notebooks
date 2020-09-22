@@ -715,14 +715,14 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                 }
               </>
             ) : (
-                <Cells>
-                  {/* show default paragraph if no paragraphs in this notebook */}
+                // show default paragraph if no paragraphs in this notebook
+                <div style={{ marginTop: 20 }}>
                   <Paragraphs
                     ref={this.child}
                     addPara={this.addPara}
                     http={this.props.http}
                   />
-                </Cells>
+                </div>
               )}
           </EuiPageBody>
         </EuiPage>

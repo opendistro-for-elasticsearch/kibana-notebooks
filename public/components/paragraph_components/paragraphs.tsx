@@ -84,7 +84,7 @@ type ParagraphProps = {
   index?: number;
   showInput?: boolean;
   setShowInput?: (shouldShowInput: boolean) => void;
-  isOutputStale: boolean;
+  isOutputStale?: boolean;
   paraCount?: number;
   paragraphSelector?: (index: number) => void;
   textValueEditor?: (evt: React.ChangeEvent<HTMLTextAreaElement>, index: number) => void;
