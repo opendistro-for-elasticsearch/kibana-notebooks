@@ -54,7 +54,10 @@ export const ParaInput = (props: {
             className="editorArea"
             fullWidth
             isInvalid={runParaError}
-            onChange={(evt) => textValueEditor(evt, index)}
+            onChange={(evt) => {
+              textValueEditor(evt, index);
+              props.setIsOutputStale(true);
+            }}
             onKeyPress={(evt) => handleKeyPress(evt, para, index)}
             value={para.inp}
             autoFocus
@@ -78,7 +81,7 @@ export const ParaInput = (props: {
               onTimeChange={(e) => {
                 props.setStartTime(e.start);
                 props.setEndTime(e.end);
-                props.setIsOutputStale();
+                props.setIsOutputStale(true);
               }}
             />
           </EuiFormRow>

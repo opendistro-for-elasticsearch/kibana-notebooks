@@ -82,10 +82,8 @@ type ParagraphProps = {
   para?: ParaType;
   dateModified?: string;
   index?: number;
-  showInput?: boolean;
-  setShowInput?: (shouldShowInput: boolean) => void;
-  isOutputStale?: boolean;
-  setIsOutputStale?: (isStale: boolean) => void;
+  inputExpanded?: boolean;
+  setInputExpanded?: (inputExpanded: boolean) => void;
   paraCount?: number;
   paragraphSelector?: (index: number) => void;
   textValueEditor?: (evt: React.ChangeEvent<HTMLTextAreaElement>, index: number) => void;
@@ -107,8 +105,8 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   const {
     para,
     index,
-    showInput,
-    setShowInput,
+    inputExpanded,
+    setInputExpanded,
     paragraphSelector,
     textValueEditor,
     handleKeyPress,
@@ -127,6 +125,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   const [options, setOptions] = useState([]); // options for loading saved visualizations
   const [currentPara, setCurrentPara] = useState(0); // set current paragraph
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [isOutputStale, setIsOutputStale] = useState(false);
   const [runParaError, setRunParaError] = useState(false);
   const [selectedVisOption, setSelectedVisOption] = useState([]);
   const [visInput, setVisInput] = useState(loadedVizObject);
@@ -213,8 +212,9 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
       setRunParaError(false);
       props.runPara(para, index);
     }
+    setIsOutputStale(false);
     if (props.selectedViewId !== 'input_only') {
-      setShowInput(false);
+      setInputExpanded(false);
     }
   };
 
@@ -383,8 +383,8 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
               {`[${index + 1}] ${type} `}
               <EuiButtonIcon
                 aria-label="Toggle show input"
-                iconType={showInput ? "arrowUp" : "arrowDown"}
-                onClick={() => setShowInput(!showInput)}
+                iconType={inputExpanded ? "arrowUp" : "arrowDown"}
+                onClick={() => setInputExpanded(!inputExpanded)}
               />
             </EuiText>
           </EuiFlexItem>
@@ -466,7 +466,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
       <EuiPanel>
         {renderParaHeader(para.isVizualisation ? 'Kibana visualization' : 'Markdown', index)}
         <Cell key={index} onClick={() => paragraphSelector(index)}>
-          {showInput &&
+          {inputExpanded &&
             <>
               <EuiSpacer size='s' />
               <ParaInput
@@ -479,7 +479,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                 setStartTime={setStartTime}
                 endTime={endTime}
                 setEndTime={setEndTime}
-                setIsOutputStale={props.setIsOutputStale}
+                setIsOutputStale={setIsOutputStale}
               />
               {runParaError &&
                 <EuiText color="danger" size="s">Input is required.</EuiText>
@@ -498,13 +498,13 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                       <>
                         <EuiFlexItem grow={false} />
                         <EuiFlexItem grow={false}>
-                          {props.isOutputStale ?
+                          {isOutputStale ?
                             <EuiIcon type="questionInCircle" color="primary" /> :
                             <EuiIcon type="check" color="secondary" />}
                         </EuiFlexItem>
                         <EuiFlexItem>
                           <EuiText color='subdued'>
-                            {`Last run ${moment(props.dateModified).format(DATE_FORMAT)}. ${props.isOutputStale ?
+                            {`Last run ${moment(props.dateModified).format(DATE_FORMAT)}. ${isOutputStale ?
                               'Output below is stale.' : 'Output reflects latest input.'}`}
                           </EuiText>
                         </EuiFlexItem>
@@ -538,7 +538,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
           {props.selectedViewId !== 'input_only' && outputExists &&
             <>
               <EuiHorizontalRule margin='none' />
-              <div style={{ opacity: props.isOutputStale ? 0.5 : 1 }}>
+              <div style={{ opacity: isOutputStale ? 0.5 : 1 }}>
                 <ParaOutput
                   key={para.uniqueId}
                   para={para}
