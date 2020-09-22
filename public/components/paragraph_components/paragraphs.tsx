@@ -84,6 +84,7 @@ type ParagraphProps = {
   index?: number;
   showInput?: boolean;
   setShowInput?: (shouldShowInput: boolean) => void;
+  isOutputStale: boolean;
   paraCount?: number;
   paragraphSelector?: (index: number) => void;
   textValueEditor?: (evt: React.ChangeEvent<HTMLTextAreaElement>, index: number) => void;
@@ -463,10 +464,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     <>
       <EuiPanel>
         {renderParaHeader(para.isVizualisation ? 'Kibana visualization' : 'Markdown', index)}
-        <Cell
-          key={index}
-          onClick={() => paragraphSelector(index)}
-        >
+        <Cell key={index} onClick={() => paragraphSelector(index)}>
           {showInput &&
             <>
               <EuiSpacer size='s' />
@@ -485,24 +483,50 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                 <EuiText color="danger" size="s">Input is required.</EuiText>
               }
               <EuiSpacer size='m' />
-              <EuiFlexGroup alignItems='center'>
+              <EuiFlexGroup alignItems='center' gutterSize='s'>
                 <EuiFlexItem grow={false}>
                   <EuiButton onClick={() => onRunPara()}>
                     {outputExists ? 'Refresh' : 'Run'}
                   </EuiButton>
                 </EuiFlexItem>
+                <EuiFlexItem grow={false} />
                 {outputExists && !para.isVizualisation &&
-                  <EuiFlexItem>
-                    <EuiText color='subdued'>
-                      {`Output available from ${moment(props.dateModified).format(DATE_FORMAT)}`}
-                      {props.selectedViewId === 'input_only' &&
-                        <EuiLink
-                          onClick={() => props.setSelectedViewId('view_both', index)}
-                          style={{ marginLeft: 16 }}
-                        >Show both</EuiLink>
-                      }
-                    </EuiText>
-                  </EuiFlexItem>
+                  <>
+                    {props.selectedViewId === 'view_both' ?
+                      // render message when view mode is view_both
+                      <>
+                        <EuiFlexItem grow={false}>
+                          {props.isOutputStale ?
+                            <EuiIcon type="questionInCircle" color="primary" /> :
+                            <EuiIcon type="check" color="secondary" />}
+                        </EuiFlexItem>
+                        <EuiFlexItem>
+                          <EuiText color='subdued'>
+                            {` Last run ${moment(props.dateModified).format(DATE_FORMAT)}. ${props.isOutputStale ?
+                              'Output below is stale.' : 'Output reflects latest input.'}`}
+                          </EuiText>
+                        </EuiFlexItem>
+                      </> :
+                      // render message when view mode is input_only
+                      <>
+                        <EuiFlexItem grow={false}>
+                          <EuiIcon type="questionInCircle" color="primary" />
+                        </EuiFlexItem>
+                        <EuiFlexItem grow={false}>
+                          <EuiText color='subdued'>
+                            {`Output available from ${moment(props.dateModified).format(DATE_FORMAT)}`}
+                          </EuiText>
+                        </EuiFlexItem>
+                        <EuiFlexItem>
+                          <EuiText>
+                            <EuiLink
+                              onClick={() => props.setSelectedViewId('view_both', index)}
+                            >View both</EuiLink>
+                          </EuiText>
+                        </EuiFlexItem>
+                      </>
+                    }
+                  </>
                 }
               </EuiFlexGroup>
               <EuiSpacer size='m' />

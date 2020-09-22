@@ -75,6 +75,7 @@ type NotebookState = {
   parsedPara: Array<ParaType>; // paragraphs parsed to a common format
   paraRefs: Array<RefObject<HTMLDivElement>>; // paragraph refs for auto scrolling after moved
   paraShowInput: boolean[]; // should display input or not per paragraph
+  isOutputStale: boolean[]; // whether output of a paragraph reflects latest input
   toggleOutput: boolean; // Hide Outputs toggle
   toggleInput: boolean; // Hide Inputs toggle
   vizPrefix: string; // prefix for visualizations in Zeppelin Adaptor
@@ -97,6 +98,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       parsedPara: [],
       paraRefs: [],
       paraShowInput: [],
+      isOutputStale: [],
       toggleOutput: true,
       toggleInput: true,
       vizPrefix: '',
@@ -121,10 +123,11 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       }
       const paraRefs = parsedPara.map(() => React.createRef());
       const paraShowInput = parsedPara.map(() => this.state.selectedViewId === 'input_only');
-      this.setState({ parsedPara, paraRefs, paraShowInput });
+      const isOutputStale = parsedPara.map(() => false);
+      this.setState({ parsedPara, paraRefs, paraShowInput, isOutputStale });
     } catch (error) {
       console.error('Parsing paragraph has some issue', error);
-      this.setState({ parsedPara: [], paraRefs: [] });
+      this.setState({ parsedPara: [], paraRefs: [], isOutputStale: [] });
     }
   };
 
@@ -315,7 +318,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .then((res) => this.scrollToPara(targetIndex))
       .catch((err) => console.error('Move paragraph issue: ', err.body.message));
   };
-  
+
   scrollToPara(index: number) {
     setTimeout(() => {
       window.scrollTo({
@@ -360,7 +363,9 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       })
       .then((res) => {
         paragraphs[index] = res;
-        this.setState({ paragraphs });
+        const isOutputStale = [...this.state.isOutputStale];
+        isOutputStale[index] = false;
+        this.setState({ paragraphs, isOutputStale });
         this.parseParagraphs();
       })
       .catch((err) => console.error('run paragraph issue: ', err.body.message));
@@ -383,6 +388,11 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     if (!(evt.key === 'Enter' && evt.shiftKey)) {
       let parsedPara = this.state.parsedPara;
       parsedPara[index].inp = evt.target.value;
+      if (!this.state.isOutputStale[index] && this.state.paragraphs[index].dateModified < new Date().toISOString()) {
+        const isOutputStale = [...this.state.isOutputStale];
+        isOutputStale[index] = true;
+        this.setState({ isOutputStale });
+      }
       this.setState({ parsedPara });
     }
   };
@@ -664,6 +674,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           index={index}
                           showInput={this.state.paraShowInput[index]}
                           setShowInput={(shouldShowInput: boolean) => this.setShowInput(index, shouldShowInput)}
+                          isOutputStale={this.state.isOutputStale[index]}
                           paraCount={this.state.parsedPara.length}
                           paragraphSelector={this.paragraphSelector}
                           textValueEditor={this.textValueEditor}
