@@ -84,6 +84,8 @@ type ParagraphProps = {
   index?: number;
   inputExpanded?: boolean;
   setInputExpanded?: (inputExpanded: boolean) => void;
+  isOutputStale?: boolean;
+  setIsOutputStale?: (isStale: boolean) => void;
   paraCount?: number;
   paragraphSelector?: (index: number) => void;
   textValueEditor?: (evt: React.ChangeEvent<HTMLTextAreaElement>, index: number) => void;
@@ -107,6 +109,8 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     index,
     inputExpanded,
     setInputExpanded,
+    isOutputStale,
+    setIsOutputStale,
     paragraphSelector,
     textValueEditor,
     handleKeyPress,
@@ -125,7 +129,6 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   const [options, setOptions] = useState([]); // options for loading saved visualizations
   const [currentPara, setCurrentPara] = useState(0); // set current paragraph
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [isOutputStale, setIsOutputStale] = useState(false);
   const [runParaError, setRunParaError] = useState(false);
   const [selectedVisOption, setSelectedVisOption] = useState([]);
   const [visInput, setVisInput] = useState(loadedVizObject);

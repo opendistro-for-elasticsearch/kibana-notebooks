@@ -54,10 +54,7 @@ export const ParaInput = (props: {
             className="editorArea"
             fullWidth
             isInvalid={runParaError}
-            onChange={(evt) => {
-              textValueEditor(evt, index);
-              props.setIsOutputStale(true);
-            }}
+            onChange={(evt) => textValueEditor(evt, index)}
             onKeyPress={(evt) => handleKeyPress(evt, para, index)}
             value={para.inp}
             autoFocus
