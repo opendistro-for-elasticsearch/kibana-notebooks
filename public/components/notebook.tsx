@@ -312,13 +312,19 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         body: JSON.stringify(moveParaObj),
       })
       .then((res) => this.setState({ paragraphs }, this.parseParagraphs))
-      .then((res) => setTimeout(() => window.scrollTo({
-        left: 0,
-        top: this.state.paraRefs[targetIndex].current.offsetTop,
-        behavior: 'smooth'
-      }), 0))
+      .then((res) => this.scrollToPara(targetIndex))
       .catch((err) => console.error('Move paragraph issue: ', err.body.message));
   };
+  
+  scrollToPara(index: number) {
+    setTimeout(() => {
+      window.scrollTo({
+        left: 0,
+        top: this.state.paraRefs[index].current.offsetTop,
+        behavior: 'smooth'
+      })
+    }, 0);
+  }
 
   // Function for clearing outputs button
   clearParagraphButton = () => {
@@ -388,7 +394,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     }
   };
 
-  updateView = (viewId: string) => {
+  updateView = (viewId: string, scrollToIndex?: number) => {
+    this.setState({ selectedViewId: viewId });
     let hideInput = false, hideOutput = false;
     if (viewId === 'input_only')
       hideOutput = true;
@@ -405,6 +412,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     const paraShowInput = parsedPara.map(() => viewId === 'input_only');
     this.paragraphSelector(-1);
     this.setState({ parsedPara, paraShowInput });
+    if (scrollToIndex)
+      this.scrollToPara(scrollToIndex);
   };
 
   loadNotebook = () => {
@@ -598,7 +607,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                       options={viewOptions}
                       idSelected={this.state.selectedViewId}
                       onChange={(id) => {
-                        this.setState({ selectedViewId: id });
                         this.updateView(id);
                       }}
                     />
@@ -663,6 +671,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           vizualizationEditor={this.vizualizationEditor}
                           http={this.props.http}
                           selectedViewId={this.state.selectedViewId}
+                          setSelectedViewId={this.updateView}
                           deletePara={this.showDeleteParaModal}
                           runPara={this.updateRunParagraph}
                           clonePara={this.cloneParaButton}

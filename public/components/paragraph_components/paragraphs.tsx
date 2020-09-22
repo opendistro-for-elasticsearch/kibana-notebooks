@@ -38,6 +38,7 @@ import {
   EuiContextMenuPanelDescriptor,
   EuiIcon,
   EuiComboBox,
+  EuiLink,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui/lib/services';
 import _ from 'lodash';
@@ -93,6 +94,7 @@ type ParagraphProps = {
   vizualizationEditor?: (vizContent: string, index: number) => void;
   http: CoreStart['http'];
   selectedViewId?: string;
+  setSelectedViewId?: (viewId: string, scrollToIndex?: number) => void;
   deletePara?: (para: ParaType, index: number) => void;
   runPara?: (para: ParaType, index: number) => void;
   clonePara?: (para: ParaType, index: number) => void;
@@ -493,6 +495,12 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                   <EuiFlexItem>
                     <EuiText color='subdued'>
                       {`Output available from ${moment(props.dateModified).format(DATE_FORMAT)}`}
+                      {props.selectedViewId === 'input_only' &&
+                        <EuiLink
+                          onClick={() => props.setSelectedViewId('view_both', index)}
+                          style={{ marginLeft: 16 }}
+                        >Show both</EuiLink>
+                      }
                     </EuiText>
                   </EuiFlexItem>
                 }
