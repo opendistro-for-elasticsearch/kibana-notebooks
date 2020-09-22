@@ -507,6 +507,9 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             onClick: () => {
               this.setState({ isParaActionsPopoverOpen: false });
               this.runForAllParagraphs(this.updateRunParagraph);
+              if (this.state.selectedViewId === 'input_only') {
+                this.updateView('view_both');
+              }
             },
           },
           {
