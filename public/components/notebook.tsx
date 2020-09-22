@@ -122,12 +122,33 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         parsedPara = defaultParagraphParser(this.state.paragraphs);
       }
       const paraRefs = parsedPara.map(() => React.createRef());
-      const paraShowInput = parsedPara.map(() => this.state.selectedViewId === 'input_only');
-      const isOutputStale = parsedPara.map(() => false);
-      this.setState({ parsedPara, paraRefs, paraShowInput, isOutputStale });
+      if (this.state.paraShowInput.length === 0) {
+        const paraShowInput = parsedPara.map(() => this.state.selectedViewId === 'input_only');
+        this.setState({ paraShowInput });
+      }
+      if (this.state.isOutputStale.length === 0) {
+        const isOutputStale = parsedPara.map(() => false);
+        this.setState({ isOutputStale });
+      }
+      this.setState({ parsedPara, paraRefs });
     } catch (error) {
       console.error('Parsing paragraph has some issue', error);
       this.setState({ parsedPara: [], paraRefs: [], isOutputStale: [] });
+    }
+  };
+
+  parseOneParagraph = (paragraph: any) => {
+    try {
+      let parsedPara;
+      if (SELECTED_BACKEND === 'ZEPPELIN') {
+        parsedPara = zeppelinParagraphParser([paragraph]);
+        this.setState({ vizPrefix: '%sh #vizobject:' });
+      } else {
+        parsedPara = defaultParagraphParser([paragraph]);
+      }
+      return parsedPara[0];
+    } catch (error) {
+      console.error('Parsing paragraph has some issue', error);
     }
   };
 
@@ -165,8 +186,15 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       return this.props.http
         .delete(`${API_PREFIX}/paragraph/` + this.props.openedNoteId + '/' + para.uniqueId)
         .then((res) => {
-          this.setState({ paragraphs: res.paragraphs });
-          this.parseParagraphs();
+          const paragraphs = [...this.state.paragraphs];
+          paragraphs.splice(index, 1);
+          const paraShowInput = [...this.state.paraShowInput];
+          paraShowInput.splice(index, 1);
+          const isOutputStale = [...this.state.isOutputStale];
+          isOutputStale.splice(index, 1);
+          const parsedPara = [...this.state.parsedPara];
+          parsedPara.splice(index, 1);
+          this.setState({ paragraphs, paraShowInput, parsedPara, isOutputStale });
           if (showToast)
             this.props.setToast('Paragraph successfully deleted!');
         })
@@ -268,8 +296,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
 
   // Backend call to add a paragraph
   addPara = (index: number, newParaContent: string, inpType: string) => {
-    let paragraphs = this.state.paragraphs;
-
     const addParaObj = {
       noteId: this.props.openedNoteId,
       paragraphIndex: index,
@@ -282,9 +308,15 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         body: JSON.stringify(addParaObj),
       })
       .then((res) => {
+        const paragraphs = [...this.state.paragraphs];
         paragraphs.splice(index, 0, res);
-        this.setState({ paragraphs });
-        this.parseParagraphs();
+        const paraShowInput = [...this.state.paraShowInput];
+        paraShowInput.splice(index, 0, true);
+        const isOutputStale = [...this.state.isOutputStale];
+        isOutputStale.splice(index, 0, false);
+        const parsedPara = [...this.state.parsedPara];
+        parsedPara.splice(index, 0, this.parseOneParagraph(res));
+        this.setState({ paragraphs, paraShowInput, parsedPara, isOutputStale });
         this.setShowInput(index, true);
         this.paragraphSelector(index);
       })
@@ -306,6 +338,12 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   movePara = (index: number, targetIndex: number) => {
     const paragraphs = [...this.state.paragraphs];
     paragraphs.splice(targetIndex, 0, paragraphs.splice(index, 1)[0]);
+    const paraShowInput = [...this.state.paraShowInput];
+    paraShowInput.splice(targetIndex, 0, paraShowInput.splice(index, 1)[0]);
+    const parsedPara = [...this.state.parsedPara];
+    parsedPara.splice(targetIndex, 0, parsedPara.splice(index, 1)[0]);
+    const isOutputStale = [...this.state.isOutputStale];
+    isOutputStale.splice(targetIndex, 0, isOutputStale.splice(index, 1)[0]);
 
     const moveParaObj = {
       noteId: this.props.openedNoteId,
@@ -316,7 +354,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .post(`${API_PREFIX}/set_paragraphs/`, {
         body: JSON.stringify(moveParaObj),
       })
-      .then((res) => this.setState({ paragraphs }, this.parseParagraphs))
+      .then((res) => this.setState({ paragraphs, paraShowInput, parsedPara, isOutputStale }))
       .then((res) => this.scrollToPara(targetIndex))
       .catch((err) => console.error('Move paragraph issue: ', err.body.message));
   };
@@ -351,7 +389,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   // Backend call to update and run contents of paragraph
   updateRunParagraph = (para: ParaType, index: number) => {
     this.showParagraphRunning(index);
-    let paragraphs = this.state.paragraphs;
 
     const paraUpdateObject = {
       noteId: this.props.openedNoteId,
@@ -364,11 +401,13 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         body: JSON.stringify(paraUpdateObject),
       })
       .then((res) => {
+        const paragraphs = this.state.paragraphs;
         paragraphs[index] = res;
+        const parsedPara = [...this.state.parsedPara];
+        parsedPara[index] = this.parseOneParagraph(res);
         const isOutputStale = [...this.state.isOutputStale];
         isOutputStale[index] = false;
-        this.setState({ paragraphs, isOutputStale });
-        this.parseParagraphs();
+        this.setState({ paragraphs, parsedPara, isOutputStale });
       })
       .catch((err) => console.error('run paragraph issue: ', err.body.message));
   };
