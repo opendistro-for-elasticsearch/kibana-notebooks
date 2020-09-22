@@ -117,7 +117,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     http,
   } = props;
 
-  const outputExists = para?.out[0] !== '' || para?.vizObjectInput !== '';
+  const outputExists = (para?.out.length > 0 && para?.out[0] !== '') || para?.vizObjectInput !== '';
   const loadedVizObject: DashboardContainerInput = para?.isVizualisation ? JSON.parse(para.vizObjectInput) : {};
   loadedVizObject.viewMode = ViewMode.VIEW;
 
