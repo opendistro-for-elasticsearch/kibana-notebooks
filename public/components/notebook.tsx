@@ -433,6 +433,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     }
   };
 
+  // update view mode, scrolls to paragraph and expands input if scrollToIndex is given
   updateView = (viewId: string, scrollToIndex?: number) => {
     this.setState({ selectedViewId: viewId });
     let hideInput = false, hideOutput = false;
@@ -448,11 +449,14 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         parsedPara[index].isOutputHidden = hideOutput;
       }
     );
+    this.setState({ parsedPara });
     const paraInputExpanded = parsedPara.map(() => viewId === 'input_only');
-    this.paragraphSelector(-1);
-    this.setState({ parsedPara, paraInputExpanded });
-    if (scrollToIndex)
+    if (scrollToIndex !== undefined) {
+      paraInputExpanded[scrollToIndex] = true;
       this.scrollToPara(scrollToIndex);
+    }
+    this.setState({ paraInputExpanded });
+    this.paragraphSelector(scrollToIndex !== undefined ? scrollToIndex : -1);
   };
 
   loadNotebook = () => {
