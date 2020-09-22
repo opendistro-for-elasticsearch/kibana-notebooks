@@ -85,6 +85,7 @@ type ParagraphProps = {
   showInput?: boolean;
   setShowInput?: (shouldShowInput: boolean) => void;
   isOutputStale?: boolean;
+  setIsOutputStale?: (isStale: boolean) => void;
   paraCount?: number;
   paragraphSelector?: (index: number) => void;
   textValueEditor?: (evt: React.ChangeEvent<HTMLTextAreaElement>, index: number) => void;
@@ -478,6 +479,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                 setStartTime={setStartTime}
                 endTime={endTime}
                 setEndTime={setEndTime}
+                setIsOutputStale={props.setIsOutputStale}
               />
               {runParaError &&
                 <EuiText color="danger" size="s">Input is required.</EuiText>
@@ -489,12 +491,12 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                     {outputExists ? 'Refresh' : 'Run'}
                   </EuiButton>
                 </EuiFlexItem>
-                <EuiFlexItem grow={false} />
-                {outputExists && !para.isVizualisation &&
+                {outputExists &&
                   <>
                     {props.selectedViewId === 'view_both' ?
                       // render message when view mode is view_both
                       <>
+                        <EuiFlexItem grow={false} />
                         <EuiFlexItem grow={false}>
                           {props.isOutputStale ?
                             <EuiIcon type="questionInCircle" color="primary" /> :
@@ -502,13 +504,14 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                         </EuiFlexItem>
                         <EuiFlexItem>
                           <EuiText color='subdued'>
-                            {` Last run ${moment(props.dateModified).format(DATE_FORMAT)}. ${props.isOutputStale ?
+                            {`Last run ${moment(props.dateModified).format(DATE_FORMAT)}. ${props.isOutputStale ?
                               'Output below is stale.' : 'Output reflects latest input.'}`}
                           </EuiText>
                         </EuiFlexItem>
                       </> :
                       // render message when view mode is input_only
                       <>
+                        <EuiFlexItem grow={false} />
                         <EuiFlexItem grow={false}>
                           <EuiIcon type="questionInCircle" color="primary" />
                         </EuiFlexItem>

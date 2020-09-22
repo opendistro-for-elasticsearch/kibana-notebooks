@@ -378,10 +378,17 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .reduce((chain, func) => chain.then(func), Promise.resolve());
   };
 
+  setIsOutputStale = (index: number, isStale = true) => {
+    const isOutputStale = [...this.state.isOutputStale];
+    isOutputStale[index] = isStale;
+    this.setState({ isOutputStale });
+  }
+
   // Hanldes Edits in visualization and syncs with paragraph input
   vizualizationEditor = (vizContent: string, index: number) => {
     let parsedPara = this.state.parsedPara;
     parsedPara[index].inp = this.state.vizPrefix + vizContent; // "%sh check"
+    this.setIsOutputStale(index, false);
     this.setState({ parsedPara });
   };
 
@@ -390,11 +397,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     if (!(evt.key === 'Enter' && evt.shiftKey)) {
       let parsedPara = this.state.parsedPara;
       parsedPara[index].inp = evt.target.value;
-      if (!this.state.isOutputStale[index] && this.state.paragraphs[index].dateModified < new Date().toISOString()) {
-        const isOutputStale = [...this.state.isOutputStale];
-        isOutputStale[index] = true;
-        this.setState({ isOutputStale });
-      }
+      if (!this.state.isOutputStale[index] && this.state.paragraphs[index].dateModified < new Date().toISOString())
+        this.setIsOutputStale(index);
       this.setState({ parsedPara });
     }
   };
@@ -677,6 +681,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           showInput={this.state.paraShowInput[index]}
                           setShowInput={(shouldShowInput: boolean) => this.setShowInput(index, shouldShowInput)}
                           isOutputStale={this.state.isOutputStale[index]}
+                          setIsOutputStale={(isStale?: boolean) => this.setIsOutputStale(index, isStale)}
                           paraCount={this.state.parsedPara.length}
                           paragraphSelector={this.paragraphSelector}
                           textValueEditor={this.textValueEditor}

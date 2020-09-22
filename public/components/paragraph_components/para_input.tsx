@@ -41,6 +41,7 @@ export const ParaInput = (props: {
   setStartTime: (startTime: string) => void;
   endTime: string;
   setEndTime: (endTime: string) => void;
+  setIsOutputStale: (isStale?: boolean) => void;
 }) => {
   const { para, index, runParaError, textValueEditor, handleKeyPress } = props;
 
@@ -77,6 +78,7 @@ export const ParaInput = (props: {
               onTimeChange={(e) => {
                 props.setStartTime(e.start);
                 props.setEndTime(e.end);
+                props.setIsOutputStale();
               }}
             />
           </EuiFormRow>
