@@ -181,7 +181,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   };
 
   // Function for delete a Notebook button
-  deleteParagraphButton = (para: ParaType, index: number, showToast = true) => {
+  deleteParagraphButton = (para: ParaType, index: number) => {
     if (index !== -1) {
       return this.props.http
         .delete(`${API_PREFIX}/paragraph/` + this.props.openedNoteId + '/' + para.uniqueId)
@@ -195,8 +195,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           const parsedPara = [...this.state.parsedPara];
           parsedPara.splice(index, 1);
           this.setState({ paragraphs, paraShowInput, parsedPara, isOutputStale });
-          if (showToast)
-            this.props.setToast('Paragraph successfully deleted!');
         })
         .catch((err) => console.error('Delete paragraph issue: ', err.body.message));
     }
@@ -222,7 +220,15 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         () => this.setState({ isModalVisible: false }),
         async () => {
           this.setState({ isModalVisible: false });
-          await this.runForAllParagraphs((para: ParaType, index: number) => this.deleteParagraphButton(para, index, false));
+          await this.runForAllParagraphs((para: ParaType, index: number) => {
+            return this.props.http
+              .delete(`${API_PREFIX}/paragraph/${this.props.openedNoteId}/${para.uniqueId}`)
+              .then((res) => {
+                this.setState({ paragraphs: res.paragraphs });
+                this.parseParagraphs();
+              })
+              .catch((err) => console.error('Delete paragraph issue: ', err.body.message));
+          });
           this.props.setToast('Paragraphs successfully deleted!');
         },
         'Delete all paragraphs',
