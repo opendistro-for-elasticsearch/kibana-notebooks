@@ -57,7 +57,7 @@ export class DefaultBackend implements NotebookAdaptor {
         id: noteId,
         body: body,
       };
-      const esClientResponse = await context.core.elasticsearch.legacy.client.callAsInternalUser(
+      const esClientResponse = await context.core.elasticsearch.legacy.client.callAsCurrentUser(
         'index',
         options
       );
@@ -78,7 +78,7 @@ export class DefaultBackend implements NotebookAdaptor {
           doc: updateBody,
         },
       };
-      const esClientResponse = await context.core.elasticsearch.legacy.client.callAsInternalUser(
+      const esClientResponse = await context.core.elasticsearch.legacy.client.callAsCurrentUser(
         'update',
         options
       );
@@ -91,7 +91,7 @@ export class DefaultBackend implements NotebookAdaptor {
   // fetched a notebook by Id
   getNote = async function (context: RequestHandlerContext, noteId: string) {
     try {
-      const esClientResponse = await context.core.elasticsearch.legacy.client.callAsInternalUser(
+      const esClientResponse = await context.core.elasticsearch.legacy.client.callAsCurrentUser(
         'get',
         {
           index: '.notebooks',
@@ -119,7 +119,7 @@ export class DefaultBackend implements NotebookAdaptor {
           },
         },
       };
-      esClientResponse = await context.core.elasticsearch.legacy.client.callAsInternalUser(
+      esClientResponse = await context.core.elasticsearch.legacy.client.callAsCurrentUser(
         'search',
         options
       );
@@ -228,7 +228,7 @@ export class DefaultBackend implements NotebookAdaptor {
     _wreckOptions: optionsType
   ) {
     try {
-      const esClientResponse = await context.core.elasticsearch.legacy.client.callAsInternalUser(
+      const esClientResponse = await context.core.elasticsearch.legacy.client.callAsCurrentUser(
         'delete',
         {
           index: '.notebooks',

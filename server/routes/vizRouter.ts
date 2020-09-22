@@ -31,7 +31,7 @@ export function vizRouter(router: IRouter) {
         q: 'type:visualization',
       };
       try {
-        const esClientResponse = await context.core.elasticsearch.legacy.client.callAsInternalUser(
+        const esClientResponse = await context.core.elasticsearch.legacy.client.callAsCurrentUser(
           'search',
           params
         );
