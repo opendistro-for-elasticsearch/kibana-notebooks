@@ -146,6 +146,7 @@ export class Main extends React.Component<MainProps, MainState> {
       .then((res) => {
         this.fetchNotebooks();
         this.setToast(`Notebook "${clonedNoteName}" successfully created!`);
+        return res.body;
       })
       .catch((err) => this.setToast('Issue in cloning the notebook ' + err.body.message, 'danger'));
   };
@@ -186,6 +187,7 @@ export class Main extends React.Component<MainProps, MainState> {
                   http={this.props.http}
                   setBreadcrumbs={this.props.setBreadcrumbs}
                   renameNotebook={this.renameNotebook}
+                  cloneNotebook={this.cloneNotebook}
                   deleteNotebook={this.deleteNotebook}
                   setToast={this.setToast}
                 />

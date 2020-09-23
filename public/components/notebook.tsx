@@ -62,6 +62,7 @@ type NotebookProps = {
   http: CoreStart['http'];
   setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
   renameNotebook: (newNoteName: string, noteId: string) => void;
+  cloneNotebook: (newNoteName: string, noteId: string) => Promise<string>;
   deleteNotebook: (noteId: string, noteName?: string, showToast?: boolean) => void;
   setToast: (title: string, color?: string, text?: string) => void;
 };
@@ -247,11 +248,35 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           this.loadNotebook();
         },
         () => this.setState({ isModalVisible: false }),
-        'Edit notebook name',
-        'Please edit name',
+        'Name',
+        'Rename notebook',
         'Cancel',
         'Rename',
         this.state.path,
+        'Enter a unique name to describe the purpose of this notebook. The name must be less than 50 characters.')
+    });
+    this.setState({ isModalVisible: true });
+  }
+
+  showCloneModal = () => {
+    this.setState({
+      modalLayout: getCustomModal(
+        (newName: string) => {
+          this.props.cloneNotebook(newName, this.props.openedNoteId)
+            .then((id: string) => {
+              window.location.assign(`${this.props.basename}#${id}`);
+              setTimeout(() => {
+                this.loadNotebook()
+              }, 0);
+            });
+          this.setState({ isModalVisible: false });
+        },
+        () => this.setState({ isModalVisible: false }),
+        'Name',
+        'Duplicate notebook',
+        'Cancel',
+        'Duplicate',
+        this.state.path + ' (copy)',
         'Enter a unique name to describe the purpose of this notebook. The name must be less than 50 characters.')
     });
     this.setState({ isModalVisible: true });
@@ -638,6 +663,13 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             onClick: () => {
               this.setState({ isNoteActionsPopoverOpen: false });
               this.showRenameModal();
+            },
+          },
+          {
+            name: 'Duplicate notebook',
+            onClick: () => {
+              this.setState({ isNoteActionsPopoverOpen: false });
+              this.showCloneModal();
             },
           },
           {

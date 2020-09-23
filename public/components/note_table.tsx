@@ -97,8 +97,8 @@ export function NoteTable(props: NoteTableProps) {
     closeModal();
   };
 
-  const onClone = async () => {
-    cloneNotebook(selectedNotebooks[0].path + ' (copy)', selectedNotebooks[0].id);
+  const onClone = async (newName: string) => {
+    cloneNotebook(newName, selectedNotebooks[0].id);
     closeModal();
   };
 
@@ -132,8 +132,8 @@ export function NoteTable(props: NoteTableProps) {
       getCustomModal(
         onRename,
         closeModal,
-        'Edit notebook name',
-        'Please edit name',
+        'Name',
+        'Rename notebook',
         'Cancel',
         'Rename',
         selectedNotebooks[0].path,
@@ -144,7 +144,18 @@ export function NoteTable(props: NoteTableProps) {
   };
 
   const cloneNote = () => {
-    setModalLayout(getCloneModal(closeModal, onClone));
+    setModalLayout(
+      getCustomModal(
+        onClone,
+        closeModal,
+        'Name',
+        'Duplicate notebook',
+        'Cancel',
+        'Duplicate',
+        selectedNotebooks[0].path + ' (copy)',
+        'Enter a unique name to describe the purpose of this notebook. The name must be less than 50 characters.'
+      )
+    );
     showModal();
   };
 
