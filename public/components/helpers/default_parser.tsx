@@ -55,16 +55,25 @@ const parseInputType = (paraObject: any) => {
 // Param: Default Backend Paragraph
 const parseVisualization = (paraObject: any) => {
   try {
-    let vizContent = '';
     if (paraObject.input.inputType === 'VISUALIZATION') {
-      vizContent = paraObject.input.inputText;
-      const { panels, timeRange } = JSON.parse(vizContent);
+      let vizContent = paraObject.input.inputText;
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 30);
+      let visStartTime = startDate.toISOString();
+      let visEndTime = new Date().toISOString();
+      let visSavedObjId = '';
+      if (vizContent !== '') {
+        const { panels, timeRange } = JSON.parse(vizContent);
+        visStartTime = timeRange.from;
+        visEndTime = timeRange.to
+        visSavedObjId = panels['1'].explicitInput.savedObjectId;
+      }
       return {
         isViz: true,
         VizObject: vizContent,
-        visStartTime: timeRange.from,
-        visEndTime: timeRange.to,
-        visSavedObjId: panels['1'].explicitInput.savedObjectId,
+        visStartTime,
+        visEndTime,
+        visSavedObjId,
       };
     } else {
       return {
@@ -107,6 +116,7 @@ export const defaultParagraphParser = (defaultBackendParagraphs: any) => {
         isInputExpanded: false,
         isOutputStale: false,
         paraRef: undefined,
+        paraDivRef: undefined,
         visStartTime: vizParams.visStartTime,
         visEndTime: vizParams.visEndTime,
         visSavedObjId: vizParams.visSavedObjId,

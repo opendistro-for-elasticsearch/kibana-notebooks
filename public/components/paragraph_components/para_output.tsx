@@ -55,8 +55,8 @@ export const ParaOutput = (props: {
         case 'VISUALIZATION':
           return (
             <>
-              <EuiText>
-                {moment(visInput.timeRange.from).format(DATE_FORMAT) + ' - ' + moment(visInput.timeRange.to).format(DATE_FORMAT)}
+              <EuiText size='s' style={{ marginLeft: 9 }}>
+                {moment(visInput?.timeRange?.from).format(DATE_FORMAT) + ' - ' + moment(visInput?.timeRange?.to).format(DATE_FORMAT)}
               </EuiText>
               <DashboardContainerByValueRenderer key={key} input={visInput} onInputUpdated={setVisInput} />
             </>

@@ -31,6 +31,8 @@ import {
   EuiOverlayMask,
   EuiContextMenuPanelDescriptor,
   EuiButtonGroupOption,
+  EuiIcon,
+  EuiPanel,
 } from '@elastic/eui';
 import { Cells } from '@nteract/presentational-components';
 
@@ -84,7 +86,6 @@ type NotebookState = {
   modalLayout: React.ReactNode;
 };
 export class Notebook extends Component<NotebookProps, NotebookState> {
-  child: React.RefObject<any>;
   constructor(props: Readonly<NotebookProps>) {
     super(props);
     this.state = {
@@ -103,8 +104,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       isModalVisible: false,
       modalLayout: <EuiOverlayMask></EuiOverlayMask>,
     };
-    // child ref is used to call "showModal()" in Paragraphs to add vis paragraph
-    this.child = React.createRef();
   }
 
   parseAllParagraphs = () => {
@@ -124,7 +123,8 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       }
       parsedPara.forEach((para: ParaType) => {
         para.isInputExpanded = this.state.selectedViewId === 'input_only';
-        para.paraRef = React.createRef<HTMLDivElement>();
+        para.paraRef = React.createRef();
+        para.paraDivRef = React.createRef<HTMLDivElement>();
       });
       return parsedPara;
     } catch (error) {
@@ -257,7 +257,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
               window.location.assign(`${this.props.basename}#${id}`);
               setTimeout(() => {
                 this.loadNotebook()
-              }, 0);
+              }, 100);
             });
           this.setState({ isModalVisible: false });
         },
@@ -364,7 +364,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     setTimeout(() => {
       window.scrollTo({
         left: 0,
-        top: this.state.parsedPara[index].paraRef.current.offsetTop,
+        top: this.state.parsedPara[index].paraDivRef.current.offsetTop,
         behavior: 'smooth'
       })
     }, 0);
@@ -526,7 +526,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             name: 'Kibana visualization',
             onClick: () => {
               this.setState({ isAddParaPopoverOpen: false });
-              this.child.current.showAddVisualizationModal(this.state.paragraphs.length);
+              this.addPara(this.state.paragraphs.length, '', 'VISUALIZATION');
             },
           },
         ],
@@ -550,17 +550,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             onClick: () => {
               this.setState({ isParaActionsPopoverOpen: false });
               this.runForAllParagraphs((para: ParaType, index: number) => {
-                let vizObjectInput = undefined;
-                if (para.isVizualisation) {
-                  const newTimeRange = {
-                    from: para.visStartTime,
-                    to: para.visEndTime,
-                  };
-                  const visInput = JSON.parse(para.vizObjectInput);
-                  visInput.timeRange = newTimeRange;
-                  vizObjectInput = JSON.stringify(visInput);
-                }
-                return this.updateRunParagraph(para, index, vizObjectInput);
+                return para.paraRef.current.runParagraph();
               });
               if (this.state.selectedViewId === 'input_only') {
                 this.updateView('view_both');
@@ -598,7 +588,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             name: 'Kibana visualization',
             onClick: () => {
               this.setState({ isParaActionsPopoverOpen: false });
-              this.child.current.showAddVisualizationModal(0);
+              this.addPara(0, '', 'VISUALIZATION');
             },
           }
         ],
@@ -618,7 +608,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             name: 'Kibana visualization',
             onClick: () => {
               this.setState({ isParaActionsPopoverOpen: false });
-              this.child.current.showAddVisualizationModal(this.state.paragraphs.length);
+              this.addPara(this.state.paragraphs.length, '', 'VISUALIZATION');
             },
           }
         ],
@@ -718,9 +708,9 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                 <Cells>
                   <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
                     {this.state.parsedPara.map((para: ParaType, index: number) => (
-                      <div ref={this.state.parsedPara[index].paraRef} key={`para_div_${para.uniqueId}`}>
+                      <div ref={this.state.parsedPara[index].paraDivRef} key={`para_div_${para.uniqueId}`}>
                         <Paragraphs
-                          ref={index === 0 && this.child}
+                          ref={this.state.parsedPara[index].paraRef}
                           para={para}
                           setPara={(para: ParaType) => this.setPara(para, index)}
                           dateModified={this.state.paragraphs[index]?.dateModified}
@@ -764,11 +754,39 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             ) : (
                 // show default paragraph if no paragraphs in this notebook
                 <div style={{ marginTop: 20 }}>
-                  <Paragraphs
-                    ref={this.child}
-                    addPara={this.addPara}
-                    http={this.props.http}
-                  />
+                  <EuiPanel>
+                    <EuiSpacer size='xxl' />
+                    <EuiText textAlign='center'>
+                      <h2>No paragraph</h2>
+                      <EuiText>
+                        Add paragraph to compose your document or story. Notebook now supports two types of input:
+                      </EuiText>
+                    </EuiText>
+                    <EuiSpacer size='xl' />
+                    <EuiFlexGroup justifyContent='spaceAround'>
+                      <EuiFlexItem grow={false}>
+                        <EuiText textAlign='center'>
+                          <EuiIcon size="xxl" type="editorCodeBlock" />
+                          <h3>Markdown</h3>
+                          <p>Create rich text with markup language</p>
+                        </EuiText>
+                        <EuiButton onClick={() => this.addPara(0, '', 'CODE')}>
+                          Add markdown paragraph
+                        </EuiButton>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiText textAlign='center'>
+                          <EuiIcon size="xxl" type="visArea" />
+                          <h3>Kibana visualization</h3>
+                          <p>Import Kibana visualizations to the notes</p>
+                        </EuiText>
+                        <EuiButton onClick={() => this.addPara(0, '', 'VISUALIZATION')}>
+                          Add Kibana visualization paragraph
+                        </EuiButton>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                    <EuiSpacer size='xxl' />
+                  </EuiPanel>
                 </div>
               )}
           </EuiPageBody>

@@ -17,7 +17,7 @@ import React from 'react';
 import { Input, Prompt, Source } from '@nteract/presentational-components';
 
 import { ParaType } from '../../../common';
-import { EuiForm, EuiFormRow, EuiSuperDatePicker, EuiTextArea } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiForm, EuiFormRow, EuiSuperDatePicker, EuiTextArea } from '@elastic/eui';
 
 /*
  * "ParaInput" component is used by notebook to populate paragraph inputs for an open notebook.
@@ -42,6 +42,7 @@ export const ParaInput = (props: {
   endTime: string;
   setEndTime: (endTime: string) => void;
   setIsOutputStale: (isStale?: boolean) => void;
+  comboBox: React.ReactElement;
 }) => {
   const { para, index, runParaError, textValueEditor, handleKeyPress } = props;
 
@@ -72,20 +73,27 @@ export const ParaInput = (props: {
   const renderVisInput = () => {
     return (
       <>
-        <EuiForm>
-          <EuiFormRow label="Date range" fullWidth>
-            <EuiSuperDatePicker
-              start={props.startTime}
-              end={props.endTime}
-              showUpdateButton={false}
-              onTimeChange={(e) => {
-                props.setStartTime(e.start);
-                props.setEndTime(e.end);
-                props.setIsOutputStale(true);
-              }}
-            />
-          </EuiFormRow>
-        </EuiForm>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiFormRow label="Title" fullWidth>
+              {props.comboBox}
+            </EuiFormRow>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiFormRow label="Date range" fullWidth>
+              <EuiSuperDatePicker
+                start={props.startTime}
+                end={props.endTime}
+                showUpdateButton={false}
+                onTimeChange={(e) => {
+                  props.setStartTime(e.start);
+                  props.setEndTime(e.end);
+                  props.setIsOutputStale(true);
+                }}
+              />
+            </EuiFormRow>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       </>
     );
   };

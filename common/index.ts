@@ -62,8 +62,9 @@ export type ParaType = {
   out: any[];
   isInputExpanded: boolean;
   isOutputStale: boolean;
-  paraRef: RefObject<HTMLDivElement>;
-  visStartTime: string;
-  visEndTime: string;
-  visSavedObjId: string;
+  paraRef: RefObject<React.ReactElement>;
+  paraDivRef: RefObject<HTMLDivElement>;
+  visStartTime?: string;
+  visEndTime?: string;
+  visSavedObjId?: string;
 };
