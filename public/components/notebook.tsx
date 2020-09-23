@@ -550,7 +550,17 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             onClick: () => {
               this.setState({ isParaActionsPopoverOpen: false });
               this.runForAllParagraphs((para: ParaType, index: number) => {
-                return this.updateRunParagraph(para, index, para.isVizualisation ? para.vizObjectInput : undefined);
+                let vizObjectInput = undefined;
+                if (para.isVizualisation) {
+                  const newTimeRange = {
+                    from: para.visStartTime,
+                    to: para.visEndTime,
+                  };
+                  const visInput = JSON.parse(para.vizObjectInput);
+                  visInput.timeRange = newTimeRange;
+                  vizObjectInput = JSON.stringify(visInput);
+                }
+                return this.updateRunParagraph(para, index, vizObjectInput);
               });
               if (this.state.selectedViewId === 'input_only') {
                 this.updateView('view_both');

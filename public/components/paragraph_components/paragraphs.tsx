@@ -124,8 +124,6 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   const [runParaError, setRunParaError] = useState(false);
   const [selectedVisOption, setSelectedVisOption] = useState([]);
   const [visInput, setVisInput] = useState(loadedVizObject);
-  const [startTime, setStartTime] = useState(loadedVizObject?.timeRange?.from);
-  const [endTime, setEndTime] = useState(loadedVizObject?.timeRange?.to);
   const [toggleVisEdit, setToggleVisEdit] = useState(false);
 
   useImperativeHandle(ref, () => ({
@@ -193,8 +191,8 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     if (para.isVizualisation) {
       let inputTemp = _.cloneDeep(visInput);
       const newTimeRange = {
-        from: startTime,
-        to: endTime,
+        from: para.visStartTime,
+        to: para.visEndTime,
       };
       inputTemp.timeRange = newTimeRange;
       setVisInput(inputTemp);
@@ -470,10 +468,18 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                 runParaError={runParaError}
                 textValueEditor={textValueEditor}
                 handleKeyPress={handleKeyPress}
-                startTime={startTime}
-                setStartTime={setStartTime}
-                endTime={endTime}
-                setEndTime={setEndTime}
+                startTime={para.visStartTime}
+                setStartTime={(time: string) => {
+                  const newPara = props.para;
+                  newPara.visStartTime = time;
+                  props.setPara(newPara);
+                }}
+                endTime={para.visEndTime}
+                setEndTime={(time: string) => {
+                  const newPara = props.para;
+                  newPara.visEndTime = time;
+                  props.setPara(newPara);
+                }}
                 setIsOutputStale={(isStale: boolean) => {
                   const newPara = props.para;
                   newPara.isOutputStale = isStale;

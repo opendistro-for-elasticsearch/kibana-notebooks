@@ -59,8 +59,10 @@ export type ParaType = {
   lang: string;
   editorLanguage: string;
   typeOut: Array<string>;
-  out: string;
+  out: any[];
   isInputExpanded: boolean;
   isOutputStale: boolean;
   paraRef: RefObject<HTMLDivElement>;
+  visStartTime: string;
+  visEndTime: string;
 };
