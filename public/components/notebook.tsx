@@ -421,8 +421,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   vizualizationEditor = (vizContent: string, index: number) => {
     let parsedPara = this.state.parsedPara;
     parsedPara[index].inp = this.state.vizPrefix + vizContent; // "%sh check"
+    parsedPara[index].typeOut = ['VISUALIZATION'];
     this.setParaOutputStale(index, false);
     this.setState({ parsedPara });
+    return Promise.resolve();
   };
 
   // Handles text editor value and syncs with paragraph input
@@ -558,7 +560,12 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             name: 'Run all paragraphs',
             onClick: () => {
               this.setState({ isParaActionsPopoverOpen: false });
-              this.runForAllParagraphs(this.updateRunParagraph);
+              this.runForAllParagraphs((para: ParaType, index: number) => {
+                if (para.isVizualisation) {
+                  return this.vizualizationEditor(para.vizObjectInput, index);
+                }
+                return this.updateRunParagraph(para, index);
+              });
               if (this.state.selectedViewId === 'input_only') {
                 this.updateView('view_both');
               }
