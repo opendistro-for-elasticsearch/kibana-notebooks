@@ -13,6 +13,8 @@
  * permissions and limitations under the License.
  */
 
+import { RefObject } from 'react';
+
 export const PLUGIN_ID = 'kibanaNotebooks';
 export const PLUGIN_NAME = 'Kibana Notebooks';
 export const API_PREFIX = '/api/notebooks';
@@ -58,4 +60,7 @@ export type ParaType = {
   editorLanguage: string;
   typeOut: Array<string>;
   out: string;
+  isInputExpanded: boolean;
+  isOutputStale: boolean;
+  paraRef: RefObject<HTMLDivElement>;
 };

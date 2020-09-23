@@ -80,12 +80,9 @@ import { API_PREFIX, ParaType, DATE_FORMAT } from '../../../common';
  */
 type ParagraphProps = {
   para?: ParaType;
+  setPara?: (para: ParaType) => void;
   dateModified?: string;
   index?: number;
-  inputExpanded?: boolean;
-  setInputExpanded?: (inputExpanded: boolean) => void;
-  isOutputStale?: boolean;
-  setIsOutputStale?: (isStale: boolean) => void;
   paraCount?: number;
   paragraphSelector?: (index: number) => void;
   textValueEditor?: (evt: React.ChangeEvent<HTMLTextAreaElement>, index: number) => void;
@@ -107,10 +104,6 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   const {
     para,
     index,
-    inputExpanded,
-    setInputExpanded,
-    isOutputStale,
-    setIsOutputStale,
     paragraphSelector,
     textValueEditor,
     handleKeyPress,
@@ -215,10 +208,6 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
       }
       setRunParaError(false);
       props.runPara(para, index);
-    }
-    setIsOutputStale(false);
-    if (props.selectedViewId !== 'input_only') {
-      setInputExpanded(false);
     }
   };
 
@@ -387,8 +376,12 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
               {`[${index + 1}] ${type} `}
               <EuiButtonIcon
                 aria-label="Toggle show input"
-                iconType={inputExpanded ? "arrowUp" : "arrowDown"}
-                onClick={() => setInputExpanded(!inputExpanded)}
+                iconType={para.isInputExpanded ? "arrowUp" : "arrowDown"}
+                onClick={() => {
+                  const newPara = props.para;
+                  newPara.isInputExpanded = !newPara.isInputExpanded;
+                  props.setPara(newPara);
+                }}
               />
             </EuiText>
           </EuiFlexItem>
@@ -470,7 +463,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
       <EuiPanel>
         {renderParaHeader(para.isVizualisation ? 'Kibana visualization' : 'Markdown', index)}
         <Cell key={index} onClick={() => paragraphSelector(index)}>
-          {inputExpanded &&
+          {para.isInputExpanded &&
             <>
               <EuiSpacer size='s' />
               <ParaInput
@@ -483,7 +476,11 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                 setStartTime={setStartTime}
                 endTime={endTime}
                 setEndTime={setEndTime}
-                setIsOutputStale={setIsOutputStale}
+                setIsOutputStale={(isStale: boolean) => {
+                  const newPara = props.para;
+                  newPara.isOutputStale = isStale;
+                  props.setPara(newPara);
+                }}
               />
               {runParaError &&
                 <EuiText color="danger" size="s">Input is required.</EuiText>
@@ -502,13 +499,13 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                       <>
                         <EuiFlexItem grow={false} />
                         <EuiFlexItem grow={false}>
-                          {isOutputStale ?
+                          {para.isOutputStale ?
                             <EuiIcon type="questionInCircle" color="primary" /> :
                             <EuiIcon type="check" color="secondary" />}
                         </EuiFlexItem>
                         <EuiFlexItem>
                           <EuiText color='subdued'>
-                            {`Last run ${moment(props.dateModified).format(DATE_FORMAT)}. ${isOutputStale ?
+                            {`Last run ${moment(props.dateModified).format(DATE_FORMAT)}. ${para.isOutputStale ?
                               'Output below is stale.' : 'Output reflects latest input.'}`}
                           </EuiText>
                         </EuiFlexItem>
@@ -542,7 +539,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
           {props.selectedViewId !== 'input_only' && isOutputAvailable &&
             <>
               <EuiHorizontalRule margin='none' />
-              <div style={{ opacity: isOutputStale ? 0.5 : 1 }}>
+              <div style={{ opacity: para.isOutputStale ? 0.5 : 1 }}>
                 <ParaOutput
                   key={para.uniqueId}
                   para={para}

@@ -74,9 +74,6 @@ type NotebookState = {
   dateModified: string;
   paragraphs: any; // notebook paragraphs fetched from API
   parsedPara: Array<ParaType>; // paragraphs parsed to a common format
-  paraRefs: Array<RefObject<HTMLDivElement>>; // paragraph refs for auto scrolling after moved
-  paraInputExpanded: boolean[]; // input is expanded or collapsed per paragraph
-  paraOutputStale: boolean[]; // whether output of a paragraph reflects latest input
   toggleOutput: boolean; // Hide Outputs toggle
   toggleInput: boolean; // Hide Inputs toggle
   vizPrefix: string; // prefix for visualizations in Zeppelin Adaptor
@@ -97,9 +94,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       dateModified: '',
       paragraphs: [],
       parsedPara: [],
-      paraRefs: [],
-      paraInputExpanded: [],
-      paraOutputStale: [],
       toggleOutput: true,
       toggleInput: true,
       vizPrefix: '',
@@ -109,21 +103,17 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       isModalVisible: false,
       modalLayout: <EuiOverlayMask></EuiOverlayMask>,
     };
+    // child ref is used to call "showModal()" in Paragraphs to add vis paragraph
     this.child = React.createRef();
   }
 
   parseAllParagraphs = () => {
     let parsedPara = this.parseParagraphs(this.state.paragraphs);
-    // set default state for displaying input and output stale
-    if (this.state.paraInputExpanded.length === 0)
-      this.setState({ paraInputExpanded: parsedPara.map(() => this.state.selectedViewId === 'input_only') });
-    if (this.state.paraOutputStale.length === 0)
-      this.setState({ paraOutputStale: parsedPara.map(() => false) });
-    this.setState({ parsedPara, paraRefs: parsedPara.map(() => React.createRef()) });
+    this.setState({ parsedPara });
   };
 
   // parse paragraphs based on backend
-  parseParagraphs = (paragraphs: any[]) => {
+  parseParagraphs = (paragraphs: any[]): ParaType[] => {
     try {
       let parsedPara;
       if (SELECTED_BACKEND === 'ZEPPELIN') {
@@ -132,10 +122,14 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       } else {
         parsedPara = defaultParagraphParser(paragraphs);
       }
+      parsedPara.forEach((para: ParaType) => {
+        para.isInputExpanded = this.state.selectedViewId === 'input_only';
+        para.paraRef = React.createRef<HTMLDivElement>();
+      })
       return parsedPara;
     } catch (error) {
       console.error('Parsing paragraph has some issue', error);
-      this.setState({ parsedPara: [], paraRefs: [], paraOutputStale: [] });
+      this.setState({ parsedPara: [] });
     }
   };
 
@@ -177,11 +171,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           paragraphs.splice(index, 1);
           const parsedPara = [...this.state.parsedPara];
           parsedPara.splice(index, 1);
-          const paraInputExpanded = [...this.state.paraInputExpanded];
-          paraInputExpanded.splice(index, 1);
-          const paraOutputStale = [...this.state.paraOutputStale];
-          paraOutputStale.splice(index, 1);
-          this.setState({ paragraphs, parsedPara, paraInputExpanded, paraOutputStale });
+          this.setState({ paragraphs, parsedPara });
         })
         .catch((err) => console.error('Delete paragraph issue: ', err.body.message));
     }
@@ -234,7 +224,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         },
         'Clear all outputs',
         'Are you sure you want to clear all outputs? The action cannot be undone.',
-        'Yes, clear')
+        'Clear')
     });
     this.setState({ isModalVisible: true });
   };
@@ -327,16 +317,12 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .then((res) => {
         const paragraphs = [...this.state.paragraphs];
         paragraphs.splice(index, 0, res);
+        const newPara = this.parseParagraphs([res])[0];
+        newPara.isInputExpanded = true;
         const parsedPara = [...this.state.parsedPara];
-        parsedPara.splice(index, 0, this.parseParagraphs([res])[0]);
-        const paraInputExpanded = [...this.state.paraInputExpanded];
-        paraInputExpanded.splice(index, 0, true);
-        const paraOutputStale = [...this.state.paraOutputStale];
-        paraOutputStale.splice(index, 0, false);
-        const paraRefs = [...this.state.paraRefs];
-        paraRefs.splice(index, 0, React.createRef());
+        parsedPara.splice(index, 0, newPara);
 
-        this.setState({ paragraphs, parsedPara, paraInputExpanded, paraOutputStale, paraRefs });
+        this.setState({ paragraphs, parsedPara });
         this.paragraphSelector(index);
       })
       .catch((err) => console.error('Add paragraph issue: ', err.body.message));
@@ -359,10 +345,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     paragraphs.splice(targetIndex, 0, paragraphs.splice(index, 1)[0]);
     const parsedPara = [...this.state.parsedPara];
     parsedPara.splice(targetIndex, 0, parsedPara.splice(index, 1)[0]);
-    const paraInputExpanded = [...this.state.paraInputExpanded];
-    paraInputExpanded.splice(targetIndex, 0, paraInputExpanded.splice(index, 1)[0]);
-    const paraOutputStale = [...this.state.paraOutputStale];
-    paraOutputStale.splice(targetIndex, 0, paraOutputStale.splice(index, 1)[0]);
 
     const moveParaObj = {
       noteId: this.props.openedNoteId,
@@ -373,7 +355,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .post(`${API_PREFIX}/set_paragraphs/`, {
         body: JSON.stringify(moveParaObj),
       })
-      .then((res) => this.setState({ paragraphs, parsedPara, paraInputExpanded, paraOutputStale }))
+      .then((res) => this.setState({ paragraphs, parsedPara }))
       .then((res) => this.scrollToPara(targetIndex))
       .catch((err) => console.error('Move paragraph issue: ', err.body.message));
   };
@@ -382,7 +364,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     setTimeout(() => {
       window.scrollTo({
         left: 0,
-        top: this.state.paraRefs[index].current.offsetTop,
+        top: this.state.parsedPara[index].paraRef.current.offsetTop,
         behavior: 'smooth'
       })
     }, 0);
@@ -424,9 +406,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         paragraphs[index] = res;
         const parsedPara = [...this.state.parsedPara];
         parsedPara[index] = this.parseParagraphs([res])[0];
-        const paraOutputStale = [...this.state.paraOutputStale];
-        paraOutputStale[index] = false;
-        this.setState({ paragraphs, parsedPara, paraOutputStale });
+        this.setState({ paragraphs, parsedPara });
       })
       .catch((err) => console.error('run paragraph issue: ', err.body.message));
   };
@@ -436,18 +416,11 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .reduce((chain, func) => chain.then(func), Promise.resolve());
   };
 
-  setParaOutputStale = (index: number, isStale = true) => {
-    const paraOutputStale = [...this.state.paraOutputStale];
-    paraOutputStale[index] = isStale;
-    this.setState({ paraOutputStale });
-  }
-
   // Hanldes Edits in visualization and syncs with paragraph input
   vizualizationEditor = (vizContent: string, index: number) => {
     let parsedPara = this.state.parsedPara;
     parsedPara[index].inp = this.state.vizPrefix + vizContent; // "%sh check"
     parsedPara[index].typeOut = ['VISUALIZATION'];
-    this.setParaOutputStale(index, false);
     this.setState({ parsedPara });
     return Promise.resolve();
   };
@@ -457,8 +430,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     if (!(evt.key === 'Enter' && evt.shiftKey)) {
       let parsedPara = this.state.parsedPara;
       parsedPara[index].inp = evt.target.value;
-      if (!this.state.paraOutputStale[index])
-        this.setParaOutputStale(index);
       this.setState({ parsedPara });
     }
   };
@@ -483,15 +454,14 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.state.parsedPara.map((para: ParaType, index: number) => {
       parsedPara[index].isInputHidden = hideInput;
       parsedPara[index].isOutputHidden = hideOutput;
+      parsedPara[index].isInputExpanded = viewId === 'input_only';
     });
-    this.setState({ parsedPara });
 
-    const paraInputExpanded = parsedPara.map(() => viewId === 'input_only');
     if (scrollToIndex !== undefined) {
-      paraInputExpanded[scrollToIndex] = true;
+      parsedPara[scrollToIndex].isInputExpanded = true;
       this.scrollToPara(scrollToIndex);
     }
-    this.setState({ paraInputExpanded });
+    this.setState({ parsedPara });
     this.paragraphSelector(scrollToIndex !== undefined ? scrollToIndex : -1);
   };
 
@@ -508,10 +478,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.setState({ toggleOutput: true });
   };
 
-  setParaInputExpanded(index: number, inputExpanded: boolean) {
-    const paraInputExpanded = [...this.state.paraInputExpanded];
-    paraInputExpanded[index] = inputExpanded;
-    this.setState({ paraInputExpanded });
+  setPara = (para: ParaType, index: number) => {
+    const parsedPara = [...this.state.parsedPara];
+    parsedPara.splice(index, 1, para);
+    this.setState({ parsedPara });
   }
 
   setBreadcrumbs(path: string) {
@@ -747,16 +717,13 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                 <Cells>
                   <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
                     {this.state.parsedPara.map((para: ParaType, index: number) => (
-                      <div ref={this.state.paraRefs[index]} key={`para_div_${para.uniqueId}`}>
+                      <div ref={this.state.parsedPara[index].paraRef} key={`para_div_${para.uniqueId}`}>
                         <Paragraphs
                           ref={index === 0 && this.child}
                           para={para}
+                          setPara={(para: ParaType) => this.setPara(para, index)}
                           dateModified={this.state.paragraphs[index]?.dateModified}
                           index={index}
-                          inputExpanded={this.state.paraInputExpanded[index]}
-                          setInputExpanded={(inputExpanded: boolean) => this.setParaInputExpanded(index, inputExpanded)}
-                          isOutputStale={this.state.paraOutputStale[index]}
-                          setIsOutputStale={(isStale: boolean) => this.setParaOutputStale(index, isStale)}
                           paraCount={this.state.parsedPara.length}
                           paragraphSelector={this.paragraphSelector}
                           textValueEditor={this.textValueEditor}

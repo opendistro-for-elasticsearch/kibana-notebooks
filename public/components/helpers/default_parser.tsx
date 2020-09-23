@@ -100,6 +100,9 @@ export const defaultParagraphParser = (defaultBackendParagraphs: any) => {
         editorLanguage: codeLanguage,
         typeOut: message.outputType,
         out: message.outputData,
+        isInputExpanded: false,
+        isOutputStale: false,
+        paraRef: undefined,
       };
       parsedPara.push(tempPara);
     });
