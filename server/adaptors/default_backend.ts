@@ -354,6 +354,15 @@ export class DefaultBackend implements NotebookAdaptor {
               execution_time: '0s',
             },
           ];
+        } else if (paragraph.input.inputType === 'VISUALIZATION' && paragraph.id === paragraphId) {
+          updatedParagraph.dateModified = new Date().toISOString();
+          updatedParagraph.output = [
+            {
+              outputType: 'VISUALIZATION',
+              result: '',
+              execution_time: '0s',
+            },
+          ];
         }
         updatedParagraphs.push(updatedParagraph);
       });

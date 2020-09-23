@@ -90,12 +90,11 @@ type ParagraphProps = {
   addPara: (index: number, newParaContent: string, inputType: string) => void;
   DashboardContainerByValueRenderer?: DashboardStart['DashboardContainerByValueRenderer'];
   deleteVizualization?: (uniqueId: string) => void;
-  vizualizationEditor?: (vizContent: string, index: number) => void;
   http: CoreStart['http'];
   selectedViewId?: string;
   setSelectedViewId?: (viewId: string, scrollToIndex?: number) => void;
   deletePara?: (para: ParaType, index: number) => void;
-  runPara?: (para: ParaType, index: number) => void;
+  runPara?: (para: ParaType, index: number, vizObjectInput?: string) => void;
   clonePara?: (para: ParaType, index: number) => void;
   movePara?: (index: number, targetIndex: number) => void;
 };
@@ -110,7 +109,6 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     addPara,
     DashboardContainerByValueRenderer,
     deleteVizualization,
-    vizualizationEditor,
     http,
   } = props;
 
@@ -200,7 +198,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
       };
       inputTemp.timeRange = newTimeRange;
       setVisInput(inputTemp);
-      vizualizationEditor(JSON.stringify(inputTemp), index);
+      props.runPara(para, index, JSON.stringify(inputTemp));
     } else {
       if (!para.inp) {
         setRunParaError(true);

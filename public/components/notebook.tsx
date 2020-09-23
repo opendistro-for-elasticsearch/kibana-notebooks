@@ -125,7 +125,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       parsedPara.forEach((para: ParaType) => {
         para.isInputExpanded = this.state.selectedViewId === 'input_only';
         para.paraRef = React.createRef<HTMLDivElement>();
-      })
+      });
       return parsedPara;
     } catch (error) {
       console.error('Parsing paragraph has some issue', error);
@@ -388,8 +388,11 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   };
 
   // Backend call to update and run contents of paragraph
-  updateRunParagraph = (para: ParaType, index: number) => {
+  updateRunParagraph = (para: ParaType, index: number, vizObjectInput?: string) => {
     this.showParagraphRunning(index);
+    if (vizObjectInput) {
+      para.inp = this.state.vizPrefix + vizObjectInput; // "%sh check"
+    }
 
     const paraUpdateObject = {
       noteId: this.props.openedNoteId,
@@ -414,15 +417,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   runForAllParagraphs = (reducer: (para: ParaType, index: number) => Promise<any>) => {
     return this.state.parsedPara.map((para: ParaType, index: number) => () => reducer(para, index))
       .reduce((chain, func) => chain.then(func), Promise.resolve());
-  };
-
-  // Hanldes Edits in visualization and syncs with paragraph input
-  vizualizationEditor = (vizContent: string, index: number) => {
-    let parsedPara = this.state.parsedPara;
-    parsedPara[index].inp = this.state.vizPrefix + vizContent; // "%sh check"
-    parsedPara[index].typeOut = ['VISUALIZATION'];
-    this.setState({ parsedPara });
-    return Promise.resolve();
   };
 
   // Handles text editor value and syncs with paragraph input
@@ -556,10 +550,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             onClick: () => {
               this.setState({ isParaActionsPopoverOpen: false });
               this.runForAllParagraphs((para: ParaType, index: number) => {
-                if (para.isVizualisation) {
-                  return this.vizualizationEditor(para.vizObjectInput, index);
-                }
-                return this.updateRunParagraph(para, index);
+                return this.updateRunParagraph(para, index, para.isVizualisation ? para.vizObjectInput : undefined);
               });
               if (this.state.selectedViewId === 'input_only') {
                 this.updateView('view_both');
@@ -731,7 +722,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           addPara={this.addPara}
                           DashboardContainerByValueRenderer={this.props.DashboardContainerByValueRenderer}
                           deleteVizualization={this.deleteVizualization}
-                          vizualizationEditor={this.vizualizationEditor}
                           http={this.props.http}
                           selectedViewId={this.state.selectedViewId}
                           setSelectedViewId={this.updateView}
