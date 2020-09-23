@@ -102,7 +102,7 @@ export const getDeleteModal = (
         onCancel={onCancel}
         onConfirm={onConfirm}
         cancelButtonText="Cancel"
-        confirmButtonText={confirmMessage || "Yes, delete"}
+        confirmButtonText={confirmMessage || "Delete"}
         buttonColor="danger"
         defaultFocusedButton="confirm"
       >

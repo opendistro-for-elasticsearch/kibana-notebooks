@@ -253,6 +253,22 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     </EuiOverlayMask>
   );
 
+  const setStartTime = (time: string) => {
+    const newPara = props.para;
+    newPara.visStartTime = time;
+    props.setPara(newPara);
+  };
+  const setEndTime = (time: string) => {
+    const newPara = props.para;
+    newPara.visEndTime = time;
+    props.setPara(newPara);
+  };
+  const setIsOutputStale = (isStale: boolean) => {
+    const newPara = props.para;
+    newPara.isOutputStale = isStale;
+    props.setPara(newPara);
+  };
+
   const renderParaHeader = (type: string, index: number) => {
     const panels: EuiContextMenuPanelDescriptor[] = [
       {
@@ -443,15 +459,17 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     );
   }
 
+  const paraOutput = <ParaOutput
+    key={para.uniqueId}
+    para={para}
+    visInput={visInput}
+    setVisInput={setVisInput}
+    DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
+  />;
+
   // do not show input and EuiPanel if view mode is output_only
   if (props.selectedViewId === 'output_only') {
-    return <ParaOutput
-      key={para.uniqueId}
-      para={para}
-      visInput={visInput}
-      setVisInput={setVisInput}
-      DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
-    />;
+    return paraOutput;
   }
 
   return (
@@ -469,22 +487,10 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                 textValueEditor={textValueEditor}
                 handleKeyPress={handleKeyPress}
                 startTime={para.visStartTime}
-                setStartTime={(time: string) => {
-                  const newPara = props.para;
-                  newPara.visStartTime = time;
-                  props.setPara(newPara);
-                }}
+                setStartTime={setStartTime}
                 endTime={para.visEndTime}
-                setEndTime={(time: string) => {
-                  const newPara = props.para;
-                  newPara.visEndTime = time;
-                  props.setPara(newPara);
-                }}
-                setIsOutputStale={(isStale: boolean) => {
-                  const newPara = props.para;
-                  newPara.isOutputStale = isStale;
-                  props.setPara(newPara);
-                }}
+                setEndTime={setEndTime}
+                setIsOutputStale={setIsOutputStale}
               />
               {runParaError &&
                 <EuiText color="danger" size="s">Input is required.</EuiText>
@@ -544,13 +550,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
             <>
               <EuiHorizontalRule margin='none' />
               <div style={{ opacity: para.isOutputStale ? 0.5 : 1 }}>
-                <ParaOutput
-                  key={para.uniqueId}
-                  para={para}
-                  visInput={visInput}
-                  setVisInput={setVisInput}
-                  DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
-                />
+                {paraOutput}
               </div>
             </>
           }
