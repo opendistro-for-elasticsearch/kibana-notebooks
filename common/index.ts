@@ -65,4 +65,5 @@ export type ParaType = {
   paraRef: RefObject<HTMLDivElement>;
   visStartTime: string;
   visEndTime: string;
+  visSavedObjId: string;
 };

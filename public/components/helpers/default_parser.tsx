@@ -58,12 +58,13 @@ const parseVisualization = (paraObject: any) => {
     let vizContent = '';
     if (paraObject.input.inputType === 'VISUALIZATION') {
       vizContent = paraObject.input.inputText;
-      const { timeRange } = JSON.parse(vizContent);
+      const { panels, timeRange } = JSON.parse(vizContent);
       return {
         isViz: true,
         VizObject: vizContent,
         visStartTime: timeRange.from,
         visEndTime: timeRange.to,
+        visSavedObjId: panels['1'].explicitInput.savedObjectId,
       };
     } else {
       return {
@@ -108,6 +109,7 @@ export const defaultParagraphParser = (defaultBackendParagraphs: any) => {
         paraRef: undefined,
         visStartTime: vizParams.visStartTime,
         visEndTime: vizParams.visEndTime,
+        visSavedObjId: vizParams.visSavedObjId,
       };
       parsedPara.push(tempPara);
     });
