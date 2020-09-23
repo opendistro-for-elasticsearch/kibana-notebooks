@@ -430,11 +430,11 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
               <EuiText textAlign='center'>
                 <EuiIcon size="xxl" type="editorCodeBlock" />
                 <h3>Markdown</h3>
-                <p>Create rich text with markup language.</p>
+                <p>Create rich text with markup language</p>
               </EuiText>
               <EuiButton onClick={() => props.addPara(0, '', 'CODE')}>
                 Add markdown paragraph
-            </EuiButton>
+              </EuiButton>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiText textAlign='center'>
@@ -444,7 +444,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
               </EuiText>
               <EuiButton onClick={() => showModal(0)}>
                 Add Kibana visualization paragraph
-            </EuiButton>
+              </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size='xxl' />
