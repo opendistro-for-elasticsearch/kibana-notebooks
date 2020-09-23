@@ -207,7 +207,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
       };
       inputTemp.timeRange = newTimeRange;
       setVisInput(inputTemp);
-      vizualizationEditor(JSON.stringify(inputTemp), para.id - 1);
+      vizualizationEditor(JSON.stringify(inputTemp), index);
     } else {
       if (!para.inp) {
         setRunParaError(true);
@@ -345,14 +345,14 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
             name: 'Markdown',
             onClick: () => {
               setIsPopoverOpen(false);
-              props.addPara(para.id - 1, '', 'CODE');
+              props.addPara(index, '', 'CODE');
             },
           },
           {
             name: 'Visualization',
             onClick: () => {
               setIsPopoverOpen(false);
-              showModal(para.id - 1);
+              showModal(index);
             },
           },
         ],
@@ -365,14 +365,14 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
             name: 'Markdown',
             onClick: () => {
               setIsPopoverOpen(false);
-              props.addPara(para.id, '', 'CODE');
+              props.addPara(index + 1, '', 'CODE');
             },
           },
           {
             name: 'Visualization',
             onClick: () => {
               setIsPopoverOpen(false);
-              showModal(para.id);
+              showModal(index + 1);
             },
           },
         ],
