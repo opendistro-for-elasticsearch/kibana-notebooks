@@ -121,7 +121,8 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     http,
   } = props;
 
-  const outputExists = (para?.out.length > 0 && para?.out[0] !== '') || para?.vizObjectInput !== '';
+  const isOutputAvailable = (para?.out.length > 0 && para?.out[0] !== '') ||
+    (para?.isVizualisation && para?.typeOut.length > 0);
   const loadedVizObject: DashboardContainerInput = para?.isVizualisation ? JSON.parse(para.vizObjectInput) : {};
   loadedVizObject.viewMode = ViewMode.VIEW;
 
@@ -491,10 +492,10 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
               <EuiFlexGroup alignItems='center' gutterSize='s'>
                 <EuiFlexItem grow={false}>
                   <EuiButton onClick={() => onRunPara()}>
-                    {outputExists ? 'Refresh' : 'Run'}
+                    {isOutputAvailable ? 'Refresh' : 'Run'}
                   </EuiButton>
                 </EuiFlexItem>
-                {outputExists &&
+                {isOutputAvailable &&
                   <>
                     {props.selectedViewId === 'view_both' ?
                       // render message when view mode is view_both
@@ -538,7 +539,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
               <EuiSpacer size='m' />
             </>
           }
-          {props.selectedViewId !== 'input_only' && outputExists &&
+          {props.selectedViewId !== 'input_only' && isOutputAvailable &&
             <>
               <EuiHorizontalRule margin='none' />
               <div style={{ opacity: isOutputStale ? 0.5 : 1 }}>
