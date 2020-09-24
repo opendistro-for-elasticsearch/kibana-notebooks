@@ -184,7 +184,8 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   };
 
   const onRunPara = () => {
-    if (!para.inp || (para.isVizualisation && selectedVisOption.length === 0)) {
+    if ((!para.isVizualisation && !para.inp) ||
+      (para.isVizualisation && selectedVisOption.length === 0)) {
       setRunParaError(true);
       return;
     }
