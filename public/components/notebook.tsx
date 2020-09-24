@@ -76,8 +76,6 @@ type NotebookState = {
   dateModified: string;
   paragraphs: any; // notebook paragraphs fetched from API
   parsedPara: Array<ParaType>; // paragraphs parsed to a common format
-  toggleOutput: boolean; // Hide Outputs toggle
-  toggleInput: boolean; // Hide Inputs toggle
   vizPrefix: string; // prefix for visualizations in Zeppelin Adaptor
   isAddParaPopoverOpen: boolean;
   isParaActionsPopoverOpen: boolean;
@@ -95,8 +93,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       dateModified: '',
       paragraphs: [],
       parsedPara: [],
-      toggleOutput: true,
-      toggleInput: true,
       vizPrefix: '',
       isAddParaPopoverOpen: false,
       isParaActionsPopoverOpen: false,
@@ -436,26 +432,17 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   };
 
   // update view mode, scrolls to paragraph and expands input if scrollToIndex is given
-  updateView = (viewId: string, scrollToIndex?: number) => {
-    this.setState({ selectedViewId: viewId });
-    let hideInput = false, hideOutput = false;
-    if (viewId === 'input_only')
-      hideOutput = true;
-    else if (viewId === 'output_only')
-      hideInput = true;
-
+  updateView = (selectedViewId: string, scrollToIndex?: number) => {
     let parsedPara = [...this.state.parsedPara];
     this.state.parsedPara.map((para: ParaType, index: number) => {
-      parsedPara[index].isInputHidden = hideInput;
-      parsedPara[index].isOutputHidden = hideOutput;
-      parsedPara[index].isInputExpanded = viewId === 'input_only';
+      parsedPara[index].isInputExpanded = selectedViewId === 'input_only';
     });
 
     if (scrollToIndex !== undefined) {
       parsedPara[scrollToIndex].isInputExpanded = true;
       this.scrollToPara(scrollToIndex);
     }
-    this.setState({ parsedPara });
+    this.setState({ parsedPara, selectedViewId });
     this.paragraphSelector(scrollToIndex !== undefined ? scrollToIndex : -1);
   };
 
@@ -468,8 +455,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         this.setState(res, this.parseAllParagraphs);
       })
       .catch((err) => console.error('Fetching notebook issue: ', err.body.message));
-    this.setState({ toggleInput: true });
-    this.setState({ toggleOutput: true });
   };
 
   setPara = (para: ParaType, index: number) => {

@@ -47,7 +47,6 @@ export type ParaType = {
   uniqueId: string;
   isRunning: boolean;
   inQueue: boolean;
-  ishovered: boolean;
   isSelected: boolean;
   isInputHidden: boolean;
   isOutputHidden: boolean;

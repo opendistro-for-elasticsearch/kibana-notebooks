@@ -100,7 +100,6 @@ export const defaultParagraphParser = (defaultBackendParagraphs: any) => {
         uniqueId: paraObject.id,
         isRunning: false,
         inQueue: false,
-        ishovered: false,
         isSelected: false,
         isInputHidden: false,
         isOutputHidden: false,

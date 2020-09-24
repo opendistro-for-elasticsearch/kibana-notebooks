@@ -184,23 +184,20 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   };
 
   const onRunPara = () => {
-    if (para.isVizualisation) {
-      if (selectedVisOption.length === 0) {
-        setRunParaError(true);
-        return;
-      }
-      const inputTemp = createNewVizObject(selectedVisOption[0].key);
-      setVisInput(inputTemp);
-      setRunParaError(false);
-      return props.runPara(para, index, JSON.stringify(inputTemp));
-    }
-
-    if (!para.inp) {
+    if (!para.inp || (para.isVizualisation && selectedVisOption.length === 0)) {
       setRunParaError(true);
       return;
     }
+
+    let newVisObjectInput = undefined;
+    if (para.isVizualisation) {
+      const inputTemp = createNewVizObject(selectedVisOption[0].key);
+      setVisInput(inputTemp);
+      setRunParaError(false);
+      newVisObjectInput = JSON.stringify(inputTemp);
+    }
     setRunParaError(false);
-    return props.runPara(para, index);
+    return props.runPara(para, index, newVisObjectInput)
   };
 
   const setStartTime = (time: string) => {
@@ -219,29 +216,32 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     props.setPara(newPara);
   };
 
-  const paraOutput = (!para.isVizualisation || visInput) && <ParaOutput
-    key={para.uniqueId}
-    para={para}
-    visInput={visInput}
-    setVisInput={setVisInput}
-    DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
-  />;
+  // do not show output if it is a visualization paragraph and visInput is not loaded yet
+  const paraOutput = (!para.isVizualisation || visInput) && (
+    <ParaOutput
+      key={para.uniqueId}
+      para={para}
+      visInput={visInput}
+      setVisInput={setVisInput}
+      DashboardContainerByValueRenderer={DashboardContainerByValueRenderer}
+    />);
 
   // do not show input and EuiPanel if view mode is output_only
   if (props.selectedViewId === 'output_only') {
     return paraOutput;
   }
 
-  const comboBox = <EuiComboBox
-    placeholder="Find Kibana visualization"
-    singleSelection={{ asPlainText: true }}
-    options={options}
-    selectedOptions={selectedVisOption}
-    onChange={(newOptions) => {
-      setSelectedVisOption(newOptions);
-      setIsOutputStale(true);
-    }}
-  />;
+  const comboBox = (
+    <EuiComboBox
+      placeholder="Find Kibana visualization"
+      singleSelection={{ asPlainText: true }}
+      options={options}
+      selectedOptions={selectedVisOption}
+      onChange={(newOptions) => {
+        setSelectedVisOption(newOptions);
+        setIsOutputStale(true);
+      }}
+    />);
 
   const renderParaHeader = (type: string, index: number) => {
     const panels: EuiContextMenuPanelDescriptor[] = [
@@ -391,6 +391,48 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     );
   };
 
+  const renderOutputTimestampMessage = () => {
+    if (props.selectedViewId === 'view_both') {
+      return (
+        <>
+          <EuiFlexItem grow={false} />
+          <EuiFlexItem grow={false}>
+            {para.isOutputStale ?
+              <EuiIcon type="questionInCircle" color="primary" /> :
+              <EuiIcon type="check" color="secondary" />}
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiText color='subdued'>
+              {`Last run ${moment(props.dateModified).format(DATE_FORMAT)}. ${para.isOutputStale ?
+                'Output below is stale.' : 'Output reflects latest input.'}`}
+            </EuiText>
+          </EuiFlexItem>
+        </>
+      )
+    } else {  // render message when view mode is input_only
+      return (
+        <>
+          <EuiFlexItem grow={false} />
+          <EuiFlexItem grow={false}>
+            <EuiIcon type="questionInCircle" color="primary" />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiText color='subdued'>
+              {`Output available from ${moment(props.dateModified).format(DATE_FORMAT)}`}
+            </EuiText>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiText>
+              <EuiLink
+                onClick={() => props.setSelectedViewId('view_both', index)}
+              >View both</EuiLink>
+            </EuiText>
+          </EuiFlexItem>
+        </>
+      )
+    }
+  };
+
   return (
     <>
       <EuiPanel>
@@ -422,46 +464,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                     {isOutputAvailable ? 'Refresh' : 'Run'}
                   </EuiButton>
                 </EuiFlexItem>
-                {isOutputAvailable &&
-                  <>
-                    {props.selectedViewId === 'view_both' ?
-                      // render message when view mode is view_both
-                      <>
-                        <EuiFlexItem grow={false} />
-                        <EuiFlexItem grow={false}>
-                          {para.isOutputStale ?
-                            <EuiIcon type="questionInCircle" color="primary" /> :
-                            <EuiIcon type="check" color="secondary" />}
-                        </EuiFlexItem>
-                        <EuiFlexItem>
-                          <EuiText color='subdued'>
-                            {`Last run ${moment(props.dateModified).format(DATE_FORMAT)}. ${para.isOutputStale ?
-                              'Output below is stale.' : 'Output reflects latest input.'}`}
-                          </EuiText>
-                        </EuiFlexItem>
-                      </> :
-                      // render message when view mode is input_only
-                      <>
-                        <EuiFlexItem grow={false} />
-                        <EuiFlexItem grow={false}>
-                          <EuiIcon type="questionInCircle" color="primary" />
-                        </EuiFlexItem>
-                        <EuiFlexItem grow={false}>
-                          <EuiText color='subdued'>
-                            {`Output available from ${moment(props.dateModified).format(DATE_FORMAT)}`}
-                          </EuiText>
-                        </EuiFlexItem>
-                        <EuiFlexItem>
-                          <EuiText>
-                            <EuiLink
-                              onClick={() => props.setSelectedViewId('view_both', index)}
-                            >View both</EuiLink>
-                          </EuiText>
-                        </EuiFlexItem>
-                      </>
-                    }
-                  </>
-                }
+                {isOutputAvailable && renderOutputTimestampMessage()}
               </EuiFlexGroup>
               <EuiSpacer size='m' />
             </>
