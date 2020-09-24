@@ -160,12 +160,13 @@ export function NoteTable(props: NoteTableProps) {
   };
 
   const deleteNote = () => {
+    const notebookString = `notebook${selectedNotebooks.length > 1 ? 's' : ''}`;
     setModalLayout(
       <DeleteNotebookModal
         onConfirm={onDelete}
         onCancel={closeModal}
-        title={"Delete selected notebooks"}
-        message="Are you sure you want to delete the selected notebooks?"
+        title={`Delete ${selectedNotebooks.length} ${notebookString}`}
+        message={`Are you sure you want to delete the selected ${selectedNotebooks.length} ${notebookString}?`}
       />
     );
     showModal();
