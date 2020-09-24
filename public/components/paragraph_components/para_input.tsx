@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Input, Prompt, Source } from '@nteract/presentational-components';
 
 import { ParaType } from '../../../common';
@@ -25,6 +25,17 @@ import {
   EuiTextArea,
   EuiComboBox,
   EuiComboBoxOptionOption,
+  EuiButton,
+  EuiButtonEmpty,
+  EuiInMemoryTable,
+  EuiModal,
+  EuiModalBody,
+  EuiModalFooter,
+  EuiModalHeader,
+  EuiModalHeaderTitle,
+  EuiOverlayMask,
+  EuiHorizontalRule,
+  EuiLink,
 } from '@elastic/eui';
 
 /*
@@ -82,10 +93,19 @@ export const ParaInput = (props: {
   };
 
   const renderVisInput = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const columns = [
+      {
+        field: 'label',
+        name: 'Title',
+        truncateText: true,
+        render: (item) => <EuiLink>{item}</EuiLink>
+      }
+    ];
     return (
       <>
-        <EuiFlexGroup>
-          <EuiFlexItem grow={4}>
+        <EuiFlexGroup alignItems="flexEnd" gutterSize="s">
+          <EuiFlexItem grow={6}>
             <EuiFormRow label="Title" fullWidth>
               <EuiComboBox
                 placeholder="Find Kibana visualization"
@@ -99,7 +119,13 @@ export const ParaInput = (props: {
               />
             </EuiFormRow>
           </EuiFlexItem>
-          <EuiFlexItem grow={4}>
+          <EuiFlexItem grow={false}>
+            <EuiButton iconSide="right" iconType="folderOpen" onClick={() => setIsModalOpen(true)}>
+              Browse
+            </EuiButton>
+          </EuiFlexItem>
+          <EuiFlexItem grow={2} />
+          <EuiFlexItem grow={9}>
             <EuiFormRow label="Date range" fullWidth>
               <EuiSuperDatePicker
                 start={props.startTime}
@@ -115,6 +141,41 @@ export const ParaInput = (props: {
           </EuiFlexItem>
           <EuiFlexItem />
         </EuiFlexGroup>
+
+        {isModalOpen &&
+          <EuiOverlayMask>
+            <EuiModal onClose={() => setIsModalOpen(false)}>
+              <EuiModalHeader>
+                <EuiModalHeaderTitle>Browse Kibana visualizations</EuiModalHeaderTitle>
+              </EuiModalHeader>
+
+              <EuiModalBody>
+                <EuiInMemoryTable
+                  items={props.visOptions}
+                  columns={columns}
+                  search={{
+                    box: {
+                      incremental: true,
+                      schema: true,
+                    }
+                  }}
+                  pagination={{
+                    initialPageSize: 10,
+                    pageSizeOptions: [5, 10, 15],
+                  }}
+                />
+              </EuiModalBody>
+
+              <EuiModalFooter>
+                <EuiButtonEmpty onClick={() => setIsModalOpen(false)}>Cancel</EuiButtonEmpty>
+                <EuiButton onClick={() => {
+                  props.setIsOutputStale(true);
+                  setIsModalOpen(false);
+                }} fill>Select</EuiButton>
+              </EuiModalFooter>
+            </EuiModal>
+          </EuiOverlayMask>
+        }
       </>
     );
   };
