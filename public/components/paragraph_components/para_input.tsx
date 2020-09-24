@@ -17,7 +17,15 @@ import React from 'react';
 import { Input, Prompt, Source } from '@nteract/presentational-components';
 
 import { ParaType } from '../../../common';
-import { EuiFlexGroup, EuiFlexItem, EuiForm, EuiFormRow, EuiSuperDatePicker, EuiTextArea } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiFormRow,
+  EuiSuperDatePicker,
+  EuiTextArea,
+  EuiComboBox,
+  EuiComboBoxOptionOption,
+} from '@elastic/eui';
 
 /*
  * "ParaInput" component is used by notebook to populate paragraph inputs for an open notebook.
@@ -31,6 +39,7 @@ import { EuiFlexGroup, EuiFlexItem, EuiForm, EuiFormRow, EuiSuperDatePicker, Eui
  * Input component of nteract used as a container for notebook UI.
  * https://components.nteract.io/#input
  */
+
 export const ParaInput = (props: {
   para: ParaType;
   index: number;
@@ -42,7 +51,9 @@ export const ParaInput = (props: {
   endTime: string;
   setEndTime: (endTime: string) => void;
   setIsOutputStale: (isStale?: boolean) => void;
-  comboBox: React.ReactElement;
+  visOptions: EuiComboBoxOptionOption[];
+  selectedVisOption: EuiComboBoxOptionOption[];
+  setSelectedVisOption: (newOption: EuiComboBoxOptionOption[]) => void;
 }) => {
   const { para, index, runParaError, textValueEditor, handleKeyPress } = props;
 
@@ -74,12 +85,21 @@ export const ParaInput = (props: {
     return (
       <>
         <EuiFlexGroup>
-          <EuiFlexItem>
+          <EuiFlexItem grow={4}>
             <EuiFormRow label="Title" fullWidth>
-              {props.comboBox}
+              <EuiComboBox
+                placeholder="Find Kibana visualization"
+                singleSelection={{ asPlainText: true }}
+                options={props.visOptions}
+                selectedOptions={props.selectedVisOption}
+                onChange={(newOption: EuiComboBoxOptionOption[]) => {
+                  props.setSelectedVisOption(newOption);
+                  props.setIsOutputStale(true);
+                }}
+              />
             </EuiFormRow>
           </EuiFlexItem>
-          <EuiFlexItem>
+          <EuiFlexItem grow={4}>
             <EuiFormRow label="Date range" fullWidth>
               <EuiSuperDatePicker
                 start={props.startTime}
@@ -93,6 +113,7 @@ export const ParaInput = (props: {
               />
             </EuiFormRow>
           </EuiFlexItem>
+          <EuiFlexItem />
         </EuiFlexGroup>
       </>
     );

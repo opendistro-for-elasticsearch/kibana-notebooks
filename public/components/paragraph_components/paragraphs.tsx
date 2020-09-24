@@ -104,7 +104,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     http,
   } = props;
 
-  const [options, setOptions] = useState([]); // options for loading saved visualizations
+  const [visOptions, setVisOptions] = useState([]); // options for loading saved visualizations
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [runParaError, setRunParaError] = useState(false);
   const [selectedVisOption, setSelectedVisOption] = useState([]);
@@ -133,7 +133,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
             label: vizObject.label,
             key: vizObject.key,
           }));
-          setOptions(opt);
+          setVisOptions(opt);
           setSelectedVisOption(opt.filter((o) => o.key === para.visSavedObjId));
         })
         .catch((err) => console.error('Fetching visualization issue', err.body.message));
@@ -230,18 +230,6 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   if (props.selectedViewId === 'output_only') {
     return paraOutput;
   }
-
-  const comboBox = (
-    <EuiComboBox
-      placeholder="Find Kibana visualization"
-      singleSelection={{ asPlainText: true }}
-      options={options}
-      selectedOptions={selectedVisOption}
-      onChange={(newOptions) => {
-        setSelectedVisOption(newOptions);
-        setIsOutputStale(true);
-      }}
-    />);
 
   const renderParaHeader = (type: string, index: number) => {
     const panels: EuiContextMenuPanelDescriptor[] = [
@@ -452,7 +440,9 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
                 endTime={para.visEndTime}
                 setEndTime={setEndTime}
                 setIsOutputStale={setIsOutputStale}
-                comboBox={comboBox}
+                visOptions={visOptions}
+                selectedVisOption={selectedVisOption}
+                setSelectedVisOption={setSelectedVisOption}
               />
               {runParaError &&
                 <EuiText color="danger" size="s">{`${para.isVizualisation ? 'Visualization' : 'Input'} is required.`}</EuiText>
