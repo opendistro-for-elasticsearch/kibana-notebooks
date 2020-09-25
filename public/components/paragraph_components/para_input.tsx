@@ -16,7 +16,7 @@
 import React, { useState } from 'react';
 import { Input, Prompt, Source } from '@nteract/presentational-components';
 
-import { ParaType } from '../../../common';
+import { ParaType, PLUGIN_ID } from '../../../common';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -27,15 +27,17 @@ import {
   EuiComboBoxOptionOption,
   EuiButton,
   EuiButtonEmpty,
-  EuiInMemoryTable,
   EuiModal,
   EuiModalBody,
   EuiModalFooter,
   EuiModalHeader,
   EuiModalHeaderTitle,
   EuiOverlayMask,
-  EuiHorizontalRule,
   EuiLink,
+  EuiSelectable,
+  EuiText,
+  EuiSpacer,
+  EuiHighlight,
 } from '@elastic/eui';
 
 /*
@@ -94,14 +96,30 @@ export const ParaInput = (props: {
 
   const renderVisInput = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const columns = [
-      {
-        field: 'label',
-        name: 'Title',
-        truncateText: true,
-        render: (item) => <EuiLink>{item}</EuiLink>
+    const [selectableOptions, setSelectableOptions] = useState([]);
+    const [selectableError, setSelectableError] = useState(false);
+
+    const onSelect = () => {
+      const selectedOptions = selectableOptions.filter((opt) => opt.checked === 'on');
+      if (selectedOptions.length === 0) {
+        setSelectableError(true);
+        return;
       }
-    ];
+      props.setIsOutputStale(true);
+      props.setSelectedVisOption(selectedOptions);
+      setIsModalOpen(false);
+    };
+
+    const renderOption = (option, searchValue) => {
+      const visURL = `${window.location.href.substring(
+        0, window.location.href.indexOf(PLUGIN_ID))}visualize#/edit/${option.key}`;
+      return (
+        <EuiLink href={visURL} target="_blank">
+          <EuiHighlight search={searchValue}>{option.label}</EuiHighlight>
+        </EuiLink>
+      );
+    };
+
     return (
       <>
         <EuiFlexGroup alignItems="flexEnd" gutterSize="s">
@@ -120,7 +138,14 @@ export const ParaInput = (props: {
             </EuiFormRow>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButton iconSide="right" iconType="folderOpen" onClick={() => setIsModalOpen(true)}>
+            <EuiButton
+              iconSide="right"
+              iconType="folderOpen"
+              onClick={() => {
+                setSelectableOptions(props.visOptions);
+                setSelectableError(false);
+                setIsModalOpen(true);
+              }}>
               Browse
             </EuiButton>
           </EuiFlexItem>
@@ -144,34 +169,41 @@ export const ParaInput = (props: {
 
         {isModalOpen &&
           <EuiOverlayMask>
-            <EuiModal onClose={() => setIsModalOpen(false)}>
+            <EuiModal onClose={() => setIsModalOpen(false)} style={{ width: 500 }}>
               <EuiModalHeader>
                 <EuiModalHeaderTitle>Browse Kibana visualizations</EuiModalHeaderTitle>
               </EuiModalHeader>
 
               <EuiModalBody>
-                <EuiInMemoryTable
-                  items={props.visOptions}
-                  columns={columns}
-                  search={{
-                    box: {
-                      incremental: true,
-                      schema: true,
-                    }
+                <EuiSelectable
+                  aria-label="Searchable Visualizations"
+                  searchable
+                  options={selectableOptions}
+                  singleSelection={true}
+                  renderOption={renderOption}
+                  onChange={(newOptions) => {
+                    setSelectableOptions(newOptions);
+                    setSelectableError(false);
                   }}
-                  pagination={{
-                    initialPageSize: 10,
-                    pageSizeOptions: [5, 10, 15],
-                  }}
-                />
+                >
+                  {(list, search) => (
+                    <>
+                      {search}
+                      {list}
+                    </>
+                  )}
+                </EuiSelectable>
+                {selectableError &&
+                  <>
+                    <EuiSpacer size="s" />
+                    <EuiText color="danger" size="s">{'Visualization is required.'}</EuiText>
+                  </>
+                }
               </EuiModalBody>
 
               <EuiModalFooter>
                 <EuiButtonEmpty onClick={() => setIsModalOpen(false)}>Cancel</EuiButtonEmpty>
-                <EuiButton onClick={() => {
-                  props.setIsOutputStale(true);
-                  setIsModalOpen(false);
-                }} fill>Select</EuiButton>
+                <EuiButton onClick={() => onSelect()} fill>Select</EuiButton>
               </EuiModalFooter>
             </EuiModal>
           </EuiOverlayMask>
