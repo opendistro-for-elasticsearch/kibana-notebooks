@@ -53,10 +53,14 @@ export const ParaOutput = (props: {
             </EuiText>
           );
         case 'VISUALIZATION':
+          let from = moment(visInput?.timeRange?.from).format(DATE_FORMAT);
+          let to = moment(visInput?.timeRange?.to).format(DATE_FORMAT);
+          from = from === 'Invalid date' ? visInput.timeRange.from : from;
+          to = to === 'Invalid date' ? visInput.timeRange.to : to;
           return (
             <>
               <EuiText size='s' style={{ marginLeft: 9 }}>
-                {moment(visInput?.timeRange?.from).format(DATE_FORMAT) + ' - ' + moment(visInput?.timeRange?.to).format(DATE_FORMAT)}
+                {`${from} - ${to}`}
               </EuiText>
               <DashboardContainerByValueRenderer key={key} input={visInput} onInputUpdated={setVisInput} />
             </>

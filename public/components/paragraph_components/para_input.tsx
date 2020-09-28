@@ -111,8 +111,9 @@ export const ParaInput = (props: {
     };
 
     const renderOption = (option, searchValue) => {
-      const visURL = `${window.location.href.substring(
-        0, window.location.href.indexOf(PLUGIN_ID))}visualize#/edit/${option.key}`;
+      const href = window.location.href;
+      const visURL = `${href.substring(0, href.indexOf(PLUGIN_ID))}visualize#/edit/${option.key}`
+        + `?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:'${props.startTime}',to:'${props.endTime}'))`;
       return (
         <EuiLink href={visURL} target="_blank">
           <EuiHighlight search={searchValue}>{option.label}</EuiHighlight>
