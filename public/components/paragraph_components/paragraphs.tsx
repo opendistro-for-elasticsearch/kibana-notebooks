@@ -29,7 +29,6 @@ import {
   EuiButton,
   EuiContextMenuPanelDescriptor,
   EuiIcon,
-  EuiComboBox,
   EuiLink,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui/lib/services';
@@ -393,7 +392,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
           <EuiFlexItem>
             <EuiText color='subdued'>
               {`Last run ${moment(props.dateModified).format(DATE_FORMAT)}. ${para.isOutputStale ?
-                'Output below is stale.' : 'Output reflects latest input.'}`}
+                'Output below is stale.' : 'Output reflects the latest input.'}`}
             </EuiText>
           </EuiFlexItem>
         </>

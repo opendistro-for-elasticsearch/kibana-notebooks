@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import React, { Component, RefObject } from 'react';
+import React, { Component } from 'react';
 import {
   EuiTitle,
   EuiPage,
@@ -532,6 +532,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           },
           {
             name: 'Run all paragraphs',
+            disabled: this.state.parsedPara.length === 0,
             onClick: () => {
               this.setState({ isParaActionsPopoverOpen: false });
               this.runForAllParagraphs((para: ParaType, index: number) => {
@@ -544,6 +545,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           },
           {
             name: 'Clear all outputs',
+            disabled: this.state.parsedPara.length === 0,
             onClick: () => {
               this.setState({ isParaActionsPopoverOpen: false });
               this.showClearOutputsModal();
@@ -551,6 +553,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           },
           {
             name: 'Delete all paragraphs',
+            disabled: this.state.parsedPara.length === 0,
             onClick: () => {
               this.setState({ isParaActionsPopoverOpen: false });
               this.showDeleteAllParaModal();
@@ -742,13 +745,14 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                   <EuiPanel>
                     <EuiSpacer size='xxl' />
                     <EuiText textAlign='center'>
-                      <h2>No paragraph</h2>
+                      <h2>No paragraphs</h2>
                       <EuiText>
                         Add paragraph to compose your document or story. Notebook now supports two types of input:
                       </EuiText>
                     </EuiText>
                     <EuiSpacer size='xl' />
-                    <EuiFlexGroup justifyContent='spaceAround'>
+                    <EuiFlexGroup justifyContent='spaceEvenly'>
+                      <EuiFlexItem grow={false} />
                       <EuiFlexItem grow={false}>
                         <EuiText textAlign='center'>
                           <EuiIcon size="xxl" type="editorCodeBlock" />
@@ -769,6 +773,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           Add Kibana visualization paragraph
                         </EuiButton>
                       </EuiFlexItem>
+                      <EuiFlexItem grow={false} />
                     </EuiFlexGroup>
                     <EuiSpacer size='xxl' />
                   </EuiPanel>

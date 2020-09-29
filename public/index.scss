@@ -12,7 +12,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-
+ 
 .editorArea {
   font-family: Dank Mono, Source Code Pro, Consolas, Courier New, Courier, monospace;
   background-color: #fafafa;
@@ -23,38 +23,8 @@
   height: 14em;
 }
 
-.hoverDiv {
-  height: 1vh;
-}
-
-.hoveredDiv {
-  width: 100%;
-}
-
-.addParagraphButton {
-  background-color: #e0fbfc;
-  text-align: center;
-  color: #98c1d9;
-  font-weight: bold;
-  padding: 0.5vh;
-  width: 50%;
-}
-
-.addVisualizationButton {
-  background-color: #68f7f0;
-  text-align: center;
-  color: #3c7572;
-  font-weight: bold;
-  padding: 0.5vh;
-  width: 50%;
-}
-
 #notebookArea {
   max-width: 88vw;
-}
-
-#titleIcon {
-  margin-right: 0.5vw;
 }
 
 .panel-header-count {
@@ -62,6 +32,6 @@
   font-weight: normal;
 }
 
-.eui-color-primary {
-  color: #006BB4;
+.markdown-output-text {
+  font-family: "Inter UI", -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }

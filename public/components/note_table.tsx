@@ -42,7 +42,7 @@ import moment from 'moment';
 import React, { useEffect, useState, ReactElement } from 'react';
 import { ChromeBreadcrumb } from '../../../../src/core/public';
 import { DATE_FORMAT } from '../../common';
-import { getCloneModal, getCustomModal, DeleteNotebookModal } from './helpers/modal_containers';
+import { getCustomModal, DeleteNotebookModal } from './helpers/modal_containers';
 import { NotebookType } from './main';
 
 type NoteTableProps = {
@@ -181,7 +181,7 @@ export function NoteTable(props: NoteTableProps) {
   const popoverItems: ReactElement[] = [
     <EuiContextMenuItem
       key="rename"
-      disabled={selectedNotebooks.length !== 1}
+      disabled={notebooks.length === 0 || selectedNotebooks.length !== 1}
       onClick={() => {
         setIsActionsPopoverOpen(false);
         renameNote();
@@ -190,7 +190,7 @@ export function NoteTable(props: NoteTableProps) {
     </EuiContextMenuItem>,
     <EuiContextMenuItem
       key="duplicate"
-      disabled={selectedNotebooks.length !== 1}
+      disabled={notebooks.length === 0 || selectedNotebooks.length !== 1}
       onClick={() => {
         setIsActionsPopoverOpen(false);
         cloneNote();
@@ -199,7 +199,7 @@ export function NoteTable(props: NoteTableProps) {
     </EuiContextMenuItem>,
     <EuiContextMenuItem
       key="delete"
-      disabled={selectedNotebooks.length === 0}
+      disabled={notebooks.length === 0 || selectedNotebooks.length === 0}
       onClick={() => {
         setIsActionsPopoverOpen(false);
         deleteNote();
@@ -250,7 +250,7 @@ export function NoteTable(props: NoteTableProps) {
                 </EuiTitle>
                 <EuiSpacer size='s' />
                 <EuiText size="s" color="subdued">
-                  Use notebooks to create post-modern documents, build Live infrastructure reports, or foster explorative collaborations with data. Notebook now supports two types of input: markdown, and visualizations created from Kibana Visualize.{' '}
+                  Use notebooks to create post-modern documents, build live infrastructure reports, or foster explorative collaborations with data. Notebook now supports two types of input: markdown, and visualizations created from Kibana Visualize.{' '}
                   <EuiLink external={true} href="/">Learn more</EuiLink>
                 </EuiText>
               </EuiPageContentHeaderSection>
@@ -307,15 +307,16 @@ export function NoteTable(props: NoteTableProps) {
                 <>
                   <EuiSpacer size='xxl' />
                   <EuiText textAlign='center'>
-                    <h2>No notebook</h2>
+                    <h2>No notebooks</h2>
+                    <EuiSpacer size='m' />
                     <EuiText color="subdued">
-                      Use notebooks to create post-modern documents, build Live infrastructure reports, or<br />
+                      Use notebooks to create post-modern documents, build live infrastructure reports, or<br />
                       foster explorative collaborations with data. Notebooks now supports two types of input:<br />
                       markdown, and visualizations created from Kibana Visualize.{' '}
                       <EuiLink external={true} href="/">Learn more</EuiLink>
                     </EuiText>
                   </EuiText>
-                  <EuiSpacer size='s' />
+                  <EuiSpacer size='m' />
                   <EuiFlexGroup justifyContent='spaceAround'>
                     <EuiFlexItem grow={false}>
                       <EuiButton fullWidth={false} onClick={() => createNote()}>

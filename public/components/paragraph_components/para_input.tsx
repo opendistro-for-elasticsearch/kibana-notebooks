@@ -140,8 +140,6 @@ export const ParaInput = (props: {
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton
-              iconSide="right"
-              iconType="folderOpen"
               onClick={() => {
                 setSelectableOptions(props.visOptions);
                 setSelectableError(false);

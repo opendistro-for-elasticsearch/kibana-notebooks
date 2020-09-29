@@ -48,7 +48,7 @@ export const ParaOutput = (props: {
       switch (typeOut) {
         case 'MARKDOWN':
           return (
-            <EuiText key={key}>
+            <EuiText key={key} className='markdown-output-text'>
               <MarkdownRender source={val} />
             </EuiText>
           );
