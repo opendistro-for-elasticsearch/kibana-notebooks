@@ -310,10 +310,8 @@ export function NoteTable(props: NoteTableProps) {
                     <h2>No notebooks</h2>
                     <EuiSpacer size='m' />
                     <EuiText color="subdued">
-                      Use notebooks to create post-modern documents, build live infrastructure reports, or<br />
-                      foster explorative collaborations with data. Notebooks now supports two types of input:<br />
-                      markdown, and visualizations created from Kibana Visualize.{' '}
-                      <EuiLink external={true} href="/">Learn more</EuiLink>
+                      Use notebooks to create post-modern documents, build live infrastructure<br />
+                      reports, or foster explorative collaborations with data.
                     </EuiText>
                   </EuiText>
                   <EuiSpacer size='m' />
