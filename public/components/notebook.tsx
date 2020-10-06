@@ -40,7 +40,7 @@ import { CoreStart, ChromeBreadcrumb } from '../../../../src/core/public';
 import { DashboardStart } from '../../../../src/plugins/dashboard/public';
 
 import { Paragraphs } from './paragraph_components/paragraphs';
-import { SELECTED_BACKEND, DATE_FORMAT } from '../../common';
+import { SELECTED_BACKEND, DATE_FORMAT, CREATE_NOTE_MESSAGE } from '../../common';
 import { API_PREFIX, ParaType } from '../../common';
 import { zeppelinParagraphParser } from './helpers/zeppelin_parser';
 import { defaultParagraphParser } from './helpers/default_parser';
@@ -239,7 +239,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         'Cancel',
         'Rename',
         this.state.path,
-        'Enter a unique name to describe the purpose of this notebook. The name must be less than 50 characters.')
+        CREATE_NOTE_MESSAGE)
     });
     this.setState({ isModalVisible: true });
   }
@@ -263,7 +263,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         'Cancel',
         'Duplicate',
         this.state.path + ' (copy)',
-        'Enter a unique name to describe the purpose of this notebook. The name must be less than 50 characters.')
+        CREATE_NOTE_MESSAGE)
     });
     this.setState({ isModalVisible: true });
   }
@@ -644,16 +644,18 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
               </EuiPageHeaderSection>
               <EuiPageHeaderSection>
                 <EuiFlexGroup gutterSize='s'>
-                  <EuiFlexItem>
-                    <EuiButtonGroup
-                      buttonSize='m'
-                      options={viewOptions}
-                      idSelected={this.state.selectedViewId}
-                      onChange={(id) => {
-                        this.updateView(id);
-                      }}
-                    />
-                  </EuiFlexItem>
+                  {this.state.parsedPara.length > 0 &&
+                    <EuiFlexItem>
+                      <EuiButtonGroup
+                        buttonSize='m'
+                        options={viewOptions}
+                        idSelected={this.state.selectedViewId}
+                        onChange={(id) => {
+                          this.updateView(id);
+                        }}
+                      />
+                    </EuiFlexItem>
+                  }
                   <EuiFlexItem />
                   <EuiFlexItem>
                     <EuiPopover
@@ -747,7 +749,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                     <EuiText textAlign='center'>
                       <h2>No paragraphs</h2>
                       <EuiText>
-                        Add paragraph to compose your document or story. Notebook now supports two types of input:
+                        Add a paragraph to compose your document or story. Notebooks now support two types of input:
                       </EuiText>
                     </EuiText>
                     <EuiSpacer size='xl' />
@@ -755,7 +757,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                       <EuiFlexItem grow={false} />
                       <EuiFlexItem grow={false}>
                         <EuiText textAlign='center'>
-                          <EuiIcon size="xxl" type="editorCodeBlock" />
+                          <EuiIcon size="xxl" type="editorCodeBlock" style={{ marginBottom: -20 }} />
                           <h3>Markdown</h3>
                           <p>Create rich text with markup language</p>
                         </EuiText>
@@ -765,7 +767,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         <EuiText textAlign='center'>
-                          <EuiIcon size="xxl" type="visArea" />
+                          <EuiIcon size="xxl" type="visArea" style={{ marginBottom: -20 }} />
                           <h3>Kibana visualization</h3>
                           <p>Import Kibana visualizations to the notes</p>
                         </EuiText>

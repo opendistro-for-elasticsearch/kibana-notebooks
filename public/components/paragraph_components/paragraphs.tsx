@@ -238,6 +238,14 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
         title: 'Paragraph actions',
         items: [
           {
+            name: 'Insert paragraph above',
+            panel: 1,
+          },
+          {
+            name: 'Insert paragraph below',
+            panel: 2,
+          },
+          {
             name: 'Run input',
             onClick: () => {
               setIsPopoverOpen(false);
@@ -282,14 +290,6 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
               setIsPopoverOpen(false);
               props.clonePara(para, index + 1);
             },
-          },
-          {
-            name: 'Insert paragraph above',
-            panel: 1,
-          },
-          {
-            name: 'Insert paragraph below',
-            panel: 2,
           },
           {
             name: 'Delete',
@@ -346,7 +346,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
       <>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiText color="subdued">
+            <EuiText style={{ fontSize: 17 }} >
               {`[${index + 1}] ${type} `}
               <EuiButtonIcon
                 aria-label="Toggle show input"

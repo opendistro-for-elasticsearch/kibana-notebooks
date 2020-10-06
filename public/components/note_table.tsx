@@ -41,7 +41,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React, { useEffect, useState, ReactElement } from 'react';
 import { ChromeBreadcrumb } from '../../../../src/core/public';
-import { DATE_FORMAT } from '../../common';
+import { CREATE_NOTE_MESSAGE, DATE_FORMAT } from '../../common';
 import { getCustomModal, DeleteNotebookModal } from './helpers/modal_containers';
 import { NotebookType } from './main';
 
@@ -121,7 +121,7 @@ export function NoteTable(props: NoteTableProps) {
         'Cancel',
         'Create',
         undefined,
-        'Enter a unique name to describe the purpose of this notebook. The name must be less than 50 characters.'
+        CREATE_NOTE_MESSAGE,
       )
     );
     showModal();
@@ -137,7 +137,7 @@ export function NoteTable(props: NoteTableProps) {
         'Cancel',
         'Rename',
         selectedNotebooks[0].path,
-        'Enter a unique name to describe the purpose of this notebook. The name must be less than 50 characters.'
+        CREATE_NOTE_MESSAGE,
       )
     );
     showModal();
@@ -153,7 +153,7 @@ export function NoteTable(props: NoteTableProps) {
         'Cancel',
         'Duplicate',
         selectedNotebooks[0].path + ' (copy)',
-        'Enter a unique name to describe the purpose of this notebook. The name must be less than 50 characters.'
+        CREATE_NOTE_MESSAGE,
       )
     );
     showModal();
