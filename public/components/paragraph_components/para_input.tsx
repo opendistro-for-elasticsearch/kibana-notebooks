@@ -155,6 +155,7 @@ export const ParaInput = (props: {
                 start={props.startTime}
                 end={props.endTime}
                 showUpdateButton={false}
+                dateFormat="MM/DD/YYYY hh:mm:ss A"
                 onTimeChange={(e) => {
                   props.setStartTime(e.start);
                   props.setEndTime(e.end);
