@@ -33,6 +33,7 @@ import {
   EuiButtonGroupOption,
   EuiIcon,
   EuiPanel,
+  EuiCard,
 } from '@elastic/eui';
 import { Cells } from '@nteract/presentational-components';
 
@@ -754,28 +755,32 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                     </EuiText>
                     <EuiSpacer size='xl' />
                     <EuiFlexGroup justifyContent='spaceEvenly'>
-                      <EuiFlexItem grow={false} />
-                      <EuiFlexItem grow={false}>
-                        <EuiText textAlign='center'>
-                          <EuiIcon size="xxl" type="editorCodeBlock" style={{ marginBottom: -20 }} />
-                          <h3>Markdown</h3>
-                          <p>Create rich text with markup language</p>
-                        </EuiText>
-                        <EuiButton onClick={() => this.addPara(0, '', 'CODE')}>
-                          Add markdown paragraph
-                        </EuiButton>
+                      <EuiFlexItem grow={2} />
+                      <EuiFlexItem grow={3}>
+                        <EuiCard
+                          icon={<EuiIcon size="xxl" type="editorCodeBlock" />}
+                          title="Markdown"
+                          description="Create rich text with markup language"
+                          footer={
+                            <EuiButton onClick={() => this.addPara(0, '', 'CODE')} style={{ marginBottom: 17 }}>
+                              Add markdown paragraph
+                            </EuiButton>
+                          }
+                        />
                       </EuiFlexItem>
-                      <EuiFlexItem grow={false}>
-                        <EuiText textAlign='center'>
-                          <EuiIcon size="xxl" type="visArea" style={{ marginBottom: -20 }} />
-                          <h3>Kibana visualization</h3>
-                          <p>Import Kibana visualizations to the notes</p>
-                        </EuiText>
-                        <EuiButton onClick={() => this.addPara(0, '', 'VISUALIZATION')}>
-                          Add Kibana visualization paragraph
-                        </EuiButton>
+                      <EuiFlexItem grow={3}>
+                        <EuiCard
+                          icon={<EuiIcon size="xxl" type="visArea" />}
+                          title="Kibana visualization"
+                          description="Import Kibana visualizations to the notes"
+                          footer={
+                            <EuiButton onClick={() => this.addPara(0, '', 'VISUALIZATION')} style={{ marginBottom: 17 }}>
+                              Add Kibana visualization paragraph
+                            </EuiButton>
+                          }
+                        />
                       </EuiFlexItem>
-                      <EuiFlexItem grow={false} />
+                      <EuiFlexItem grow={2} />
                     </EuiFlexGroup>
                     <EuiSpacer size='xxl' />
                   </EuiPanel>
