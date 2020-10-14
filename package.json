@@ -1,7 +1,7 @@
 {
   "name": "kibana_notebooks",
   "version": "0.0.1",
-  "description": "Kibana Notebooks ",
+  "description": "Kibana Notebooks",
   "main": "index.ts",
   "kibana": {
     "version": "7.9.1",
@@ -29,6 +29,7 @@
     "@kbn/expect": "link:../../packages/kbn-expect",
     "@kbn/plugin-helpers": "link:../../packages/kbn-plugin-helpers",
     "babel-eslint": "^10.0.1",
+    "cypress": "^5.3.0",
     "eslint": "^5.16.0",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-import": "^2.16.0",
@@ -64,4 +65,3 @@
     "yarn": "^1.21.1"
   }
 }
-
