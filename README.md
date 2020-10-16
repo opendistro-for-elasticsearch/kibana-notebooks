@@ -44,6 +44,19 @@ Example output: `./build/kibana_notebooks-*.zip`
 
   Runs the plugin cypress tests.
 
+## Contributing to Open Distro for Elasticsearch Kibana Notebooks
+
+- Refer to [CONTRIBUTING.md](./CONTRIBUTING.md).
+- Since this is a workbench, it can be useful to review the [Kibana contributing guide](https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md) alongside the documentation around [workbenchs](https://www.elastic.co/guide/en/kibana/master/kibana-plugins.html) and [plugin development](https://www.elastic.co/guide/en/kibana/master/plugin-development.html).
+
+## Bugs, Enhancements or Questions
+
+Please file an issue to report any bugs you may find, enhancements you may need or questions you may have [here](https://github.com/opendistro-for-elasticsearch/kibana-notebooks/issues).
+
 ## License
 
-The contents of this repo are licensed under the Apache 2.0 License.
+This code is licensed under the Apache 2.0 License.
+
+## Copyright
+
+Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
