@@ -250,7 +250,7 @@ export function NoteTable(props: NoteTableProps) {
                 </EuiTitle>
                 <EuiSpacer size='s' />
                 <EuiText size="s" color="subdued">
-                  Use notebooks to create post-mortem reports, build live infrastructure reports, or foster explorative collaborations with data. Notebook now supports two types of input: markdown, and visualizations created from Kibana Visualize.{' '}
+                  Use Notebooks to interactively and collaboratively develop rich reports backed by live data. A notebook is a document made up of paragraphs that can combine markdown and visualizations with support for multi-timelines so that users can easily tell a story. Notebooks can be developed, shared and refreshed directly from Kibana to foster data driven exploration and collaboration among Elasticsearch users and their stakeholders. Common use cases for notebooks includes creating postmortem reports, designing run books, building live infrastructure reports, or even documentation.{' '}
                   <EuiLink external={true} href="https://opendistro.github.io/for-elasticsearch-docs/docs/notebooks/" target="blank">Learn more</EuiLink>
                 </EuiText>
               </EuiPageContentHeaderSection>
