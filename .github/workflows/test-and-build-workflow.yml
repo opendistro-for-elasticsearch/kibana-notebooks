@@ -27,6 +27,10 @@ jobs:
       - name: Kibana Pluign Bootstrap
         run: |
           yarn kbn bootstrap
+      - name: Start Kibana for 5 minutes to generate target/ folder
+        run: |
+          cd ../..
+          timeout 300 yarn start --oss --no-base-path
       - name: Build Artifact
         run: |
           yarn build
