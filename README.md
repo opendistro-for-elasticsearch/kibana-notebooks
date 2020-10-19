@@ -4,7 +4,7 @@ Dashboards offer a solution for a few selected use cases, and are a great tool i
 
 ## Documentation
 
-Please see our technical [documentation](https://opendistro.github.io/for-elasticsearch-docs/) to learn more about its features.
+Please see our technical [documentation](https://opendistro.github.io/for-elasticsearch-docs/docs/kibana/notebooks/) to learn more about its features.
 
 ## Setup
 
@@ -46,8 +46,9 @@ Example output: `./build/kibana_notebooks-*.zip`
 
 ## Contributing to Open Distro for Elasticsearch Kibana Notebooks
 
-- Refer to [CONTRIBUTING.md](./CONTRIBUTING.md).
-- Since this is a workbench, it can be useful to review the [Kibana contributing guide](https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md) alongside the documentation around [workbenchs](https://www.elastic.co/guide/en/kibana/master/kibana-plugins.html) and [plugin development](https://www.elastic.co/guide/en/kibana/master/plugin-development.html).
+We welcome you to get involved in development, documentation, testing the kibana reports plugin. See our [CONTRIBUTING.md](./CONTRIBUTING.md) and join in.
+
+Since this is a Kibana plugin, it can be useful to review the [Kibana contributing guide](https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md) alongside the documentation around [Kibana plugins](https://www.elastic.co/guide/en/kibana/master/kibana-plugins.html) and [plugin development](https://www.elastic.co/guide/en/kibana/current/plugin-development.html).
 
 ## Bugs, Enhancements or Questions
 

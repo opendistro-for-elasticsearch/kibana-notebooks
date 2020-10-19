@@ -251,7 +251,7 @@ export function NoteTable(props: NoteTableProps) {
                 <EuiSpacer size='s' />
                 <EuiText size="s" color="subdued">
                   Use notebooks to create post-mortem reports, build live infrastructure reports, or foster explorative collaborations with data. Notebook now supports two types of input: markdown, and visualizations created from Kibana Visualize.{' '}
-                  <EuiLink external={true} href="/">Learn more</EuiLink>
+                  <EuiLink external={true} href="https://opendistro.github.io/for-elasticsearch-docs/docs/notebooks/" target="blank">Learn more</EuiLink>
                 </EuiText>
               </EuiPageContentHeaderSection>
               <EuiPageContentHeaderSection>
