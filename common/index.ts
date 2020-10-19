@@ -15,7 +15,7 @@
 
 import { RefObject } from 'react';
 
-export const PLUGIN_ID = 'kibanaNotebooks';
+export const PLUGIN_ID = 'opendistro-notebooks-kibana';
 export const PLUGIN_NAME = 'Kibana Notebooks';
 export const API_PREFIX = '/api/notebooks';
 export const SELECTED_BACKEND = 'DEFAULT'; // ZEPPELIN || DEFAULT

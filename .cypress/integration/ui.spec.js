@@ -27,7 +27,7 @@ describe('Adding sample data and visualization', () => {
 
 describe('Testing notebooks table', () => {
   beforeEach(() => {
-    cy.visit('app/kibanaNotebooks#');
+    cy.visit('app/opendistro-notebooks-kibana#');
     cy.wait(delay * 5);
   });
 
@@ -113,7 +113,7 @@ describe('Testing notebooks table', () => {
 
 describe('Testing paragraphs', () => {
   beforeEach(() => {
-    cy.visit('app/kibanaNotebooks#');
+    cy.visit('app/opendistro-notebooks-kibana#');
     cy.get('.euiTableCellContent').contains(TEST_NOTEBOOK).click();
     cy.wait(delay * 5);
   });

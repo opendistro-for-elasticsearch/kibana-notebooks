@@ -1,5 +1,5 @@
 {
-  "name": "kibana_notebooks",
+  "name": "opendistro-notebooks-kibana",
   "version": "1.11.0.0",
   "description": "Kibana Notebooks",
   "main": "index.ts",
