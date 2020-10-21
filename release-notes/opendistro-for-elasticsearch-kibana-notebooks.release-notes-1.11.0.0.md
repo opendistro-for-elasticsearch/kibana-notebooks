@@ -13,6 +13,15 @@
 * Build sample plugin RPM ([#3](https://github.com/opendistro-for-elasticsearch/kibana-notebooks/pull/3))
 
 
+### Enhancements
+* Update dependency package version ([#44](https://github.com/opendistro-for-elasticsearch/kibana-notebooks/pull/44))
+
+
+### Infrastructure
+* Revert s3 release bucket ([#41](https://github.com/opendistro-for-elasticsearch/kibana-notebooks/pull/41))
+* adding unit tests, config for babel/jest and package json ([#36](https://github.com/opendistro-for-elasticsearch/kibana-notebooks/pull/36))
+
+
 ### Documentation
 * Merging Latest Documents to migrated-7.9.0 branch ([#38](https://github.com/opendistro-for-elasticsearch/kibana-notebooks/pull/38))
 * Documentation Update - "Usage, API, Example notebooks, README gif" ([#37](https://github.com/opendistro-for-elasticsearch/kibana-notebooks/pull/37))
@@ -25,6 +34,3 @@
 * adding RFC doc and linking in README  ([#16](https://github.com/opendistro-for-elasticsearch/kibana-notebooks/pull/16))
 
 
-### Infrastructure
-* Revert s3 release bucket ([#41](https://github.com/opendistro-for-elasticsearch/kibana-notebooks/pull/41))
-* adding unit tests, config for babel/jest and package json ([#36](https://github.com/opendistro-for-elasticsearch/kibana-notebooks/pull/36))
