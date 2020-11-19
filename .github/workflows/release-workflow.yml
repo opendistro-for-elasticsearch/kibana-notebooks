@@ -46,6 +46,7 @@ jobs:
       - name: Build Artifact
         run: |
           yarn build
+          mv ./build/*.zip ./build/opendistroNotebooksKibana-1.12.0.0.zip
           artifact=`ls ./build/*.zip`
 
           aws s3 cp $artifact s3://artifacts.opendistroforelasticsearch.amazon.com/downloads/kibana-plugins/opendistro-notebooks/

@@ -30,6 +30,7 @@ jobs:
       - name: Build Artifact
         run: |
           yarn build
+          mv ./build/*.zip ./build/opendistroNotebooksKibana-1.12.0.0.zip
       - name: Upload Artifact
         uses: actions/upload-artifact@v1
         with:
