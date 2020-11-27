@@ -26,6 +26,7 @@ import { HashRouter } from 'react-router-dom';
 import { Switch, Route } from 'react-router';
 import { EuiGlobalToastList, EuiLink } from '@elastic/eui';
 import { Toast } from '@elastic/eui/src/components/toast/global_toast_list';
+import { isGlobalSecurityTenant } from './helpers/helper_functions';
 
 /*
  * "Main" component renders the whole Notebooks as a single page application
@@ -80,7 +81,11 @@ export class Main extends React.Component<MainProps, MainState> {
   }
 
   // Fetches path and id for all stored notebooks
-  fetchNotebooks = () => {
+  fetchNotebooks = async () => {
+    if (!(await isGlobalSecurityTenant(this.props.http))) {
+      this.setToast('Notebooks is only available in the global tenant.', 'danger');
+      return;
+    }
     return this.props.http
       .get(`${API_PREFIX}/`)
       .then((res) => this.setState(res))
@@ -90,7 +95,11 @@ export class Main extends React.Component<MainProps, MainState> {
   };
 
   // Creates a new notebook
-  createNotebook = (newNoteName: string) => {
+  createNotebook = async (newNoteName: string) => {
+    if (!(await isGlobalSecurityTenant(this.props.http))) {
+      this.setToast('Notebooks is only available in the global tenant.', 'danger');
+      return;
+    }
     if (newNoteName.length >= 50 || newNoteName.length === 0) {
       this.setToast('Invalid notebook name', 'danger');
       return;
