@@ -16,10 +16,7 @@
 
 package com.amazon.opendistroforelasticsearch.reportsscheduler.model
 
-import com.amazon.opendistroforelasticsearch.jobscheduler.spi.ScheduledJobParameter
-import com.amazon.opendistroforelasticsearch.jobscheduler.spi.schedule.Schedule
 import com.amazon.opendistroforelasticsearch.reportsscheduler.ReportsSchedulerPlugin.Companion.LOG_PREFIX
-import com.amazon.opendistroforelasticsearch.reportsscheduler.model.ReportDefinition.TriggerType
 import com.amazon.opendistroforelasticsearch.reportsscheduler.model.RestTag.ACCESS_LIST_FIELD
 import com.amazon.opendistroforelasticsearch.reportsscheduler.model.RestTag.CREATED_TIME_FIELD
 import com.amazon.opendistroforelasticsearch.reportsscheduler.model.RestTag.ID_FIELD
@@ -32,6 +29,7 @@ import com.amazon.opendistroforelasticsearch.reportsscheduler.util.logger
 import com.amazon.opendistroforelasticsearch.reportsscheduler.util.stringList
 import org.elasticsearch.common.xcontent.ToXContent
 import org.elasticsearch.common.xcontent.ToXContent.EMPTY_PARAMS
+import org.elasticsearch.common.xcontent.ToXContentObject
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentFactory
 import org.elasticsearch.common.xcontent.XContentParser
@@ -61,7 +59,7 @@ internal data class ReportDefinitionDetails(
     val tenant: String,
     val access: List<String>,
     val reportDefinition: ReportDefinition
-) : ScheduledJobParameter {
+) : ToXContentObject {
     internal companion object {
         private val log by logger(ReportDefinitionDetails::class.java)
 
@@ -142,39 +140,40 @@ internal data class ReportDefinitionDetails(
     /**
      * {@inheritDoc}
      */
-    override fun getName(): String {
+    fun getName(): String {
         return reportDefinition.name
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun getLastUpdateTime(): Instant {
+    fun getLastUpdateTime(): Instant {
         return updatedTime
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun getEnabledTime(): Instant {
+    fun getEnabledTime(): Instant {
         return createdTime
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun getLockDurationSeconds(): Long? {
+    fun getLockDurationSeconds(): Long? {
         return PluginSettings.jobLockDurationSeconds.toLong()
     }
 
-    override fun getSchedule(): Schedule {
-        return reportDefinition.trigger.schedule!!
-    }
-
-    override fun isEnabled(): Boolean {
-        val trigger = reportDefinition.trigger
-        return (reportDefinition.isEnabled &&
-            (reportDefinition.trigger.schedule != null) &&
-            (trigger.triggerType == TriggerType.IntervalSchedule || trigger.triggerType == TriggerType.CronSchedule))
-    }
+//    fun getSchedule() {
+//        return reportDefinition.trigger.schedule!!
+//    }
+//
+//    fun isEnabled(): Boolean {
+//        val trigger = reportDefinition.trigger
+//        return (reportDefinition.isEnabled &&
+//            (reportDefinition.trigger.schedule != null) &&
+//            (trigger.triggerType == TriggerType.IntervalSchedule || trigger.triggerType == TriggerType.CronSchedule))
+//        return true;
+//    }
 }

@@ -62,7 +62,6 @@ esplugin {
     name 'opendistro-reports-scheduler'
     description 'Scheduler for ODFE Kibana Reports Plugin'
     classname "com.amazon.opendistroforelasticsearch.reportsscheduler.ReportsSchedulerPlugin"
-    extendedPlugins = ['opendistro-job-scheduler']
 }
 
 allOpen {
@@ -125,7 +124,6 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-common:${kotlin_version}"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9"
     compile "${group}:common-utils:${opendistroVersion}.2"
-    compileOnly "${group}:opendistro-job-scheduler-spi:${opendistroVersion}.0"
     compile group: 'com.google.guava', name: 'guava', version: '15.0'
     testImplementation(
             'org.assertj:assertj-core:3.16.1',

@@ -16,8 +16,6 @@
 
 package com.amazon.opendistroforelasticsearch.reportsscheduler.model
 
-import com.amazon.opendistroforelasticsearch.jobscheduler.spi.schedule.Schedule
-import com.amazon.opendistroforelasticsearch.jobscheduler.spi.schedule.ScheduleParser
 import com.amazon.opendistroforelasticsearch.reportsscheduler.ReportsSchedulerPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.reportsscheduler.util.logger
 import com.amazon.opendistroforelasticsearch.reportsscheduler.util.stringList
@@ -314,7 +312,7 @@ internal data class ReportDefinition(
      */
     internal data class Trigger(
         val triggerType: TriggerType,
-        val schedule: Schedule?
+        val schedule: Any?
     ) : ToXContentObject {
         internal companion object {
             private const val TRIGGER_TYPE_TAG = "triggerType"
@@ -327,14 +325,14 @@ internal data class ReportDefinition(
              */
             fun parse(parser: XContentParser): Trigger {
                 var triggerType: TriggerType? = null
-                var schedule: Schedule? = null
+                var schedule: Any? = null
                 XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
                 while (XContentParser.Token.END_OBJECT != parser.nextToken()) {
                     val fieldName = parser.currentName()
                     parser.nextToken()
                     when (fieldName) {
                         TRIGGER_TYPE_TAG -> triggerType = TriggerType.valueOf(parser.text())
-                        SCHEDULE_TAG -> schedule = ScheduleParser.parse(parser)
+//                        SCHEDULE_TAG -> schedule = ScheduleParser.parse(parser)
                         else -> log.info("$LOG_PREFIX: Trigger Skipping Unknown field $fieldName")
                     }
                 }
@@ -359,7 +357,7 @@ internal data class ReportDefinition(
                 .field(TRIGGER_TYPE_TAG, triggerType)
             if (isScheduleType(triggerType)) {
                 builder.field(SCHEDULE_TAG)
-                schedule!!.toXContent(builder, ToXContent.EMPTY_PARAMS)
+//                schedule!!.toXContent(builder, ToXContent.EMPTY_PARAMS)
             }
             builder.endObject()
             return builder
