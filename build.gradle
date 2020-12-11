@@ -59,13 +59,13 @@ def usingMultiNode = project.properties.containsKey('numNodes')
 check.dependsOn jacocoTestReport
 
 esplugin {
-    name 'opendistro-reports-scheduler'
-    description 'Scheduler for ODFE Kibana Reports Plugin'
-    classname "com.amazon.opendistroforelasticsearch.reportsscheduler.ReportsSchedulerPlugin"
+    name 'opendistro-notebooks'
+    description 'ES Plugin for ODFE Kibana Notebooks'
+    classname "com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin"
 }
 
 allOpen {
-    annotation("com.amazon.opendistroforelasticsearch.reportsscheduler.util.OpenForTesting")
+    annotation("com.amazon.opendistroforelasticsearch.notebooks.util.OpenForTesting")
 }
 
 configurations {
