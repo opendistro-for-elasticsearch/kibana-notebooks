@@ -40,7 +40,7 @@ internal class CreateReportDefinitionAction @Inject constructor(
     actionFilters,
     ::CreateReportDefinitionRequest) {
     companion object {
-        private const val NAME = "cluster:admin/opendistro/reports/definition/create"
+        private const val NAME = "cluster:admin/opendistro/notebooks/create"
         internal val ACTION_TYPE = ActionType(NAME, ::CreateReportDefinitionResponse)
     }
 

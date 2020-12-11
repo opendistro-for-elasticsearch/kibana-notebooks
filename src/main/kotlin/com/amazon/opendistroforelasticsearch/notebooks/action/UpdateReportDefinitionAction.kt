@@ -40,7 +40,7 @@ internal class UpdateReportDefinitionAction @Inject constructor(
     actionFilters,
     ::UpdateReportDefinitionRequest) {
     companion object {
-        private const val NAME = "cluster:admin/opendistro/reports/definition/update"
+        private const val NAME = "cluster:admin/opendistro/notebooks/update"
         internal val ACTION_TYPE = ActionType(NAME, ::UpdateReportDefinitionResponse)
     }
 

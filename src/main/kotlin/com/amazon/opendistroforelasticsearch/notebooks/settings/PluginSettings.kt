@@ -36,7 +36,7 @@ internal object PluginSettings {
     /**
      * Settings Key prefix for this plugin.
      */
-    private const val KEY_PREFIX = "opendistro.reports"
+    private const val KEY_PREFIX = "opendistro.notebooks"
 
     /**
      * General settings Key prefix.
@@ -81,7 +81,7 @@ internal object PluginSettings {
     /**
      * Setting to choose default number of items to query.
      */
-    private const val DEFAULT_ITEMS_QUERY_COUNT_KEY = "$POLLING_KEY_PREFIX.defaultItemsQueryCount"
+    private const val DEFAULT_ITEMS_QUERY_COUNT_KEY = "$GENERAL_KEY_PREFIX.defaultItemsQueryCount"
 
     /**
      * Setting to choose admin access restriction.

@@ -40,7 +40,7 @@ internal class GetReportDefinitionAction @Inject constructor(
     actionFilters,
     ::GetReportDefinitionRequest) {
     companion object {
-        private const val NAME = "cluster:admin/opendistro/reports/definition/get"
+        private const val NAME = "cluster:admin/opendistro/notebooks/get"
         internal val ACTION_TYPE = ActionType(NAME, ::GetReportDefinitionResponse)
     }
 

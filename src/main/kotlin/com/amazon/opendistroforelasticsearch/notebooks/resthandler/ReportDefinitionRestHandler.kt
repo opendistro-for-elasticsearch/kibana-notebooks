@@ -15,7 +15,7 @@
  */
 package com.amazon.opendistroforelasticsearch.notebooks.resthandler
 
-import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion.BASE_REPORTS_URI
+import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion.BASE_NOTEBOOKS_URI
 import com.amazon.opendistroforelasticsearch.notebooks.action.CreateReportDefinitionAction
 import com.amazon.opendistroforelasticsearch.notebooks.action.DeleteReportDefinitionAction
 import com.amazon.opendistroforelasticsearch.notebooks.action.GetReportDefinitionAction
@@ -45,15 +45,15 @@ import org.elasticsearch.rest.RestStatus
  */
 internal class ReportDefinitionRestHandler : BaseRestHandler() {
     companion object {
-        private const val REPORT_DEFINITION_ACTION = "report_definition_actions"
-        private const val REPORT_DEFINITION_URL = "$BASE_REPORTS_URI/definition"
+        private const val NOTEBOOKS_ACTION = "notebooks_actions"
+        private const val NOTEBOOKS_URL = "$BASE_NOTEBOOKS_URI/definition"
     }
 
     /**
      * {@inheritDoc}
      */
     override fun getName(): String {
-        return REPORT_DEFINITION_ACTION
+        return NOTEBOOKS_ACTION
     }
 
     /**
@@ -67,28 +67,28 @@ internal class ReportDefinitionRestHandler : BaseRestHandler() {
              * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.CreateReportDefinitionRequest]
              * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.CreateReportDefinitionResponse]
              */
-            Route(POST, REPORT_DEFINITION_URL),
+            Route(POST, NOTEBOOKS_URL),
             /**
              * Update report definition
              * Request URL: PUT REPORT_DEFINITION_URL/{reportDefinitionId}
              * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.UpdateReportDefinitionRequest]
              * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.UpdateReportDefinitionResponse]
              */
-            Route(PUT, "$REPORT_DEFINITION_URL/{$REPORT_DEFINITION_ID_FIELD}"),
+            Route(PUT, "$NOTEBOOKS_URL/{$REPORT_DEFINITION_ID_FIELD}"),
             /**
              * Get a report definition
              * Request URL: GET REPORT_DEFINITION_URL/{reportDefinitionId}
              * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.GetReportDefinitionRequest]
              * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.GetReportDefinitionResponse]
              */
-            Route(GET, "$REPORT_DEFINITION_URL/{$REPORT_DEFINITION_ID_FIELD}"),
+            Route(GET, "$NOTEBOOKS_URL/{$REPORT_DEFINITION_ID_FIELD}"),
             /**
              * Delete report definition
              * Request URL: DELETE REPORT_DEFINITION_URL/{reportDefinitionId}
              * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.DeleteReportDefinitionRequest]
              * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.DeleteReportDefinitionResponse]
              */
-            Route(DELETE, "$REPORT_DEFINITION_URL/{$REPORT_DEFINITION_ID_FIELD}")
+            Route(DELETE, "$NOTEBOOKS_URL/{$REPORT_DEFINITION_ID_FIELD}")
         )
     }
 

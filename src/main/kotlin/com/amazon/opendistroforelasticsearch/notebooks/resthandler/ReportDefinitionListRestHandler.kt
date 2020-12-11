@@ -15,7 +15,7 @@
  */
 package com.amazon.opendistroforelasticsearch.notebooks.resthandler
 
-import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion.BASE_REPORTS_URI
+import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion.BASE_NOTEBOOKS_URI
 import com.amazon.opendistroforelasticsearch.notebooks.action.GetAllReportDefinitionsAction
 import com.amazon.opendistroforelasticsearch.notebooks.action.ReportDefinitionActions
 import com.amazon.opendistroforelasticsearch.notebooks.model.GetAllReportDefinitionsRequest
@@ -37,15 +37,15 @@ import org.elasticsearch.rest.RestStatus
  */
 internal class ReportDefinitionListRestHandler : BaseRestHandler() {
     companion object {
-        private const val REPORT_DEFINITION_LIST_ACTION = "report_definition_list_actions"
-        private const val LIST_REPORT_DEFINITIONS_URL = "$BASE_REPORTS_URI/definitions"
+        private const val NOTEBOOKS_LIST_ACTION = "notebooks_list_actions"
+        private const val LIST_REPORT_DEFINITIONS_URL = "$BASE_NOTEBOOKS_URI/definitions"
     }
 
     /**
      * {@inheritDoc}
      */
     override fun getName(): String {
-        return REPORT_DEFINITION_LIST_ACTION
+        return NOTEBOOKS_LIST_ACTION
     }
 
     /**
