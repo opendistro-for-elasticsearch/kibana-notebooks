@@ -17,9 +17,7 @@
 package com.amazon.opendistroforelasticsearch.notebooks.model
 
 import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion.LOG_PREFIX
-import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.REPORT_DEFINITION_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.REPORT_DEFINITION_ID_FIELD
-import com.amazon.opendistroforelasticsearch.notebooks.util.createJsonParser
 import com.amazon.opendistroforelasticsearch.notebooks.util.logger
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionRequestValidationException
@@ -35,58 +33,50 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Report Definition-update request.
+ * Report Definition-delete request.
  * reportDefinitionId is from request query params
  * <pre> JSON format
  * {@code
  * {
- *   "reportDefinitionId":"reportDefinitionId",
- *   "reportDefinition":{
- *      // refer [com.amazon.opendistroforelasticsearch.notebooks.model.ReportDefinition]
- *   }
+ *   "reportDefinitionId":"reportDefinitionId"
  * }
  * }</pre>
  */
-internal class UpdateReportDefinitionRequest : ActionRequest, ToXContentObject {
+internal class DeleteNotebookRequest(
     val reportDefinitionId: String
-    val reportDefinition: ReportDefinition
-
-    companion object {
-        private val log by logger(CreateReportDefinitionRequest::class.java)
-    }
-
-    constructor(reportDefinitionId: String, reportDefinition: ReportDefinition) : super() {
-        this.reportDefinitionId = reportDefinitionId
-        this.reportDefinition = reportDefinition
-    }
+) : ActionRequest(), ToXContentObject {
 
     @Throws(IOException::class)
-    constructor(input: StreamInput) : this(input.createJsonParser())
+    constructor(input: StreamInput) : this(
+        reportDefinitionId = input.readString()
+    )
 
-    /**
-     * Parse the data from parser and create [UpdateReportDefinitionRequest] object
-     * @param parser data referenced at parser
-     */
-    constructor(parser: XContentParser, useReportDefinitionId: String? = null) : super() {
-        var reportDefinitionId: String? = useReportDefinitionId
-        var reportDefinition: ReportDefinition? = null
-        XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser)
-        while (Token.END_OBJECT != parser.nextToken()) {
-            val fieldName = parser.currentName()
-            parser.nextToken()
-            when (fieldName) {
-                REPORT_DEFINITION_ID_FIELD -> reportDefinitionId = parser.text()
-                REPORT_DEFINITION_FIELD -> reportDefinition = ReportDefinition.parse(parser)
-                else -> {
-                    parser.skipChildren()
-                    log.info("$LOG_PREFIX:Skipping Unknown field $fieldName")
+    companion object {
+        private val log by logger(DeleteNotebookRequest::class.java)
+
+        /**
+         * Parse the data from parser and create [DeleteNotebookRequest] object
+         * @param parser data referenced at parser
+         * @param useReportDefinitionId use this id if not available in the json
+         * @return created [DeleteNotebookRequest] object
+         */
+        fun parse(parser: XContentParser, useReportDefinitionId: String? = null): DeleteNotebookRequest {
+            var reportDefinitionId: String? = useReportDefinitionId
+            XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser)
+            while (Token.END_OBJECT != parser.nextToken()) {
+                val fieldName = parser.currentName()
+                parser.nextToken()
+                when (fieldName) {
+                    REPORT_DEFINITION_ID_FIELD -> reportDefinitionId = parser.text()
+                    else -> {
+                        parser.skipChildren()
+                        log.info("$LOG_PREFIX:Skipping Unknown field $fieldName")
+                    }
                 }
             }
+            reportDefinitionId ?: throw IllegalArgumentException("$REPORT_DEFINITION_ID_FIELD field absent")
+            return DeleteNotebookRequest(reportDefinitionId)
         }
-        reportDefinitionId ?: throw IllegalArgumentException("$REPORT_DEFINITION_ID_FIELD field absent")
-        reportDefinition ?: throw IllegalArgumentException("$REPORT_DEFINITION_FIELD field absent")
-        this.reportDefinitionId = reportDefinitionId
-        this.reportDefinition = reportDefinition
     }
 
     /**
@@ -94,7 +84,7 @@ internal class UpdateReportDefinitionRequest : ActionRequest, ToXContentObject {
      */
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
-        toXContent(XContentFactory.jsonBuilder(output), ToXContent.EMPTY_PARAMS)
+        output.writeString(reportDefinitionId)
     }
 
     /**
@@ -112,7 +102,6 @@ internal class UpdateReportDefinitionRequest : ActionRequest, ToXContentObject {
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         return builder!!.startObject()
             .field(REPORT_DEFINITION_ID_FIELD, reportDefinitionId)
-            .field(REPORT_DEFINITION_FIELD, reportDefinition)
             .endObject()
     }
 

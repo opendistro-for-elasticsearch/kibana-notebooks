@@ -17,7 +17,9 @@
 package com.amazon.opendistroforelasticsearch.notebooks.model
 
 import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion.LOG_PREFIX
-import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.REPORT_DEFINITION_ID_FIELD
+import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.FROM_INDEX_FIELD
+import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.MAX_ITEMS_FIELD
+import com.amazon.opendistroforelasticsearch.notebooks.settings.PluginSettings
 import com.amazon.opendistroforelasticsearch.notebooks.util.logger
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionRequestValidationException
@@ -33,49 +35,52 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Report Definition-delete request.
- * reportDefinitionId is from request query params
+ * Get All report definitions info request
+ * Data object created from GET request query params
  * <pre> JSON format
  * {@code
  * {
- *   "reportDefinitionId":"reportDefinitionId"
+ *   "fromIndex":100,
+ *   "maxItems":100
  * }
  * }</pre>
  */
-internal class DeleteReportDefinitionRequest(
-    val reportDefinitionId: String
+internal class GetAllNotebooksRequest(
+    val fromIndex: Int,
+    val maxItems: Int
 ) : ActionRequest(), ToXContentObject {
 
     @Throws(IOException::class)
     constructor(input: StreamInput) : this(
-        reportDefinitionId = input.readString()
+        fromIndex = input.readInt(),
+        maxItems = input.readInt()
     )
 
     companion object {
-        private val log by logger(DeleteReportDefinitionRequest::class.java)
+        private val log by logger(GetAllNotebooksRequest::class.java)
 
         /**
-         * Parse the data from parser and create [DeleteReportDefinitionRequest] object
+         * Parse the data from parser and create [GetAllNotebooksRequest] object
          * @param parser data referenced at parser
-         * @param useReportDefinitionId use this id if not available in the json
-         * @return created [DeleteReportDefinitionRequest] object
+         * @return created [GetAllNotebooksRequest] object
          */
-        fun parse(parser: XContentParser, useReportDefinitionId: String? = null): DeleteReportDefinitionRequest {
-            var reportDefinitionId: String? = useReportDefinitionId
+        fun parse(parser: XContentParser): GetAllNotebooksRequest {
+            var fromIndex = 0
+            var maxItems = PluginSettings.defaultItemsQueryCount
             XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser)
             while (Token.END_OBJECT != parser.nextToken()) {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    REPORT_DEFINITION_ID_FIELD -> reportDefinitionId = parser.text()
+                    FROM_INDEX_FIELD -> fromIndex = parser.intValue()
+                    MAX_ITEMS_FIELD -> maxItems = parser.intValue()
                     else -> {
                         parser.skipChildren()
                         log.info("$LOG_PREFIX:Skipping Unknown field $fieldName")
                     }
                 }
             }
-            reportDefinitionId ?: throw IllegalArgumentException("$REPORT_DEFINITION_ID_FIELD field absent")
-            return DeleteReportDefinitionRequest(reportDefinitionId)
+            return GetAllNotebooksRequest(fromIndex, maxItems)
         }
     }
 
@@ -84,7 +89,21 @@ internal class DeleteReportDefinitionRequest(
      */
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
-        output.writeString(reportDefinitionId)
+        output.writeInt(fromIndex)
+        output.writeInt(maxItems)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun validate(): ActionRequestValidationException? {
+        return if (fromIndex < 0) {
+            val exception = ActionRequestValidationException()
+            exception.addValidationError("fromIndex should be grater than 0")
+            exception
+        } else {
+            null
+        }
     }
 
     /**
@@ -101,14 +120,8 @@ internal class DeleteReportDefinitionRequest(
      */
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         return builder!!.startObject()
-            .field(REPORT_DEFINITION_ID_FIELD, reportDefinitionId)
+            .field(FROM_INDEX_FIELD, fromIndex)
+            .field(MAX_ITEMS_FIELD, maxItems)
             .endObject()
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    override fun validate(): ActionRequestValidationException? {
-        return null
     }
 }

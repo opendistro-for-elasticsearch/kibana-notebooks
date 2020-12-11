@@ -19,17 +19,22 @@ package com.amazon.opendistroforelasticsearch.notebooks.model
 import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.REPORT_DEFINITION_ID_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.util.logger
+import org.elasticsearch.action.ActionRequest
+import org.elasticsearch.action.ActionRequestValidationException
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
 import org.elasticsearch.common.xcontent.ToXContent
+import org.elasticsearch.common.xcontent.ToXContentObject
 import org.elasticsearch.common.xcontent.XContentBuilder
+import org.elasticsearch.common.xcontent.XContentFactory
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParser.Token
 import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Report Definition-create response.
+ * Report Definition-get request.
+ * reportDefinitionId is from request query params
  * <pre> JSON format
  * {@code
  * {
@@ -37,9 +42,9 @@ import java.io.IOException
  * }
  * }</pre>
  */
-internal class CreateReportDefinitionResponse(
+internal class GetNotebookRequest(
     val reportDefinitionId: String
-) : BaseResponse() {
+) : ActionRequest(), ToXContentObject {
 
     @Throws(IOException::class)
     constructor(input: StreamInput) : this(
@@ -47,15 +52,16 @@ internal class CreateReportDefinitionResponse(
     )
 
     companion object {
-        private val log by logger(CreateReportDefinitionResponse::class.java)
+        private val log by logger(GetNotebookRequest::class.java)
 
         /**
-         * Parse the data from parser and create [CreateReportDefinitionResponse] object
+         * Parse the data from parser and create [GetNotebookRequest] object
          * @param parser data referenced at parser
-         * @return created [CreateReportDefinitionResponse] object
+         * @param useReportDefinitionId use this id if not available in the json
+         * @return created [GetNotebookRequest] object
          */
-        fun parse(parser: XContentParser): CreateReportDefinitionResponse {
-            var reportDefinitionId: String? = null
+        fun parse(parser: XContentParser, useReportDefinitionId: String? = null): GetNotebookRequest {
+            var reportDefinitionId: String? = useReportDefinitionId
             XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser)
             while (Token.END_OBJECT != parser.nextToken()) {
                 val fieldName = parser.currentName()
@@ -69,7 +75,7 @@ internal class CreateReportDefinitionResponse(
                 }
             }
             reportDefinitionId ?: throw IllegalArgumentException("$REPORT_DEFINITION_ID_FIELD field absent")
-            return CreateReportDefinitionResponse(reportDefinitionId)
+            return GetNotebookRequest(reportDefinitionId)
         }
     }
 
@@ -82,11 +88,27 @@ internal class CreateReportDefinitionResponse(
     }
 
     /**
+     * create XContentBuilder from this object using [XContentFactory.jsonBuilder()]
+     * @param params XContent parameters
+     * @return created XContentBuilder object
+     */
+    fun toXContent(params: ToXContent.Params = ToXContent.EMPTY_PARAMS): XContentBuilder? {
+        return toXContent(XContentFactory.jsonBuilder(), params)
+    }
+
+    /**
      * {@inheritDoc}
      */
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         return builder!!.startObject()
             .field(REPORT_DEFINITION_ID_FIELD, reportDefinitionId)
             .endObject()
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    override fun validate(): ActionRequestValidationException? {
+        return null
     }
 }

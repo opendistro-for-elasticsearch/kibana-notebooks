@@ -17,8 +17,8 @@
 package com.amazon.opendistroforelasticsearch.notebooks.action
 
 import com.amazon.opendistroforelasticsearch.commons.authuser.User
-import com.amazon.opendistroforelasticsearch.notebooks.model.DeleteReportDefinitionRequest
-import com.amazon.opendistroforelasticsearch.notebooks.model.DeleteReportDefinitionResponse
+import com.amazon.opendistroforelasticsearch.notebooks.model.GetNotebookRequest
+import com.amazon.opendistroforelasticsearch.notebooks.model.GetNotebookResponse
 import org.elasticsearch.action.ActionType
 import org.elasticsearch.action.support.ActionFilters
 import org.elasticsearch.client.Client
@@ -27,27 +27,27 @@ import org.elasticsearch.common.xcontent.NamedXContentRegistry
 import org.elasticsearch.transport.TransportService
 
 /**
- * Delete reportDefinition transport action
+ * Get reportDefinition transport action
  */
-internal class DeleteReportDefinitionAction @Inject constructor(
+internal class GetNotebookAction @Inject constructor(
     transportService: TransportService,
     client: Client,
     actionFilters: ActionFilters,
     val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<DeleteReportDefinitionRequest, DeleteReportDefinitionResponse>(NAME,
+) : PluginBaseAction<GetNotebookRequest, GetNotebookResponse>(NAME,
     transportService,
     client,
     actionFilters,
-    ::DeleteReportDefinitionRequest) {
+    ::GetNotebookRequest) {
     companion object {
-        private const val NAME = "cluster:admin/opendistro/notebooks/delete"
-        internal val ACTION_TYPE = ActionType(NAME, ::DeleteReportDefinitionResponse)
+        private const val NAME = "cluster:admin/opendistro/notebooks/get"
+        internal val ACTION_TYPE = ActionType(NAME, ::GetNotebookResponse)
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(request: DeleteReportDefinitionRequest, user: User?): DeleteReportDefinitionResponse {
-        return ReportDefinitionActions.delete(request, user)
+    override fun executeRequest(request: GetNotebookRequest, user: User?): GetNotebookResponse {
+        return NotebookActions.info(request, user)
     }
 }

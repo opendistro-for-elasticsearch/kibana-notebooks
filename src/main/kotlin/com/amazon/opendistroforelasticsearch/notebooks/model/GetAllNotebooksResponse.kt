@@ -16,40 +16,35 @@
 
 package com.amazon.opendistroforelasticsearch.notebooks.model
 
-import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notebooks.util.createJsonParser
-import com.amazon.opendistroforelasticsearch.notebooks.util.logger
 import org.elasticsearch.common.io.stream.StreamInput
 import org.elasticsearch.common.io.stream.StreamOutput
 import org.elasticsearch.common.xcontent.ToXContent
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentFactory
 import org.elasticsearch.common.xcontent.XContentParser
-import org.elasticsearch.common.xcontent.XContentParser.Token
-import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Get report Definition info response.
+ * Get all report definitions response.
  * <pre> JSON format
  * {@code
  * {
- *   "reportDefinitionDetails":{
+ *   "startIndex":"0",
+ *   "totalHits":"100",
+ *   "totalHitRelation":"eq",
+ *   "reportDefinitionDetailsList":[
  *      // refer [com.amazon.opendistroforelasticsearch.notebooks.model.ReportDefinitionDetails]
- *   }
+ *   ]
  * }
  * }</pre>
  */
-internal class GetReportDefinitionResponse : BaseResponse {
-    val reportDefinitionDetails: ReportDefinitionDetails
+internal class GetAllNotebooksResponse : BaseResponse {
+    val reportDefinitionList: ReportDefinitionDetailsSearchResults
     private val filterSensitiveInfo: Boolean
 
-    companion object {
-        private val log by logger(GetReportDefinitionResponse::class.java)
-    }
-
-    constructor(reportDefinition: ReportDefinitionDetails, filterSensitiveInfo: Boolean) : super() {
-        this.reportDefinitionDetails = reportDefinition
+    constructor(reportDefinitionList: ReportDefinitionDetailsSearchResults, filterSensitiveInfo: Boolean) : super() {
+        this.reportDefinitionList = reportDefinitionList
         this.filterSensitiveInfo = filterSensitiveInfo
     }
 
@@ -57,25 +52,11 @@ internal class GetReportDefinitionResponse : BaseResponse {
     constructor(input: StreamInput) : this(input.createJsonParser())
 
     /**
-     * Parse the data from parser and create [GetReportDefinitionResponse] object
+     * Parse the data from parser and create [GetAllNotebooksResponse] object
      * @param parser data referenced at parser
      */
     constructor(parser: XContentParser) : super() {
-        var reportDefinition: ReportDefinitionDetails? = null
-        XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser)
-        while (Token.END_OBJECT != parser.nextToken()) {
-            val fieldName = parser.currentName()
-            parser.nextToken()
-            when (fieldName) {
-                RestTag.REPORT_DEFINITION_DETAILS_FIELD -> reportDefinition = ReportDefinitionDetails.parse(parser)
-                else -> {
-                    parser.skipChildren()
-                    log.info("$LOG_PREFIX:Skipping Unknown field $fieldName")
-                }
-            }
-        }
-        reportDefinition ?: throw IllegalArgumentException("${RestTag.REPORT_DEFINITION_FIELD} field absent")
-        this.reportDefinitionDetails = reportDefinition
+        reportDefinitionList = ReportDefinitionDetailsSearchResults(parser)
         this.filterSensitiveInfo = false // Sensitive info Must have filtered when created json object
     }
 
@@ -96,9 +77,6 @@ internal class GetReportDefinitionResponse : BaseResponse {
         } else {
             RestTag.REST_OUTPUT_PARAMS
         }
-        builder!!.startObject()
-            .field(RestTag.REPORT_DEFINITION_DETAILS_FIELD)
-        reportDefinitionDetails.toXContent(builder, xContentParams)
-        return builder.endObject()
+        return reportDefinitionList.toXContent(builder, xContentParams)
     }
 }

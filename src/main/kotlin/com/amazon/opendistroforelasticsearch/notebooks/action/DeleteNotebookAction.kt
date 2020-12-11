@@ -17,8 +17,8 @@
 package com.amazon.opendistroforelasticsearch.notebooks.action
 
 import com.amazon.opendistroforelasticsearch.commons.authuser.User
-import com.amazon.opendistroforelasticsearch.notebooks.model.CreateReportDefinitionRequest
-import com.amazon.opendistroforelasticsearch.notebooks.model.CreateReportDefinitionResponse
+import com.amazon.opendistroforelasticsearch.notebooks.model.DeleteNotebookRequest
+import com.amazon.opendistroforelasticsearch.notebooks.model.DeleteNotebookResponse
 import org.elasticsearch.action.ActionType
 import org.elasticsearch.action.support.ActionFilters
 import org.elasticsearch.client.Client
@@ -27,27 +27,27 @@ import org.elasticsearch.common.xcontent.NamedXContentRegistry
 import org.elasticsearch.transport.TransportService
 
 /**
- * Create reportDefinition transport action
+ * Delete reportDefinition transport action
  */
-internal class CreateReportDefinitionAction @Inject constructor(
+internal class DeleteNotebookAction @Inject constructor(
     transportService: TransportService,
     client: Client,
     actionFilters: ActionFilters,
     val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<CreateReportDefinitionRequest, CreateReportDefinitionResponse>(NAME,
+) : PluginBaseAction<DeleteNotebookRequest, DeleteNotebookResponse>(NAME,
     transportService,
     client,
     actionFilters,
-    ::CreateReportDefinitionRequest) {
+    ::DeleteNotebookRequest) {
     companion object {
-        private const val NAME = "cluster:admin/opendistro/notebooks/create"
-        internal val ACTION_TYPE = ActionType(NAME, ::CreateReportDefinitionResponse)
+        private const val NAME = "cluster:admin/opendistro/notebooks/delete"
+        internal val ACTION_TYPE = ActionType(NAME, ::DeleteNotebookResponse)
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(request: CreateReportDefinitionRequest, user: User?): CreateReportDefinitionResponse {
-        return ReportDefinitionActions.create(request, user)
+    override fun executeRequest(request: DeleteNotebookRequest, user: User?): DeleteNotebookResponse {
+        return NotebookActions.delete(request, user)
     }
 }

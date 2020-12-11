@@ -15,14 +15,14 @@
  */
 package com.amazon.opendistroforelasticsearch.notebooks
 
-import com.amazon.opendistroforelasticsearch.notebooks.action.CreateReportDefinitionAction
-import com.amazon.opendistroforelasticsearch.notebooks.action.DeleteReportDefinitionAction
-import com.amazon.opendistroforelasticsearch.notebooks.action.GetAllReportDefinitionsAction
-import com.amazon.opendistroforelasticsearch.notebooks.action.GetReportDefinitionAction
-import com.amazon.opendistroforelasticsearch.notebooks.action.UpdateReportDefinitionAction
-import com.amazon.opendistroforelasticsearch.notebooks.index.ReportDefinitionsIndex
-import com.amazon.opendistroforelasticsearch.notebooks.resthandler.ReportDefinitionListRestHandler
-import com.amazon.opendistroforelasticsearch.notebooks.resthandler.ReportDefinitionRestHandler
+import com.amazon.opendistroforelasticsearch.notebooks.action.CreateNotebookAction
+import com.amazon.opendistroforelasticsearch.notebooks.action.DeleteNotebookAction
+import com.amazon.opendistroforelasticsearch.notebooks.action.GetAllNotebooksAction
+import com.amazon.opendistroforelasticsearch.notebooks.action.GetNotebookAction
+import com.amazon.opendistroforelasticsearch.notebooks.action.UpdateNotebookAction
+import com.amazon.opendistroforelasticsearch.notebooks.index.NotebooksIndex
+import com.amazon.opendistroforelasticsearch.notebooks.resthandler.NotebookListRestHandler
+import com.amazon.opendistroforelasticsearch.notebooks.resthandler.NotebookRestHandler
 import com.amazon.opendistroforelasticsearch.notebooks.settings.PluginSettings
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.ActionResponse
@@ -85,7 +85,7 @@ class NotebooksPlugin : Plugin(), ActionPlugin {
         repositoriesServiceSupplier: Supplier<RepositoriesService>
     ): Collection<Any> {
         PluginSettings.addSettingsUpdateConsumer(clusterService)
-        ReportDefinitionsIndex.initialize(client, clusterService)
+        NotebooksIndex.initialize(client, clusterService)
         return emptyList()
     }
 
@@ -102,8 +102,8 @@ class NotebooksPlugin : Plugin(), ActionPlugin {
         nodesInCluster: Supplier<DiscoveryNodes>
     ): List<RestHandler> {
         return listOf(
-            ReportDefinitionRestHandler(),
-            ReportDefinitionListRestHandler()
+            NotebookRestHandler(),
+            NotebookListRestHandler()
         )
     }
 
@@ -112,11 +112,11 @@ class NotebooksPlugin : Plugin(), ActionPlugin {
      */
     override fun getActions(): List<ActionPlugin.ActionHandler<out ActionRequest, out ActionResponse>> {
         return listOf(
-            ActionPlugin.ActionHandler(CreateReportDefinitionAction.ACTION_TYPE, CreateReportDefinitionAction::class.java),
-            ActionPlugin.ActionHandler(DeleteReportDefinitionAction.ACTION_TYPE, DeleteReportDefinitionAction::class.java),
-            ActionPlugin.ActionHandler(GetAllReportDefinitionsAction.ACTION_TYPE, GetAllReportDefinitionsAction::class.java),
-            ActionPlugin.ActionHandler(GetReportDefinitionAction.ACTION_TYPE, GetReportDefinitionAction::class.java),
-            ActionPlugin.ActionHandler(UpdateReportDefinitionAction.ACTION_TYPE, UpdateReportDefinitionAction::class.java)
+            ActionPlugin.ActionHandler(CreateNotebookAction.ACTION_TYPE, CreateNotebookAction::class.java),
+            ActionPlugin.ActionHandler(DeleteNotebookAction.ACTION_TYPE, DeleteNotebookAction::class.java),
+            ActionPlugin.ActionHandler(GetAllNotebooksAction.ACTION_TYPE, GetAllNotebooksAction::class.java),
+            ActionPlugin.ActionHandler(GetNotebookAction.ACTION_TYPE, GetNotebookAction::class.java),
+            ActionPlugin.ActionHandler(UpdateNotebookAction.ACTION_TYPE, UpdateNotebookAction::class.java)
         )
     }
 }

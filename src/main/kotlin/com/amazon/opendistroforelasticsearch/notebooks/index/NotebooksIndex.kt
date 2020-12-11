@@ -46,11 +46,11 @@ import java.util.concurrent.TimeUnit
 /**
  * Class for doing ES index operation to maintain report definitions in cluster.
  */
-internal object ReportDefinitionsIndex {
-    private val log by logger(ReportDefinitionsIndex::class.java)
-    const val REPORT_DEFINITIONS_INDEX_NAME = ".opendistro-reports-definitions"
-    private const val REPORT_DEFINITIONS_MAPPING_FILE_NAME = "report-definitions-mapping.yml"
-    private const val REPORT_DEFINITIONS_SETTINGS_FILE_NAME = "report-definitions-settings.yml"
+internal object NotebooksIndex {
+    private val log by logger(NotebooksIndex::class.java)
+    const val NOTEBOOKS_INDEX_NAME = ".notebooks"
+    private const val NOTEBOOKS_MAPPING_FILE_NAME = "notebooks-mapping.yml"
+    private const val NOTEBOOKS_SETTINGS_FILE_NAME = "notebooks-settings.yml"
     private const val MAPPING_TYPE = "_doc"
 
     private lateinit var client: Client
@@ -72,19 +72,19 @@ internal object ReportDefinitionsIndex {
     @Suppress("TooGenericExceptionCaught")
     private fun createIndex() {
         if (!isIndexExists()) {
-            val classLoader = ReportDefinitionsIndex::class.java.classLoader
-            val indexMappingSource = classLoader.getResource(REPORT_DEFINITIONS_MAPPING_FILE_NAME)?.readText()!!
-            val indexSettingsSource = classLoader.getResource(REPORT_DEFINITIONS_SETTINGS_FILE_NAME)?.readText()!!
-            val request = CreateIndexRequest(REPORT_DEFINITIONS_INDEX_NAME)
+            val classLoader = NotebooksIndex::class.java.classLoader
+            val indexMappingSource = classLoader.getResource(NOTEBOOKS_MAPPING_FILE_NAME)?.readText()!!
+            val indexSettingsSource = classLoader.getResource(NOTEBOOKS_SETTINGS_FILE_NAME)?.readText()!!
+            val request = CreateIndexRequest(NOTEBOOKS_INDEX_NAME)
                 .mapping(MAPPING_TYPE, indexMappingSource, XContentType.YAML)
                 .settings(indexSettingsSource, XContentType.YAML)
             try {
                 val actionFuture = client.admin().indices().create(request)
                 val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
                 if (response.isAcknowledged) {
-                    log.info("$LOG_PREFIX:Index $REPORT_DEFINITIONS_INDEX_NAME creation Acknowledged")
+                    log.info("$LOG_PREFIX:Index $NOTEBOOKS_INDEX_NAME creation Acknowledged")
                 } else {
-                    throw IllegalStateException("$LOG_PREFIX:Index $REPORT_DEFINITIONS_INDEX_NAME creation not Acknowledged")
+                    throw IllegalStateException("$LOG_PREFIX:Index $NOTEBOOKS_INDEX_NAME creation not Acknowledged")
                 }
             } catch (exception: Exception) {
                 if (exception !is ResourceAlreadyExistsException && exception.cause !is ResourceAlreadyExistsException) {
@@ -100,7 +100,7 @@ internal object ReportDefinitionsIndex {
      */
     private fun isIndexExists(): Boolean {
         val clusterState = clusterService.state()
-        return clusterState.routingTable.hasIndex(REPORT_DEFINITIONS_INDEX_NAME)
+        return clusterState.routingTable.hasIndex(NOTEBOOKS_INDEX_NAME)
     }
 
     /**
@@ -111,7 +111,7 @@ internal object ReportDefinitionsIndex {
      */
     fun createReportDefinition(reportDefinitionDetails: ReportDefinitionDetails): String? {
         createIndex()
-        val indexRequest = IndexRequest(REPORT_DEFINITIONS_INDEX_NAME)
+        val indexRequest = IndexRequest(NOTEBOOKS_INDEX_NAME)
             .source(reportDefinitionDetails.toXContent())
             .create(true)
         val actionFuture = client.index(indexRequest)
@@ -131,7 +131,7 @@ internal object ReportDefinitionsIndex {
      */
     fun getReportDefinition(id: String): ReportDefinitionDetails? {
         createIndex()
-        val getRequest = GetRequest(REPORT_DEFINITIONS_INDEX_NAME).id(id)
+        val getRequest = GetRequest(NOTEBOOKS_INDEX_NAME).id(id)
         val actionFuture = client.get(getRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
         return if (response.sourceAsString == null) {
@@ -172,7 +172,7 @@ internal object ReportDefinitionsIndex {
             sourceBuilder.query(tenantQuery)
         }
         val searchRequest = SearchRequest()
-            .indices(REPORT_DEFINITIONS_INDEX_NAME)
+            .indices(NOTEBOOKS_INDEX_NAME)
             .source(sourceBuilder)
         val actionFuture = client.search(searchRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
@@ -191,7 +191,7 @@ internal object ReportDefinitionsIndex {
     fun updateReportDefinition(id: String, reportDefinitionDetails: ReportDefinitionDetails): Boolean {
         createIndex()
         val updateRequest = UpdateRequest()
-            .index(REPORT_DEFINITIONS_INDEX_NAME)
+            .index(NOTEBOOKS_INDEX_NAME)
             .id(id)
             .doc(reportDefinitionDetails.toXContent())
             .fetchSource(true)
@@ -211,7 +211,7 @@ internal object ReportDefinitionsIndex {
     fun deleteReportDefinition(id: String): Boolean {
         createIndex()
         val deleteRequest = DeleteRequest()
-            .index(REPORT_DEFINITIONS_INDEX_NAME)
+            .index(NOTEBOOKS_INDEX_NAME)
             .id(id)
         val actionFuture = client.delete(deleteRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)

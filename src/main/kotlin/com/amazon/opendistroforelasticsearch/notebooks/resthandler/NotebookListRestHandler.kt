@@ -16,9 +16,9 @@
 package com.amazon.opendistroforelasticsearch.notebooks.resthandler
 
 import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion.BASE_NOTEBOOKS_URI
-import com.amazon.opendistroforelasticsearch.notebooks.action.GetAllReportDefinitionsAction
-import com.amazon.opendistroforelasticsearch.notebooks.action.ReportDefinitionActions
-import com.amazon.opendistroforelasticsearch.notebooks.model.GetAllReportDefinitionsRequest
+import com.amazon.opendistroforelasticsearch.notebooks.action.GetAllNotebooksAction
+import com.amazon.opendistroforelasticsearch.notebooks.action.NotebookActions
+import com.amazon.opendistroforelasticsearch.notebooks.model.GetAllNotebooksRequest
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.FROM_INDEX_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.MAX_ITEMS_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.settings.PluginSettings
@@ -33,12 +33,12 @@ import org.elasticsearch.rest.RestStatus
 
 /**
  * Rest handler for getting list of report definitions.
- * This handler uses [ReportDefinitionActions].
+ * This handler uses [NotebookActions].
  */
-internal class ReportDefinitionListRestHandler : BaseRestHandler() {
+internal class NotebookListRestHandler : BaseRestHandler() {
     companion object {
         private const val NOTEBOOKS_LIST_ACTION = "notebooks_list_actions"
-        private const val LIST_REPORT_DEFINITIONS_URL = "$BASE_NOTEBOOKS_URI/definitions"
+        private const val LIST_NOTEBOOKS_URL = "$BASE_NOTEBOOKS_URI/definitions"
     }
 
     /**
@@ -57,9 +57,9 @@ internal class ReportDefinitionListRestHandler : BaseRestHandler() {
              * Get all report definitions (from optional fromIndex)
              * Request URL: GET LIST_REPORT_DEFINITIONS_URL[?[fromIndex=1000]&[maxItems=100]]
              * Request body: None
-             * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.GetAllReportDefinitionsResponse]
+             * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.GetAllNotebooksResponse]
              */
-            Route(GET, LIST_REPORT_DEFINITIONS_URL)
+            Route(GET, LIST_NOTEBOOKS_URL)
         )
     }
 
@@ -71,8 +71,8 @@ internal class ReportDefinitionListRestHandler : BaseRestHandler() {
         val maxItems = request.param(MAX_ITEMS_FIELD)?.toIntOrNull() ?: PluginSettings.defaultItemsQueryCount
         return when (request.method()) {
             GET -> RestChannelConsumer {
-                client.execute(GetAllReportDefinitionsAction.ACTION_TYPE,
-                    GetAllReportDefinitionsRequest(from, maxItems),
+                client.execute(GetAllNotebooksAction.ACTION_TYPE,
+                    GetAllNotebooksRequest(from, maxItems),
                     RestResponseToXContentListener(it))
             }
             else -> RestChannelConsumer {

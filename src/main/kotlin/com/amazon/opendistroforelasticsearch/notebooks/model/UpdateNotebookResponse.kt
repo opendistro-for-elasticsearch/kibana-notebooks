@@ -37,7 +37,7 @@ import java.io.IOException
  * }
  * }</pre>
  */
-internal class UpdateReportDefinitionResponse(
+internal class UpdateNotebookResponse(
     val reportDefinitionId: String?
 ) : BaseResponse() {
 
@@ -47,14 +47,14 @@ internal class UpdateReportDefinitionResponse(
     )
 
     companion object {
-        private val log by logger(UpdateReportDefinitionResponse::class.java)
+        private val log by logger(UpdateNotebookResponse::class.java)
 
         /**
-         * Parse the data from parser and create [UpdateReportDefinitionResponse] object
+         * Parse the data from parser and create [UpdateNotebookResponse] object
          * @param parser data referenced at parser
-         * @return created [UpdateReportDefinitionResponse] object
+         * @return created [UpdateNotebookResponse] object
          */
-        fun parse(parser: XContentParser): UpdateReportDefinitionResponse {
+        fun parse(parser: XContentParser): UpdateNotebookResponse {
             var reportDefinitionId: String? = null
             XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser)
             while (Token.END_OBJECT != parser.nextToken()) {
@@ -69,7 +69,7 @@ internal class UpdateReportDefinitionResponse(
                 }
             }
             reportDefinitionId ?: throw IllegalArgumentException("$REPORT_DEFINITION_ID_FIELD field absent")
-            return UpdateReportDefinitionResponse(reportDefinitionId)
+            return UpdateNotebookResponse(reportDefinitionId)
         }
     }
 

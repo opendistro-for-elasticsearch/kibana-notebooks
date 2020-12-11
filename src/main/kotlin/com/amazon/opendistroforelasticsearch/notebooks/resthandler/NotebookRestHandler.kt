@@ -16,16 +16,16 @@
 package com.amazon.opendistroforelasticsearch.notebooks.resthandler
 
 import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion.BASE_NOTEBOOKS_URI
-import com.amazon.opendistroforelasticsearch.notebooks.action.CreateReportDefinitionAction
-import com.amazon.opendistroforelasticsearch.notebooks.action.DeleteReportDefinitionAction
-import com.amazon.opendistroforelasticsearch.notebooks.action.GetReportDefinitionAction
-import com.amazon.opendistroforelasticsearch.notebooks.action.ReportDefinitionActions
-import com.amazon.opendistroforelasticsearch.notebooks.action.UpdateReportDefinitionAction
-import com.amazon.opendistroforelasticsearch.notebooks.model.CreateReportDefinitionRequest
-import com.amazon.opendistroforelasticsearch.notebooks.model.DeleteReportDefinitionRequest
-import com.amazon.opendistroforelasticsearch.notebooks.model.GetReportDefinitionRequest
+import com.amazon.opendistroforelasticsearch.notebooks.action.CreateNotebookAction
+import com.amazon.opendistroforelasticsearch.notebooks.action.DeleteNotebookAction
+import com.amazon.opendistroforelasticsearch.notebooks.action.GetNotebookAction
+import com.amazon.opendistroforelasticsearch.notebooks.action.NotebookActions
+import com.amazon.opendistroforelasticsearch.notebooks.action.UpdateNotebookAction
+import com.amazon.opendistroforelasticsearch.notebooks.model.CreateNotebookRequest
+import com.amazon.opendistroforelasticsearch.notebooks.model.DeleteNotebookRequest
+import com.amazon.opendistroforelasticsearch.notebooks.model.GetNotebookRequest
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.REPORT_DEFINITION_ID_FIELD
-import com.amazon.opendistroforelasticsearch.notebooks.model.UpdateReportDefinitionRequest
+import com.amazon.opendistroforelasticsearch.notebooks.model.UpdateNotebookRequest
 import com.amazon.opendistroforelasticsearch.notebooks.util.contentParserNextToken
 import org.elasticsearch.client.node.NodeClient
 import org.elasticsearch.rest.BaseRestHandler
@@ -41,9 +41,9 @@ import org.elasticsearch.rest.RestStatus
 
 /**
  * Rest handler for report definitions lifecycle management.
- * This handler uses [ReportDefinitionActions].
+ * This handler uses [NotebookActions].
  */
-internal class ReportDefinitionRestHandler : BaseRestHandler() {
+internal class NotebookRestHandler : BaseRestHandler() {
     companion object {
         private const val NOTEBOOKS_ACTION = "notebooks_actions"
         private const val NOTEBOOKS_URL = "$BASE_NOTEBOOKS_URI/definition"
@@ -64,29 +64,29 @@ internal class ReportDefinitionRestHandler : BaseRestHandler() {
             /**
              * Create a new report definition
              * Request URL: POST REPORT_DEFINITION_URL
-             * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.CreateReportDefinitionRequest]
-             * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.CreateReportDefinitionResponse]
+             * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.CreateNotebookRequest]
+             * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.CreateNotebookResponse]
              */
             Route(POST, NOTEBOOKS_URL),
             /**
              * Update report definition
              * Request URL: PUT REPORT_DEFINITION_URL/{reportDefinitionId}
-             * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.UpdateReportDefinitionRequest]
-             * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.UpdateReportDefinitionResponse]
+             * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.UpdateNotebookRequest]
+             * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.UpdateNotebookResponse]
              */
             Route(PUT, "$NOTEBOOKS_URL/{$REPORT_DEFINITION_ID_FIELD}"),
             /**
              * Get a report definition
              * Request URL: GET REPORT_DEFINITION_URL/{reportDefinitionId}
-             * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.GetReportDefinitionRequest]
-             * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.GetReportDefinitionResponse]
+             * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.GetNotebookRequest]
+             * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.GetNotebookResponse]
              */
             Route(GET, "$NOTEBOOKS_URL/{$REPORT_DEFINITION_ID_FIELD}"),
             /**
              * Delete report definition
              * Request URL: DELETE REPORT_DEFINITION_URL/{reportDefinitionId}
-             * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.DeleteReportDefinitionRequest]
-             * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.DeleteReportDefinitionResponse]
+             * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.DeleteNotebookRequest]
+             * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.DeleteNotebookResponse]
              */
             Route(DELETE, "$NOTEBOOKS_URL/{$REPORT_DEFINITION_ID_FIELD}")
         )
@@ -105,24 +105,24 @@ internal class ReportDefinitionRestHandler : BaseRestHandler() {
     override fun prepareRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
         return when (request.method()) {
             POST -> RestChannelConsumer {
-                client.execute(CreateReportDefinitionAction.ACTION_TYPE,
-                    CreateReportDefinitionRequest(request.contentParserNextToken()),
+                client.execute(CreateNotebookAction.ACTION_TYPE,
+                    CreateNotebookRequest(request.contentParserNextToken()),
                     RestResponseToXContentListener(it))
             }
             PUT -> RestChannelConsumer {
                 client.execute(
-                    UpdateReportDefinitionAction.ACTION_TYPE,
-                    UpdateReportDefinitionRequest(request.contentParserNextToken(), request.param(REPORT_DEFINITION_ID_FIELD)),
+                    UpdateNotebookAction.ACTION_TYPE,
+                    UpdateNotebookRequest(request.contentParserNextToken(), request.param(REPORT_DEFINITION_ID_FIELD)),
                     RestResponseToXContentListener(it))
             }
             GET -> RestChannelConsumer {
-                client.execute(GetReportDefinitionAction.ACTION_TYPE,
-                    GetReportDefinitionRequest(request.param(REPORT_DEFINITION_ID_FIELD)),
+                client.execute(GetNotebookAction.ACTION_TYPE,
+                    GetNotebookRequest(request.param(REPORT_DEFINITION_ID_FIELD)),
                     RestResponseToXContentListener(it))
             }
             DELETE -> RestChannelConsumer {
-                client.execute(DeleteReportDefinitionAction.ACTION_TYPE,
-                    DeleteReportDefinitionRequest(request.param(REPORT_DEFINITION_ID_FIELD)),
+                client.execute(DeleteNotebookAction.ACTION_TYPE,
+                    DeleteNotebookRequest(request.param(REPORT_DEFINITION_ID_FIELD)),
                     RestResponseToXContentListener(it))
             }
             else -> RestChannelConsumer {

@@ -17,8 +17,8 @@
 package com.amazon.opendistroforelasticsearch.notebooks.action
 
 import com.amazon.opendistroforelasticsearch.commons.authuser.User
-import com.amazon.opendistroforelasticsearch.notebooks.model.GetReportDefinitionRequest
-import com.amazon.opendistroforelasticsearch.notebooks.model.GetReportDefinitionResponse
+import com.amazon.opendistroforelasticsearch.notebooks.model.GetAllNotebooksRequest
+import com.amazon.opendistroforelasticsearch.notebooks.model.GetAllNotebooksResponse
 import org.elasticsearch.action.ActionType
 import org.elasticsearch.action.support.ActionFilters
 import org.elasticsearch.client.Client
@@ -27,27 +27,27 @@ import org.elasticsearch.common.xcontent.NamedXContentRegistry
 import org.elasticsearch.transport.TransportService
 
 /**
- * Get reportDefinition transport action
+ * Get all reportDefinitions transport action
  */
-internal class GetReportDefinitionAction @Inject constructor(
+internal class GetAllNotebooksAction @Inject constructor(
     transportService: TransportService,
     client: Client,
     actionFilters: ActionFilters,
     val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<GetReportDefinitionRequest, GetReportDefinitionResponse>(NAME,
+) : PluginBaseAction<GetAllNotebooksRequest, GetAllNotebooksResponse>(NAME,
     transportService,
     client,
     actionFilters,
-    ::GetReportDefinitionRequest) {
+    ::GetAllNotebooksRequest) {
     companion object {
-        private const val NAME = "cluster:admin/opendistro/notebooks/get"
-        internal val ACTION_TYPE = ActionType(NAME, ::GetReportDefinitionResponse)
+        private const val NAME = "cluster:admin/opendistro/notebooks/list"
+        internal val ACTION_TYPE = ActionType(NAME, ::GetAllNotebooksResponse)
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(request: GetReportDefinitionRequest, user: User?): GetReportDefinitionResponse {
-        return ReportDefinitionActions.info(request, user)
+    override fun executeRequest(request: GetAllNotebooksRequest, user: User?): GetAllNotebooksResponse {
+        return NotebookActions.getAll(request, user)
     }
 }

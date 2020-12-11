@@ -29,7 +29,7 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Report Definition-delete response.
+ * Report Definition-create response.
  * <pre> JSON format
  * {@code
  * {
@@ -37,7 +37,7 @@ import java.io.IOException
  * }
  * }</pre>
  */
-internal data class DeleteReportDefinitionResponse(
+internal class CreateNotebookResponse(
     val reportDefinitionId: String
 ) : BaseResponse() {
 
@@ -47,14 +47,14 @@ internal data class DeleteReportDefinitionResponse(
     )
 
     companion object {
-        private val log by logger(DeleteReportDefinitionResponse::class.java)
+        private val log by logger(CreateNotebookResponse::class.java)
 
         /**
-         * Parse the data from parser and create [DeleteReportDefinitionResponse] object
+         * Parse the data from parser and create [CreateNotebookResponse] object
          * @param parser data referenced at parser
-         * @return created [DeleteReportDefinitionResponse] object
+         * @return created [CreateNotebookResponse] object
          */
-        fun parse(parser: XContentParser): DeleteReportDefinitionResponse {
+        fun parse(parser: XContentParser): CreateNotebookResponse {
             var reportDefinitionId: String? = null
             XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser)
             while (Token.END_OBJECT != parser.nextToken()) {
@@ -69,7 +69,7 @@ internal data class DeleteReportDefinitionResponse(
                 }
             }
             reportDefinitionId ?: throw IllegalArgumentException("$REPORT_DEFINITION_ID_FIELD field absent")
-            return DeleteReportDefinitionResponse(reportDefinitionId)
+            return CreateNotebookResponse(reportDefinitionId)
         }
     }
 

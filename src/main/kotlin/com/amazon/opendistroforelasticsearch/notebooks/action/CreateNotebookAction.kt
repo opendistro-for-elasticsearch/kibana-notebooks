@@ -17,8 +17,8 @@
 package com.amazon.opendistroforelasticsearch.notebooks.action
 
 import com.amazon.opendistroforelasticsearch.commons.authuser.User
-import com.amazon.opendistroforelasticsearch.notebooks.model.UpdateReportDefinitionRequest
-import com.amazon.opendistroforelasticsearch.notebooks.model.UpdateReportDefinitionResponse
+import com.amazon.opendistroforelasticsearch.notebooks.model.CreateNotebookRequest
+import com.amazon.opendistroforelasticsearch.notebooks.model.CreateNotebookResponse
 import org.elasticsearch.action.ActionType
 import org.elasticsearch.action.support.ActionFilters
 import org.elasticsearch.client.Client
@@ -27,27 +27,27 @@ import org.elasticsearch.common.xcontent.NamedXContentRegistry
 import org.elasticsearch.transport.TransportService
 
 /**
- * Update reportDefinitions transport action
+ * Create reportDefinition transport action
  */
-internal class UpdateReportDefinitionAction @Inject constructor(
+internal class CreateNotebookAction @Inject constructor(
     transportService: TransportService,
     client: Client,
     actionFilters: ActionFilters,
     val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<UpdateReportDefinitionRequest, UpdateReportDefinitionResponse>(NAME,
+) : PluginBaseAction<CreateNotebookRequest, CreateNotebookResponse>(NAME,
     transportService,
     client,
     actionFilters,
-    ::UpdateReportDefinitionRequest) {
+    ::CreateNotebookRequest) {
     companion object {
-        private const val NAME = "cluster:admin/opendistro/notebooks/update"
-        internal val ACTION_TYPE = ActionType(NAME, ::UpdateReportDefinitionResponse)
+        private const val NAME = "cluster:admin/opendistro/notebooks/create"
+        internal val ACTION_TYPE = ActionType(NAME, ::CreateNotebookResponse)
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(request: UpdateReportDefinitionRequest, user: User?): UpdateReportDefinitionResponse {
-        return ReportDefinitionActions.update(request, user)
+    override fun executeRequest(request: CreateNotebookRequest, user: User?): CreateNotebookResponse {
+        return NotebookActions.create(request, user)
     }
 }

@@ -44,11 +44,11 @@ import java.io.IOException
  * }
  * }</pre>
  */
-internal class CreateReportDefinitionRequest : ActionRequest, ToXContentObject {
+internal class CreateNotebookRequest : ActionRequest, ToXContentObject {
     val reportDefinition: ReportDefinition
 
     companion object {
-        private val log by logger(CreateReportDefinitionRequest::class.java)
+        private val log by logger(CreateNotebookRequest::class.java)
     }
 
     constructor(reportDefinition: ReportDefinition) : super() {
@@ -59,7 +59,7 @@ internal class CreateReportDefinitionRequest : ActionRequest, ToXContentObject {
     constructor(input: StreamInput) : this(input.createJsonParser())
 
     /**
-     * Parse the data from parser and create [GetAllReportDefinitionsResponse] object
+     * Parse the data from parser and create [GetAllNotebooksResponse] object
      * @param parser data referenced at parser
      */
     constructor(parser: XContentParser) : super() {

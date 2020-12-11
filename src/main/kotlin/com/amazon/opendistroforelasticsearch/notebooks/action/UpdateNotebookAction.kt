@@ -17,8 +17,8 @@
 package com.amazon.opendistroforelasticsearch.notebooks.action
 
 import com.amazon.opendistroforelasticsearch.commons.authuser.User
-import com.amazon.opendistroforelasticsearch.notebooks.model.GetAllReportDefinitionsRequest
-import com.amazon.opendistroforelasticsearch.notebooks.model.GetAllReportDefinitionsResponse
+import com.amazon.opendistroforelasticsearch.notebooks.model.UpdateNotebookRequest
+import com.amazon.opendistroforelasticsearch.notebooks.model.UpdateNotebookResponse
 import org.elasticsearch.action.ActionType
 import org.elasticsearch.action.support.ActionFilters
 import org.elasticsearch.client.Client
@@ -27,27 +27,27 @@ import org.elasticsearch.common.xcontent.NamedXContentRegistry
 import org.elasticsearch.transport.TransportService
 
 /**
- * Get all reportDefinitions transport action
+ * Update reportDefinitions transport action
  */
-internal class GetAllReportDefinitionsAction @Inject constructor(
+internal class UpdateNotebookAction @Inject constructor(
     transportService: TransportService,
     client: Client,
     actionFilters: ActionFilters,
     val xContentRegistry: NamedXContentRegistry
-) : PluginBaseAction<GetAllReportDefinitionsRequest, GetAllReportDefinitionsResponse>(NAME,
+) : PluginBaseAction<UpdateNotebookRequest, UpdateNotebookResponse>(NAME,
     transportService,
     client,
     actionFilters,
-    ::GetAllReportDefinitionsRequest) {
+    ::UpdateNotebookRequest) {
     companion object {
-        private const val NAME = "cluster:admin/opendistro/notebooks/list"
-        internal val ACTION_TYPE = ActionType(NAME, ::GetAllReportDefinitionsResponse)
+        private const val NAME = "cluster:admin/opendistro/notebooks/update"
+        internal val ACTION_TYPE = ActionType(NAME, ::UpdateNotebookResponse)
     }
 
     /**
      * {@inheritDoc}
      */
-    override fun executeRequest(request: GetAllReportDefinitionsRequest, user: User?): GetAllReportDefinitionsResponse {
-        return ReportDefinitionActions.getAll(request, user)
+    override fun executeRequest(request: UpdateNotebookRequest, user: User?): UpdateNotebookResponse {
+        return NotebookActions.update(request, user)
     }
 }
