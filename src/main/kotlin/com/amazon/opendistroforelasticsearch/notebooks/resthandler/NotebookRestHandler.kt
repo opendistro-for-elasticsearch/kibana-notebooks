@@ -24,7 +24,7 @@ import com.amazon.opendistroforelasticsearch.notebooks.action.UpdateNotebookActi
 import com.amazon.opendistroforelasticsearch.notebooks.model.CreateNotebookRequest
 import com.amazon.opendistroforelasticsearch.notebooks.model.DeleteNotebookRequest
 import com.amazon.opendistroforelasticsearch.notebooks.model.GetNotebookRequest
-import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.REPORT_DEFINITION_ID_FIELD
+import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.NOTEBOOK_ID_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.model.UpdateNotebookRequest
 import com.amazon.opendistroforelasticsearch.notebooks.util.contentParserNextToken
 import org.elasticsearch.client.node.NodeClient
@@ -46,7 +46,7 @@ import org.elasticsearch.rest.RestStatus
 internal class NotebookRestHandler : BaseRestHandler() {
     companion object {
         private const val NOTEBOOKS_ACTION = "notebooks_actions"
-        private const val NOTEBOOKS_URL = "$BASE_NOTEBOOKS_URI/definition"
+        private const val NOTEBOOKS_URL = "$BASE_NOTEBOOKS_URI/notebook"
     }
 
     /**
@@ -74,21 +74,21 @@ internal class NotebookRestHandler : BaseRestHandler() {
              * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.UpdateNotebookRequest]
              * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.UpdateNotebookResponse]
              */
-            Route(PUT, "$NOTEBOOKS_URL/{$REPORT_DEFINITION_ID_FIELD}"),
+            Route(PUT, "$NOTEBOOKS_URL/{$NOTEBOOK_ID_FIELD}"),
             /**
              * Get a report definition
              * Request URL: GET REPORT_DEFINITION_URL/{reportDefinitionId}
              * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.GetNotebookRequest]
              * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.GetNotebookResponse]
              */
-            Route(GET, "$NOTEBOOKS_URL/{$REPORT_DEFINITION_ID_FIELD}"),
+            Route(GET, "$NOTEBOOKS_URL/{$NOTEBOOK_ID_FIELD}"),
             /**
              * Delete report definition
              * Request URL: DELETE REPORT_DEFINITION_URL/{reportDefinitionId}
              * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.DeleteNotebookRequest]
              * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.DeleteNotebookResponse]
              */
-            Route(DELETE, "$NOTEBOOKS_URL/{$REPORT_DEFINITION_ID_FIELD}")
+            Route(DELETE, "$NOTEBOOKS_URL/{$NOTEBOOK_ID_FIELD}")
         )
     }
 
@@ -96,7 +96,7 @@ internal class NotebookRestHandler : BaseRestHandler() {
      * {@inheritDoc}
      */
     override fun responseParams(): Set<String> {
-        return setOf(REPORT_DEFINITION_ID_FIELD)
+        return setOf(NOTEBOOK_ID_FIELD)
     }
 
     /**
@@ -112,17 +112,17 @@ internal class NotebookRestHandler : BaseRestHandler() {
             PUT -> RestChannelConsumer {
                 client.execute(
                     UpdateNotebookAction.ACTION_TYPE,
-                    UpdateNotebookRequest(request.contentParserNextToken(), request.param(REPORT_DEFINITION_ID_FIELD)),
+                    UpdateNotebookRequest(request.contentParserNextToken(), request.param(NOTEBOOK_ID_FIELD)),
                     RestResponseToXContentListener(it))
             }
             GET -> RestChannelConsumer {
                 client.execute(GetNotebookAction.ACTION_TYPE,
-                    GetNotebookRequest(request.param(REPORT_DEFINITION_ID_FIELD)),
+                    GetNotebookRequest(request.param(NOTEBOOK_ID_FIELD)),
                     RestResponseToXContentListener(it))
             }
             DELETE -> RestChannelConsumer {
                 client.execute(DeleteNotebookAction.ACTION_TYPE,
-                    DeleteNotebookRequest(request.param(REPORT_DEFINITION_ID_FIELD)),
+                    DeleteNotebookRequest(request.param(NOTEBOOK_ID_FIELD)),
                     RestResponseToXContentListener(it))
             }
             else -> RestChannelConsumer {

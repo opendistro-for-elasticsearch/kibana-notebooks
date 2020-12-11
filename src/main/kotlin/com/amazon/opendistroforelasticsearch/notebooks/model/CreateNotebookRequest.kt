@@ -17,7 +17,7 @@
 package com.amazon.opendistroforelasticsearch.notebooks.model
 
 import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion.LOG_PREFIX
-import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.REPORT_DEFINITION_FIELD
+import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.NOTEBOOK_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.util.createJsonParser
 import com.amazon.opendistroforelasticsearch.notebooks.util.logger
 import org.elasticsearch.action.ActionRequest
@@ -69,14 +69,14 @@ internal class CreateNotebookRequest : ActionRequest, ToXContentObject {
             val fieldName = parser.currentName()
             parser.nextToken()
             when (fieldName) {
-                REPORT_DEFINITION_FIELD -> reportDefinition = ReportDefinition.parse(parser)
+                NOTEBOOK_FIELD -> reportDefinition = ReportDefinition.parse(parser)
                 else -> {
                     parser.skipChildren()
                     log.info("$LOG_PREFIX:Skipping Unknown field $fieldName")
                 }
             }
         }
-        reportDefinition ?: throw IllegalArgumentException("$REPORT_DEFINITION_FIELD field absent")
+        reportDefinition ?: throw IllegalArgumentException("$NOTEBOOK_FIELD field absent")
         this.reportDefinition = reportDefinition
     }
 
@@ -102,7 +102,7 @@ internal class CreateNotebookRequest : ActionRequest, ToXContentObject {
      */
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         return builder!!.startObject()
-            .field(REPORT_DEFINITION_FIELD, reportDefinition)
+            .field(NOTEBOOK_FIELD, reportDefinition)
             .endObject()
     }
 

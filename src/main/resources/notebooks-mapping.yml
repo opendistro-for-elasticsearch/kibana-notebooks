@@ -31,6 +31,6 @@ properties:
     type: keyword
   access: # Array of access details like user,role,backend_role etc
     type: keyword
-  reportDefinition:
+  notebook:
     type: object
     enabled: false

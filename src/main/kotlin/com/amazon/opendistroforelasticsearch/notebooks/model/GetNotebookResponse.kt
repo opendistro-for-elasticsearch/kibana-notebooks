@@ -74,7 +74,7 @@ internal class GetNotebookResponse : BaseResponse {
                 }
             }
         }
-        reportDefinition ?: throw IllegalArgumentException("${RestTag.REPORT_DEFINITION_FIELD} field absent")
+        reportDefinition ?: throw IllegalArgumentException("${RestTag.NOTEBOOK_FIELD} field absent")
         this.reportDefinitionDetails = reportDefinition
         this.filterSensitiveInfo = false // Sensitive info Must have filtered when created json object
     }

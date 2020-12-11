@@ -20,7 +20,7 @@ import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.ACCESS_LIST_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.CREATED_TIME_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.ID_FIELD
-import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.REPORT_DEFINITION_FIELD
+import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.NOTEBOOK_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.TENANT_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.UPDATED_TIME_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.security.UserAccessManager.DEFAULT_TENANT
@@ -86,7 +86,7 @@ internal data class ReportDefinitionDetails(
                     CREATED_TIME_FIELD -> createdTime = Instant.ofEpochMilli(parser.longValue())
                     TENANT_FIELD -> tenant = parser.text()
                     ACCESS_LIST_FIELD -> access = parser.stringList()
-                    REPORT_DEFINITION_FIELD -> reportDefinition = ReportDefinition.parse(parser)
+                    NOTEBOOK_FIELD -> reportDefinition = ReportDefinition.parse(parser)
                     else -> {
                         parser.skipChildren()
                         log.info("$LOG_PREFIX:ReportDefinitionDetails Skipping Unknown field $fieldName")
@@ -97,7 +97,7 @@ internal data class ReportDefinitionDetails(
             updatedTime ?: throw IllegalArgumentException("$UPDATED_TIME_FIELD field absent")
             createdTime ?: throw IllegalArgumentException("$CREATED_TIME_FIELD field absent")
             tenant = tenant ?: DEFAULT_TENANT
-            reportDefinition ?: throw IllegalArgumentException("$REPORT_DEFINITION_FIELD field absent")
+            reportDefinition ?: throw IllegalArgumentException("$NOTEBOOK_FIELD field absent")
             return ReportDefinitionDetails(id,
                 updatedTime,
                 createdTime,
@@ -131,7 +131,7 @@ internal data class ReportDefinitionDetails(
         if (params?.paramAsBoolean(ACCESS_LIST_FIELD, true) == true && access.isNotEmpty()) {
             builder.field(ACCESS_LIST_FIELD, access)
         }
-        builder.field(REPORT_DEFINITION_FIELD)
+        builder.field(NOTEBOOK_FIELD)
         reportDefinition.toXContent(builder, params)
         builder.endObject()
         return builder

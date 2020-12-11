@@ -38,7 +38,7 @@ import org.elasticsearch.rest.RestStatus
 internal class NotebookListRestHandler : BaseRestHandler() {
     companion object {
         private const val NOTEBOOKS_LIST_ACTION = "notebooks_list_actions"
-        private const val LIST_NOTEBOOKS_URL = "$BASE_NOTEBOOKS_URI/definitions"
+        private const val LIST_NOTEBOOKS_URL = "$BASE_NOTEBOOKS_URI/notebooks"
     }
 
     /**
