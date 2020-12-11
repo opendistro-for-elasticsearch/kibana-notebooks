@@ -58,7 +58,7 @@ internal data class ReportDefinitionDetails(
     val createdTime: Instant,
     val tenant: String,
     val access: List<String>,
-    val reportDefinition: ReportDefinition
+    val notebook: Notebook
 ) : ToXContentObject {
     internal companion object {
         private val log by logger(ReportDefinitionDetails::class.java)
@@ -75,7 +75,7 @@ internal data class ReportDefinitionDetails(
             var createdTime: Instant? = null
             var tenant: String? = null
             var access: List<String> = listOf()
-            var reportDefinition: ReportDefinition? = null
+            var notebook: Notebook? = null
             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
             while (XContentParser.Token.END_OBJECT != parser.nextToken()) {
                 val fieldName = parser.currentName()
@@ -86,7 +86,7 @@ internal data class ReportDefinitionDetails(
                     CREATED_TIME_FIELD -> createdTime = Instant.ofEpochMilli(parser.longValue())
                     TENANT_FIELD -> tenant = parser.text()
                     ACCESS_LIST_FIELD -> access = parser.stringList()
-                    NOTEBOOK_FIELD -> reportDefinition = ReportDefinition.parse(parser)
+                    NOTEBOOK_FIELD -> notebook = Notebook.parse(parser)
                     else -> {
                         parser.skipChildren()
                         log.info("$LOG_PREFIX:ReportDefinitionDetails Skipping Unknown field $fieldName")
@@ -97,13 +97,13 @@ internal data class ReportDefinitionDetails(
             updatedTime ?: throw IllegalArgumentException("$UPDATED_TIME_FIELD field absent")
             createdTime ?: throw IllegalArgumentException("$CREATED_TIME_FIELD field absent")
             tenant = tenant ?: DEFAULT_TENANT
-            reportDefinition ?: throw IllegalArgumentException("$NOTEBOOK_FIELD field absent")
+            notebook ?: throw IllegalArgumentException("$NOTEBOOK_FIELD field absent")
             return ReportDefinitionDetails(id,
                 updatedTime,
                 createdTime,
                 tenant,
                 access,
-                reportDefinition)
+                notebook)
         }
     }
 
@@ -132,7 +132,7 @@ internal data class ReportDefinitionDetails(
             builder.field(ACCESS_LIST_FIELD, access)
         }
         builder.field(NOTEBOOK_FIELD)
-        reportDefinition.toXContent(builder, params)
+        notebook.toXContent(builder, params)
         builder.endObject()
         return builder
     }
@@ -141,7 +141,7 @@ internal data class ReportDefinitionDetails(
      * {@inheritDoc}
      */
     fun getName(): String {
-        return reportDefinition.name
+        return notebook.name
     }
 
     /**

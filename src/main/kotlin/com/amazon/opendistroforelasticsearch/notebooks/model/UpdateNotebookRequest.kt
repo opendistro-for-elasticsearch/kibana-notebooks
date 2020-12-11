@@ -49,15 +49,15 @@ import java.io.IOException
  */
 internal class UpdateNotebookRequest : ActionRequest, ToXContentObject {
     val reportDefinitionId: String
-    val reportDefinition: ReportDefinition
+    val notebook: Notebook
 
     companion object {
         private val log by logger(CreateNotebookRequest::class.java)
     }
 
-    constructor(reportDefinitionId: String, reportDefinition: ReportDefinition) : super() {
+    constructor(reportDefinitionId: String, notebook: Notebook) : super() {
         this.reportDefinitionId = reportDefinitionId
-        this.reportDefinition = reportDefinition
+        this.notebook = notebook
     }
 
     @Throws(IOException::class)
@@ -69,14 +69,14 @@ internal class UpdateNotebookRequest : ActionRequest, ToXContentObject {
      */
     constructor(parser: XContentParser, useReportDefinitionId: String? = null) : super() {
         var reportDefinitionId: String? = useReportDefinitionId
-        var reportDefinition: ReportDefinition? = null
+        var notebook: Notebook? = null
         XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser)
         while (Token.END_OBJECT != parser.nextToken()) {
             val fieldName = parser.currentName()
             parser.nextToken()
             when (fieldName) {
                 NOTEBOOK_ID_FIELD -> reportDefinitionId = parser.text()
-                NOTEBOOK_FIELD -> reportDefinition = ReportDefinition.parse(parser)
+                NOTEBOOK_FIELD -> notebook = Notebook.parse(parser)
                 else -> {
                     parser.skipChildren()
                     log.info("$LOG_PREFIX:Skipping Unknown field $fieldName")
@@ -84,9 +84,9 @@ internal class UpdateNotebookRequest : ActionRequest, ToXContentObject {
             }
         }
         reportDefinitionId ?: throw IllegalArgumentException("$NOTEBOOK_ID_FIELD field absent")
-        reportDefinition ?: throw IllegalArgumentException("$NOTEBOOK_FIELD field absent")
+        notebook ?: throw IllegalArgumentException("$NOTEBOOK_FIELD field absent")
         this.reportDefinitionId = reportDefinitionId
-        this.reportDefinition = reportDefinition
+        this.notebook = notebook
     }
 
     /**
@@ -112,7 +112,7 @@ internal class UpdateNotebookRequest : ActionRequest, ToXContentObject {
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         return builder!!.startObject()
             .field(NOTEBOOK_ID_FIELD, reportDefinitionId)
-            .field(NOTEBOOK_FIELD, reportDefinition)
+            .field(NOTEBOOK_FIELD, notebook)
             .endObject()
     }
 

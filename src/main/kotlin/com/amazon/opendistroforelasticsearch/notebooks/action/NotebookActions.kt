@@ -56,7 +56,7 @@ internal object NotebookActions {
             currentTime,
             UserAccessManager.getUserTenant(user),
             UserAccessManager.getAllAccessInfo(user),
-            request.reportDefinition
+            request.notebook
         )
         val docId = NotebooksIndex.createReportDefinition(reportDefinitionDetails)
         docId ?: throw ElasticsearchStatusException("Report Definition Creation failed",
@@ -84,7 +84,7 @@ internal object NotebookActions {
             currentReportDefinitionDetails.createdTime,
             UserAccessManager.getUserTenant(user),
             currentReportDefinitionDetails.access,
-            request.reportDefinition
+            request.notebook
         )
         if (!NotebooksIndex.updateReportDefinition(request.reportDefinitionId, reportDefinitionDetails)) {
             throw ElasticsearchStatusException("Report Definition Update failed", RestStatus.INTERNAL_SERVER_ERROR)

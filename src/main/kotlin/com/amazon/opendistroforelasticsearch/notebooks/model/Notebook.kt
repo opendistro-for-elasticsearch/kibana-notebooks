@@ -73,13 +73,10 @@ import java.time.Duration
  * }</pre>
  */
 
-internal data class ReportDefinition(
+internal data class Notebook(
     val name: String,
-    val isEnabled: Boolean,
-    val source: Source,
-    val format: Format,
-    val trigger: Trigger,
-    val delivery: Delivery?
+    val backend: String,
+    val paragraphs: List<Paragraph>
 ) : ToXContentObject {
 
     internal enum class SourceType { Dashboard, Visualization, SavedSearch }
@@ -88,53 +85,40 @@ internal data class ReportDefinition(
     internal enum class FileFormat { Pdf, Png, Csv }
 
     internal companion object {
-        private val log by logger(ReportDefinition::class.java)
+        private val log by logger(Notebook::class.java)
         private const val NAME_TAG = "name"
-        private const val IS_ENABLED_TAG = "isEnabled"
-        private const val SOURCE_TAG = "source"
-        private const val FORMAT_TAG = "format"
-        private const val TRIGGER_TAG = "trigger"
-        private const val DELIVERY_TAG = "delivery"
+        private const val BACKEND_TAG = "backend"
+        private const val PARAGRAPHS_TAG = "paragraphs"
 
         /**
-         * Parse the data from parser and create ReportDefinition object
+         * Parse the data from parser and create Notebook object
          * @param parser data referenced at parser
-         * @return created ReportDefinition object
+         * @return created Notebook object
          */
-        fun parse(parser: XContentParser): ReportDefinition {
+        fun parse(parser: XContentParser): Notebook {
             var name: String? = null
-            var isEnabled = false
-            var source: Source? = null
-            var format: Format? = null
-            var trigger: Trigger? = null
-            var delivery: Delivery? = null
+            var backend: String? = null
+            var paragraphs: List<Paragraph>? = null
             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
             while (XContentParser.Token.END_OBJECT != parser.nextToken()) {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
                     NAME_TAG -> name = parser.text()
-                    IS_ENABLED_TAG -> isEnabled = parser.booleanValue()
-                    SOURCE_TAG -> source = Source.parse(parser)
-                    FORMAT_TAG -> format = Format.parse(parser)
-                    TRIGGER_TAG -> trigger = Trigger.parse(parser)
-                    DELIVERY_TAG -> delivery = Delivery.parse(parser)
+                    BACKEND_TAG -> backend = parser.text()
+                    PARAGRAPHS_TAG -> paragraphs = Paragraph.parse(parser)
                     else -> {
                         parser.skipChildren()
-                        log.info("$LOG_PREFIX:ReportDefinition Skipping Unknown field $fieldName")
+                        log.info("$LOG_PREFIX:Notebook Skipping Unknown field $fieldName")
                     }
                 }
             }
             name ?: throw IllegalArgumentException("$NAME_TAG field absent")
-            source ?: throw IllegalArgumentException("$SOURCE_TAG field absent")
-            format ?: throw IllegalArgumentException("$FORMAT_TAG field absent")
-            trigger ?: throw IllegalArgumentException("$TRIGGER_TAG field absent")
-            return ReportDefinition(name,
-                isEnabled,
-                source,
-                format,
-                trigger,
-                delivery)
+            backend ?: throw IllegalArgumentException("$BACKEND_TAG field absent")
+            paragraphs ?: throw IllegalArgumentException("$PARAGRAPHS_TAG field absent")
+            return Notebook(name,
+                backend,
+                paragraphs)
         }
     }
 
@@ -154,17 +138,9 @@ internal data class ReportDefinition(
         builder!!
         builder.startObject()
             .field(NAME_TAG, name)
-            .field(IS_ENABLED_TAG, isEnabled)
-        builder.field(SOURCE_TAG)
-        source.toXContent(builder, ToXContent.EMPTY_PARAMS)
-        builder.field(FORMAT_TAG)
-        format.toXContent(builder, ToXContent.EMPTY_PARAMS)
-        builder.field(TRIGGER_TAG)
-        trigger.toXContent(builder, ToXContent.EMPTY_PARAMS)
-        if (delivery != null) {
-            builder.field(DELIVERY_TAG)
-            delivery.toXContent(builder, ToXContent.EMPTY_PARAMS)
-        }
+            .field(BACKEND_TAG, backend)
+        builder.field(PARAGRAPHS_TAG)
+        paragraphs.toXContent(builder, ToXContent.EMPTY_PARAMS)
         builder.endObject()
         return builder
     }
@@ -172,7 +148,7 @@ internal data class ReportDefinition(
     /**
      * Report definition source data class
      */
-    internal data class Source(
+    internal data class Paragraph(
         val description: String,
         val type: SourceType,
         val origin: String,
