@@ -15,7 +15,7 @@
 
 import { v4 as uuid } from 'uuid';
 import { NotebookAdaptor } from './notebook_adaptor';
-import { RequestHandlerContext } from '../../../../src/core/server';
+import { ILegacyScopedClusterClient, RequestHandlerContext } from '../../../../src/core/server';
 import { optionsType, FETCH_SIZE } from '../../common';
 import { RequestParams, errors } from '@elastic/elasticsearch';
 import {
@@ -49,26 +49,21 @@ export class DefaultBackend implements NotebookAdaptor {
   };
 
   // indexes a notebook with body provided
-  indexNote = async function (context: RequestHandlerContext, noteId: string, body: any) {
+  indexNote = async function (client: ILegacyScopedClusterClient, noteId: string, body: any) {
     try {
-      const options: RequestParams.Index = {
-        index: '.notebooks',
-        refresh: 'true',
-        id: noteId,
-        body: body,
-      };
-      const esClientResponse = await context.core.elasticsearch.legacy.client.callAsCurrentUser(
-        'index',
-        options
-      );
-      return esClientResponse;
+      const response = await client.callAsCurrentUser('notebooks.createNotebook', {
+        body: {
+          notebook: body
+        }
+      });
+      return response;
     } catch (error) {
       throw new Error('Index Doc Error:' + error);
     }
   };
 
   // updates a notebook with updateBody provided as parameter
-  updateNote = async function (context: RequestHandlerContext, noteId: string, updateBody: string) {
+  updateNote = async function (client: ILegacyScopedClusterClient, noteId: string, updateBody: string) {
     try {
       const options: RequestParams.Update = {
         index: '.notebooks',
@@ -89,7 +84,7 @@ export class DefaultBackend implements NotebookAdaptor {
   };
 
   // fetched a notebook by Id
-  getNote = async function (context: RequestHandlerContext, noteId: string) {
+  getNote = async function (client: ILegacyScopedClusterClient, noteId: string) {
     try {
       const esClientResponse = await context.core.elasticsearch.legacy.client.callAsCurrentUser(
         'get',
@@ -105,36 +100,18 @@ export class DefaultBackend implements NotebookAdaptor {
   };
 
   // gets first `FETCH_SIZE` notebooks available
-  viewNotes = async function (context: RequestHandlerContext, _wreckOptions: optionsType) {
-    let esClientResponse;
-    let data = [];
+  viewNotes = async function (client: ILegacyScopedClusterClient, _wreckOptions: optionsType) {
     try {
-      const options: RequestParams.Search = {
-        index: '.notebooks',
-        size: FETCH_SIZE,
-        _source: ['id', 'name', 'dateCreated', 'dateModified'],
-        body: {
-          query: {
-            match_all: {},
-          },
-        },
-      };
-      esClientResponse = await context.core.elasticsearch.legacy.client.callAsCurrentUser(
-        'search',
-        options
-      );
-      esClientResponse.hits.hits.map((doc: { _source: { name: string; id: string; dateCreated: string; dateModified: string } }) => {
-        data.push({
-          path: doc._source.name,
-          id: doc._source.id,
-          dateCreated: doc._source.dateCreated,
-          dateModified: doc._source.dateModified,
-        });
-      });
-      return data;
+      const response = await client.callAsCurrentUser('notebooks.getNotebooks');
+      return response.notebookDetailsList.map((notebook) => ({
+        path: notebook.notebook.name,
+        id: notebook.id,
+        dateCreated: notebook.notebook.dateCreated,
+        dateModified: notebook.notebook.dateModified,
+      }));
     } catch (error) {
       if (error.body.error.type === 'index_not_found_exception') {
-        return data;
+        return [];
       } else throw new Error('View Notebooks Error:' + error);
     }
   };
@@ -143,12 +120,12 @@ export class DefaultBackend implements NotebookAdaptor {
    * Param: noteId -> Id of notebook to be fetched
    */
   fetchNote = async function (
-    context: RequestHandlerContext,
+    client: ILegacyScopedClusterClient,
     noteId: string,
     _wreckOptions: optionsType
   ) {
     try {
-      const noteObject = await this.getNote(context, noteId);
+      const noteObject = await this.getNote(client, noteId);
       return {
         path: noteObject.name,
         dateCreated: noteObject.dateCreated,
@@ -164,13 +141,13 @@ export class DefaultBackend implements NotebookAdaptor {
    * Param: name -> name of new notebook
    */
   addNote = async function (
-    context: RequestHandlerContext,
+    client: ILegacyScopedClusterClient,
     params: { name: string },
     _wreckOptions: optionsType
   ) {
     try {
       const newNotebook = this.createNewNotebook(params.name);
-      const esClientResponse = await this.indexNote(context, newNotebook.id, newNotebook.object);
+      const esClientResponse = await this.indexNote(client, newNotebook.id, newNotebook.object);
       return { status: 'OK', message: esClientResponse, body: esClientResponse._id };
     } catch (error) {
       throw new Error('Creating New Notebook Error:' + error);
@@ -182,7 +159,7 @@ export class DefaultBackend implements NotebookAdaptor {
    *         noteId -> Id of notebook to be fetched
    */
   renameNote = async function (
-    context: RequestHandlerContext,
+    client: ILegacyScopedClusterClient,
     params: { name: string; noteId: string },
     _wreckOptions: optionsType
   ) {
@@ -191,7 +168,7 @@ export class DefaultBackend implements NotebookAdaptor {
         name: params.name,
         dateModified: new Date().toISOString(),
       };
-      const esClientResponse = await this.updateNote(context, params.noteId, updateNotebook);
+      const esClientResponse = await this.updateNote(client, params.noteId, updateNotebook);
       return { status: 'OK', message: esClientResponse };
     } catch (error) {
       throw new Error('Renaming Notebook Error:' + error);
@@ -203,16 +180,16 @@ export class DefaultBackend implements NotebookAdaptor {
    *         noteId -> Id for the notebook to be cloned
    */
   cloneNote = async function (
-    context: RequestHandlerContext,
+    client: ILegacyScopedClusterClient,
     params: { name: string; noteId: string },
     _wreckOptions: optionsType
   ) {
     try {
-      const noteObject = await this.getNote(context, params.noteId);
+      const noteObject = await this.getNote(client, params.noteId);
       const newNotebook = this.createNewNotebook(params.name);
       const cloneNotebook = { ...newNotebook.object };
       cloneNotebook.paragraphs = noteObject.paragraphs;
-      const esClientIndexResponse = await this.indexNote(context, newNotebook.id, cloneNotebook);
+      const esClientIndexResponse = await this.indexNote(client, newNotebook.id, cloneNotebook);
       return { status: 'OK', message: esClientIndexResponse, body: esClientIndexResponse._id };
     } catch (error) {
       throw new Error('Cloning Notebook Error:' + error);
@@ -223,7 +200,7 @@ export class DefaultBackend implements NotebookAdaptor {
    * Param: noteId -> Id for the notebook to be deleted
    */
   deleteNote = async function (
-    context: RequestHandlerContext,
+    client: ILegacyScopedClusterClient,
     noteId: string,
     _wreckOptions: optionsType
   ) {
@@ -246,12 +223,12 @@ export class DefaultBackend implements NotebookAdaptor {
    * Param: noteId -> Id for the notebook to be exported
    */
   exportNote = async function (
-    context: RequestHandlerContext,
+    client: ILegacyScopedClusterClient,
     noteId: string,
     _wreckOptions: optionsType
   ) {
     try {
-      const esClientGetResponse = await this.getNote(context, noteId);
+      const esClientGetResponse = await this.getNote(client, noteId);
       return { status: 'OK', body: esClientGetResponse };
     } catch (error) {
       throw new Error('Export Notebook Error:' + error);
@@ -262,7 +239,7 @@ export class DefaultBackend implements NotebookAdaptor {
    * Params: noteObj -> note Object to be imported
    */
   importNote = async function (
-    context: RequestHandlerContext,
+    client: ILegacyScopedClusterClient,
     noteObj: any,
     _wreckOptions: optionsType
   ) {
@@ -271,7 +248,7 @@ export class DefaultBackend implements NotebookAdaptor {
       newNoteObject.id = 'note_' + uuid();
       newNoteObject.dateCreated = new Date().toISOString();
       newNoteObject.dateModified = new Date().toISOString();
-      const esClientIndexResponse = await this.indexNote(context, newNoteObject.id, newNoteObject);
+      const esClientIndexResponse = await this.indexNote(client, newNoteObject.id, newNoteObject);
       return { status: 'OK', message: esClientIndexResponse, body: esClientIndexResponse._id };
     } catch (error) {
       throw new Error('Import Notebook Error:' + error);
@@ -381,12 +358,12 @@ export class DefaultBackend implements NotebookAdaptor {
    *         paragraphInput -> paragraph input code
    */
   updateRunFetchParagraph = async function (
-    context: RequestHandlerContext,
+    client: ILegacyScopedClusterClient,
     params: { noteId: string; paragraphId: string; paragraphInput: string },
     _wreckOptions: optionsType
   ) {
     try {
-      const esClientGetResponse = await this.getNote(context, params.noteId);
+      const esClientGetResponse = await this.getNote(client, params.noteId);
       const updatedInputParagraphs = this.updateParagraphInput(
         esClientGetResponse.paragraphs,
         params.paragraphId,
@@ -401,7 +378,7 @@ export class DefaultBackend implements NotebookAdaptor {
         paragraphs: updatedOutputParagraphs,
         dateModified: new Date().toISOString(),
       };
-      const esClientResponse = await this.updateNote(context, params.noteId, updateNotebook);
+      const esClientResponse = await this.updateNote(client, params.noteId, updateNotebook);
 
       let resultParagraph = {};
       updatedOutputParagraphs.map((paragraph: DefaultParagraph) => {
@@ -423,12 +400,12 @@ export class DefaultBackend implements NotebookAdaptor {
    *         paragraphInput -> paragraph input code
    */
   updateFetchParagraph = async function (
-    context: RequestHandlerContext,
+    client: ILegacyScopedClusterClient,
     params: { noteId: string; paragraphId: string; paragraphInput: string },
     _wreckOptions: optionsType
   ) {
     try {
-      const esClientGetResponse = await this.getNote(context, params.noteId);
+      const esClientGetResponse = await this.getNote(client, params.noteId);
       const updatedInputParagraphs = this.updateParagraphInput(
         esClientGetResponse.paragraphs,
         params.paragraphId,
@@ -439,7 +416,7 @@ export class DefaultBackend implements NotebookAdaptor {
         paragraphs: updatedInputParagraphs,
         dateModified: new Date().toISOString(),
       };
-      const esClientResponse = await this.updateNote(context, params.noteId, updateNotebook);
+      const esClientResponse = await this.updateNote(client, params.noteId, updateNotebook);
 
       let resultParagraph = {};
       updatedInputParagraphs.map((paragraph: DefaultParagraph) => {
@@ -460,12 +437,12 @@ export class DefaultBackend implements NotebookAdaptor {
    *         paragraphId -> Id of the paragraph to be fetched
    */
   addFetchNewParagraph = async function (
-    context: RequestHandlerContext,
+    client: ILegacyScopedClusterClient,
     params: { noteId: string; paragraphIndex: number; paragraphInput: string; inputType: string },
     _wreckOptions: optionsType
   ) {
     try {
-      const esClientGetResponse = await this.getNote(context, params.noteId);
+      const esClientGetResponse = await this.getNote(client, params.noteId);
       const paragraphs = esClientGetResponse.paragraphs;
       const newParagraph = this.createParagraph(params.paragraphInput, params.inputType);
       paragraphs.splice(params.paragraphIndex, 0, newParagraph);
@@ -473,7 +450,7 @@ export class DefaultBackend implements NotebookAdaptor {
         paragraphs: paragraphs,
         dateModified: new Date().toISOString(),
       };
-      const esClientResponse = await this.updateNote(context, params.noteId, updateNotebook);
+      const esClientResponse = await this.updateNote(client, params.noteId, updateNotebook);
 
       return newParagraph;
     } catch (error) {
@@ -488,12 +465,12 @@ export class DefaultBackend implements NotebookAdaptor {
    *         paragraphId -> Id of the paragraph to be deleted
    */
   deleteFetchParagraphs = async function (
-    context: RequestHandlerContext,
+    client: ILegacyScopedClusterClient,
     params: { noteId: string; paragraphId: string },
     _wreckOptions: optionsType
   ) {
     try {
-      const esClientGetResponse = await this.getNote(context, params.noteId);
+      const esClientGetResponse = await this.getNote(client, params.noteId);
       let updatedparagraphs = [];
       esClientGetResponse.paragraphs.map((paragraph: DefaultParagraph, index: number) => {
         if (paragraph.id !== params.paragraphId) {
@@ -505,7 +482,7 @@ export class DefaultBackend implements NotebookAdaptor {
         paragraphs: updatedparagraphs,
         dateModified: new Date().toISOString(),
       };
-      const esClientResponse = await this.updateNote(context, params.noteId, updateNotebook);
+      const esClientResponse = await this.updateNote(client, params.noteId, updateNotebook);
 
       return { paragraphs: updatedparagraphs };
     } catch (error) {
@@ -519,12 +496,12 @@ export class DefaultBackend implements NotebookAdaptor {
    * Param: noteId -> Id of notebook to be cleared
    */
   clearAllFetchParagraphs = async function (
-    context: RequestHandlerContext,
+    client: ILegacyScopedClusterClient,
     params: { noteId: string },
     _wreckOptions: optionsType
   ) {
     try {
-      const esClientGetResponse = await this.getNote(context, params.noteId);
+      const esClientGetResponse = await this.getNote(client, params.noteId);
       let updatedparagraphs = [];
       esClientGetResponse.paragraphs.map((paragraph: DefaultParagraph, index: number) => {
         let updatedParagraph = { ...paragraph };
@@ -536,7 +513,7 @@ export class DefaultBackend implements NotebookAdaptor {
         paragraphs: updatedparagraphs,
         dateModified: new Date().toISOString(),
       };
-      const esClientResponse = await this.updateNote(context, params.noteId, updateNotebook);
+      const esClientResponse = await this.updateNote(client, params.noteId, updateNotebook);
 
       return { paragraphs: updatedparagraphs };
     } catch (error) {

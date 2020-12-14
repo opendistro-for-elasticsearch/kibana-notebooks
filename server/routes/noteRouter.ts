@@ -14,7 +14,12 @@
  */
 
 import { schema } from '@kbn/config-schema';
-import { IRouter, IKibanaResponse, ResponseError } from '../../../../src/core/server';
+import {
+  IRouter,
+  IKibanaResponse,
+  ResponseError,
+  ILegacyScopedClusterClient,
+} from '../../../../src/core/server';
 import { API_PREFIX, wreckOptions } from '../../common';
 import BACKEND from '../adaptors';
 
@@ -26,9 +31,12 @@ export function NoteRouter(router: IRouter) {
       validate: {},
     },
     async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
+      const esNotebooksClient: ILegacyScopedClusterClient = context.notebooks_plugin.esNotebooksClient.asScoped(
+        request
+      );
       let notebooksData = [];
       try {
-        notebooksData = await BACKEND.viewNotes(context, wreckOptions);
+        notebooksData = await BACKEND.viewNotes(esNotebooksClient, wreckOptions);
         return response.ok({
           body: {
             data: notebooksData,
@@ -80,13 +88,16 @@ export function NoteRouter(router: IRouter) {
       },
     },
     async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
-      let addResponse = {};
+      const esNotebooksClient: ILegacyScopedClusterClient = context.notebooks_plugin.esNotebooksClient.asScoped(
+        request
+      );
       try {
-        addResponse = await BACKEND.addNote(context, request.body, wreckOptions);
+        const addResponse = await BACKEND.addNote(esNotebooksClient, request.body, wreckOptions);
         return response.ok({
-          body: addResponse,
+          body: addResponse.message.notebookId,
         });
       } catch (error) {
+        console.log('error', error);
         return response.custom({
           statusCode: error.statusCode || 500,
           body: error.message,

@@ -105,7 +105,7 @@ export class Main extends React.Component<MainProps, MainState> {
       })
       .then(async (res) => {
         this.setToast(`Notebook "${newNoteName}" successfully created!`);
-        window.location.assign(`${this.props.basename}#${res.body}`);
+        window.location.assign(`${this.props.basename}#${res}`);
       })
       .catch((err) => {
         this.setToast('Please ask your administrator to enable Notebooks for you.', 'danger',
@@ -150,7 +150,7 @@ export class Main extends React.Component<MainProps, MainState> {
       .then((res) => {
         this.fetchNotebooks();
         this.setToast(`Notebook "${clonedNoteName}" successfully created!`);
-        return res.body;
+        return res;
       })
       .catch((err) => this.setToast('Issue in cloning the notebook ' + err.body.message, 'danger'));
   };
