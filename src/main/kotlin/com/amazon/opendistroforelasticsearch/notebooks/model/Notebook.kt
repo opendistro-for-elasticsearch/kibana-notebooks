@@ -75,8 +75,8 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 
 internal data class Notebook(
     val name: String,
-    val backend: String
-//    val paragraphs: List<Paragraph>
+    val backend: String,
+    val paragraphs: List<Paragraph>
 ) : ToXContentObject {
 
     internal enum class SourceType { Dashboard, Visualization, SavedSearch }
@@ -98,7 +98,7 @@ internal data class Notebook(
         fun parse(parser: XContentParser): Notebook {
             var name: String? = null
             var backend: String? = null
-//            var paragraphs: List<Paragraph>? = null
+            var paragraphs: List<Paragraph>? = null
             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
             while (XContentParser.Token.END_OBJECT != parser.nextToken()) {
                 val fieldName = parser.currentName()
@@ -106,18 +106,22 @@ internal data class Notebook(
                 when (fieldName) {
                     NAME_TAG -> name = parser.text()
                     BACKEND_TAG -> backend = parser.text()
-//                    PARAGRAPHS_TAG -> paragraphs = Paragraph.parse(parser)
+                    PARAGRAPHS_TAG -> paragraphs = Paragraph.parse(parser)
                     else -> {
                         parser.skipChildren()
                         log.info("$LOG_PREFIX:Notebook Skipping Unknown field $fieldName")
                     }
                 }
+                println("paragraphs $paragraphs")
             }
             name ?: throw IllegalArgumentException("$NAME_TAG field absent")
             backend ?: throw IllegalArgumentException("$BACKEND_TAG field absent")
-//            paragraphs ?: throw IllegalArgumentException("$PARAGRAPHS_TAG field absent")
-            return Notebook(name,
-                backend)
+            paragraphs ?: throw IllegalArgumentException("$PARAGRAPHS_TAG field absent")
+            return Notebook(
+                name,
+                backend,
+                paragraphs
+            )
         }
     }
 
@@ -147,69 +151,67 @@ internal data class Notebook(
     /**
      * Report definition source data class
      */
-//    internal data class Paragraph(
-//        val description: String,
-//        val type: SourceType,
-//        val origin: String,
-//        val id: String
-//    ) : ToXContentObject {
-//        internal companion object {
-//            private const val DESCRIPTION_TAG = "description"
-//            private const val TYPE_TAG = "type"
-//            private const val ORIGIN_TAG = "origin"
-//            private const val ID_TAG = "id"
-//
-//            /**
-//             * Parse the data from parser and create Source object
-//             * @param parser data referenced at parser
-//             * @return created Source object
-//             */
-//            fun parse(parser: XContentParser): Source {
-//                var description: String? = null
-//                var type: SourceType? = null
-//                var origin: String? = null
-//                var id: String? = null
-//                XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
-//                while (XContentParser.Token.END_OBJECT != parser.nextToken()) {
-//                    val fieldName = parser.currentName()
-//                    parser.nextToken()
-//                    when (fieldName) {
-//                        DESCRIPTION_TAG -> description = parser.text()
-//                        TYPE_TAG -> type = SourceType.valueOf(parser.text())
-//                        ORIGIN_TAG -> origin = parser.text()
-//                        ID_TAG -> id = parser.text()
-//                        else -> {
-//                            parser.skipChildren()
-//                            log.info("$LOG_PREFIX:Source Skipping Unknown field $fieldName")
-//                        }
-//                    }
-//                }
-//                description ?: throw IllegalArgumentException("$DESCRIPTION_TAG field absent")
-//                type ?: throw IllegalArgumentException("$TYPE_TAG field absent")
-//                origin ?: throw IllegalArgumentException("$ORIGIN_TAG field absent")
-//                id ?: throw IllegalArgumentException("$ID_TAG field absent")
-//                return Source(description,
-//                    type,
-//                    origin,
-//                    id
-//                )
-//            }
-//        }
-//
-//        /**
-//         * {@inheritDoc}
-//         */
-//        override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
-//            builder!!
-//            builder.startObject()
-//                .field(DESCRIPTION_TAG, description)
-//                .field(TYPE_TAG, type.name)
-//                .field(ORIGIN_TAG, origin)
-//                .field(ID_TAG, id)
-//                .endObject()
-//            return builder
-//        }
-//    }
+    internal data class Paragraph(
+        val output: String
+    ) : ToXContentObject {
+        internal companion object {
+            private const val OUTPUT_TAG = "output"
+
+            /**
+             * Parse the item list from parser
+             * @param parser data referenced at parser
+             * @return created list of items
+             */
+            private fun parseItemList(parser: XContentParser): List<ItemClass> {
+                val retList: MutableList<ItemClass> = mutableListOf()
+                XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, parser.currentToken(), parser)
+                while (parser.nextToken() != XContentParser.Token.END_ARRAY) {
+                    retList.add(parseItem(parser))
+                }
+                return retList
+            }
+
+            /**
+             * Parse the data from parser and create Source object
+             * @param parser data referenced at parser
+             * @return created Source object
+             */
+            fun parse(parser: XContentParser): List<Paragraph> {
+                var output: String? = null
+                XContentParserUtils.ensureExpectedToken(
+                    XContentParser.Token.START_OBJECT,
+                    parser.currentToken(),
+                    parser
+                )
+                while (XContentParser.Token.END_OBJECT != parser.nextToken()) {
+                    val fieldName = parser.currentName()
+                    parser.nextToken()
+                    when (fieldName) {
+                        OUTPUT_TAG -> output = parser.text()
+                        else -> {
+                            parser.skipChildren()
+                            log.info("$LOG_PREFIX:Source Skipping Unknown field $fieldName")
+                        }
+                    }
+                }
+                output ?: throw IllegalArgumentException("$OUTPUT_TAG field absent")
+                return Paragraph(
+                    output
+                )
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
+            builder!!
+            builder.startObject()
+                .field(OUTPUT_TAG, output)
+                .endObject()
+            return builder
+        }
+    }
 //
 //    /**
 //     * Report definition format data class
