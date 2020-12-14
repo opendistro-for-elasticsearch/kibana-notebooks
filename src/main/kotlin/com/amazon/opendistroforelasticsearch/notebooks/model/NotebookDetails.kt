@@ -52,7 +52,7 @@ import java.time.Instant
  * }
  * }</pre>
  */
-internal data class ReportDefinitionDetails(
+internal data class NotebookDetails(
     val id: String,
     val updatedTime: Instant,
     val createdTime: Instant,
@@ -61,7 +61,7 @@ internal data class ReportDefinitionDetails(
     val notebook: Notebook
 ) : ToXContentObject {
     internal companion object {
-        private val log by logger(ReportDefinitionDetails::class.java)
+        private val log by logger(NotebookDetails::class.java)
 
         /**
          * Parse the data from parser and create ReportDefinitionDetails object
@@ -69,7 +69,7 @@ internal data class ReportDefinitionDetails(
          * @param useId use this id if not available in the json
          * @return created ReportDefinitionDetails object
          */
-        fun parse(parser: XContentParser, useId: String? = null): ReportDefinitionDetails {
+        fun parse(parser: XContentParser, useId: String? = null): NotebookDetails {
             var id: String? = useId
             var updatedTime: Instant? = null
             var createdTime: Instant? = null
@@ -98,7 +98,7 @@ internal data class ReportDefinitionDetails(
             createdTime ?: throw IllegalArgumentException("$CREATED_TIME_FIELD field absent")
             tenant = tenant ?: DEFAULT_TENANT
             notebook ?: throw IllegalArgumentException("$NOTEBOOK_FIELD field absent")
-            return ReportDefinitionDetails(id,
+            return NotebookDetails(id,
                 updatedTime,
                 createdTime,
                 tenant,

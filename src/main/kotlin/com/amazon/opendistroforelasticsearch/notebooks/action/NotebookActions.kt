@@ -27,7 +27,7 @@ import com.amazon.opendistroforelasticsearch.notebooks.model.GetAllNotebooksRequ
 import com.amazon.opendistroforelasticsearch.notebooks.model.GetAllNotebooksResponse
 import com.amazon.opendistroforelasticsearch.notebooks.model.GetNotebookRequest
 import com.amazon.opendistroforelasticsearch.notebooks.model.GetNotebookResponse
-import com.amazon.opendistroforelasticsearch.notebooks.model.ReportDefinitionDetails
+import com.amazon.opendistroforelasticsearch.notebooks.model.NotebookDetails
 import com.amazon.opendistroforelasticsearch.notebooks.model.UpdateNotebookRequest
 import com.amazon.opendistroforelasticsearch.notebooks.model.UpdateNotebookResponse
 import com.amazon.opendistroforelasticsearch.notebooks.security.UserAccessManager
@@ -51,7 +51,7 @@ internal object NotebookActions {
         log.info("$LOG_PREFIX:ReportDefinition-create")
         UserAccessManager.validateUser(user)
         val currentTime = Instant.now()
-        val reportDefinitionDetails = ReportDefinitionDetails("ignore",
+        val reportDefinitionDetails = NotebookDetails("ignore",
             currentTime,
             currentTime,
             UserAccessManager.getUserTenant(user),
@@ -79,7 +79,7 @@ internal object NotebookActions {
             throw ElasticsearchStatusException("Permission denied for Report Definition ${request.reportDefinitionId}", RestStatus.FORBIDDEN)
         }
         val currentTime = Instant.now()
-        val reportDefinitionDetails = ReportDefinitionDetails(request.reportDefinitionId,
+        val reportDefinitionDetails = NotebookDetails(request.reportDefinitionId,
             currentTime,
             currentReportDefinitionDetails.createdTime,
             UserAccessManager.getUserTenant(user),

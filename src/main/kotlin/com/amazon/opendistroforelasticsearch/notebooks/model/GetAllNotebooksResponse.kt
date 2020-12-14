@@ -40,11 +40,11 @@ import java.io.IOException
  * }</pre>
  */
 internal class GetAllNotebooksResponse : BaseResponse {
-    val reportDefinitionList: ReportDefinitionDetailsSearchResults
+    val notebookList: NotebookDetailsSearchResults
     private val filterSensitiveInfo: Boolean
 
-    constructor(reportDefinitionList: ReportDefinitionDetailsSearchResults, filterSensitiveInfo: Boolean) : super() {
-        this.reportDefinitionList = reportDefinitionList
+    constructor(notebookList: NotebookDetailsSearchResults, filterSensitiveInfo: Boolean) : super() {
+        this.notebookList = notebookList
         this.filterSensitiveInfo = filterSensitiveInfo
     }
 
@@ -56,7 +56,7 @@ internal class GetAllNotebooksResponse : BaseResponse {
      * @param parser data referenced at parser
      */
     constructor(parser: XContentParser) : super() {
-        reportDefinitionList = ReportDefinitionDetailsSearchResults(parser)
+        notebookList = NotebookDetailsSearchResults(parser)
         this.filterSensitiveInfo = false // Sensitive info Must have filtered when created json object
     }
 
@@ -77,6 +77,6 @@ internal class GetAllNotebooksResponse : BaseResponse {
         } else {
             RestTag.REST_OUTPUT_PARAMS
         }
-        return reportDefinitionList.toXContent(builder, xContentParams)
+        return notebookList.toXContent(builder, xContentParams)
     }
 }

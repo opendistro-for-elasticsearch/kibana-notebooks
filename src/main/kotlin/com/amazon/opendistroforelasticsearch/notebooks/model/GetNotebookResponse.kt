@@ -41,15 +41,15 @@ import java.io.IOException
  * }</pre>
  */
 internal class GetNotebookResponse : BaseResponse {
-    val reportDefinitionDetails: ReportDefinitionDetails
+    val notebookDetails: NotebookDetails
     private val filterSensitiveInfo: Boolean
 
     companion object {
         private val log by logger(GetNotebookResponse::class.java)
     }
 
-    constructor(reportDefinition: ReportDefinitionDetails, filterSensitiveInfo: Boolean) : super() {
-        this.reportDefinitionDetails = reportDefinition
+    constructor(notebook: NotebookDetails, filterSensitiveInfo: Boolean) : super() {
+        this.notebookDetails = notebook
         this.filterSensitiveInfo = filterSensitiveInfo
     }
 
@@ -61,21 +61,21 @@ internal class GetNotebookResponse : BaseResponse {
      * @param parser data referenced at parser
      */
     constructor(parser: XContentParser) : super() {
-        var reportDefinition: ReportDefinitionDetails? = null
+        var notebook: NotebookDetails? = null
         XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser)
         while (Token.END_OBJECT != parser.nextToken()) {
             val fieldName = parser.currentName()
             parser.nextToken()
             when (fieldName) {
-                RestTag.REPORT_DEFINITION_DETAILS_FIELD -> reportDefinition = ReportDefinitionDetails.parse(parser)
+                RestTag.REPORT_DEFINITION_DETAILS_FIELD -> notebook = NotebookDetails.parse(parser)
                 else -> {
                     parser.skipChildren()
                     log.info("$LOG_PREFIX:Skipping Unknown field $fieldName")
                 }
             }
         }
-        reportDefinition ?: throw IllegalArgumentException("${RestTag.NOTEBOOK_FIELD} field absent")
-        this.reportDefinitionDetails = reportDefinition
+        notebook ?: throw IllegalArgumentException("${RestTag.NOTEBOOK_FIELD} field absent")
+        this.notebookDetails = notebook
         this.filterSensitiveInfo = false // Sensitive info Must have filtered when created json object
     }
 
@@ -98,7 +98,7 @@ internal class GetNotebookResponse : BaseResponse {
         }
         builder!!.startObject()
             .field(RestTag.REPORT_DEFINITION_DETAILS_FIELD)
-        reportDefinitionDetails.toXContent(builder, xContentParams)
+        notebookDetails.toXContent(builder, xContentParams)
         return builder.endObject()
     }
 }

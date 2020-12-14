@@ -23,7 +23,7 @@ import org.elasticsearch.common.xcontent.XContentParser
 /**
  * ReportDefinitions search results
  */
-internal class ReportDefinitionDetailsSearchResults : SearchResults<ReportDefinitionDetails> {
+internal class NotebookDetailsSearchResults : SearchResults<NotebookDetails> {
     constructor(parser: XContentParser) : super(parser, REPORT_DEFINITION_LIST_FIELD)
 
     constructor(from: Long, response: SearchResponse) : super(from, response, REPORT_DEFINITION_LIST_FIELD)
@@ -31,7 +31,7 @@ internal class ReportDefinitionDetailsSearchResults : SearchResults<ReportDefini
     /**
      * {@inheritDoc}
      */
-    override fun parseItem(parser: XContentParser, useId: String?): ReportDefinitionDetails {
-        return ReportDefinitionDetails.parse(parser, useId)
+    override fun parseItem(parser: XContentParser, useId: String?): NotebookDetails {
+        return NotebookDetails.parse(parser, useId)
     }
 }

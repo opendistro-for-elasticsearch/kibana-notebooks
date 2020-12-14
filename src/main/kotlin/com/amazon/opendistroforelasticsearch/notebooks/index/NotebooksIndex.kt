@@ -17,8 +17,8 @@
 package com.amazon.opendistroforelasticsearch.notebooks.index
 
 import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion.LOG_PREFIX
-import com.amazon.opendistroforelasticsearch.notebooks.model.ReportDefinitionDetails
-import com.amazon.opendistroforelasticsearch.notebooks.model.ReportDefinitionDetailsSearchResults
+import com.amazon.opendistroforelasticsearch.notebooks.model.NotebookDetails
+import com.amazon.opendistroforelasticsearch.notebooks.model.NotebookDetailsSearchResults
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.ACCESS_LIST_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.TENANT_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.UPDATED_TIME_FIELD
@@ -105,14 +105,14 @@ internal object NotebooksIndex {
 
     /**
      * create a new doc for reportDefinitionDetails
-     * @param reportDefinitionDetails the Report definition details
+     * @param notebookDetails the Report definition details
      * @return ReportDefinition.id if successful, null otherwise
      * @throws java.util.concurrent.ExecutionException with a cause
      */
-    fun createReportDefinition(reportDefinitionDetails: ReportDefinitionDetails): String? {
+    fun createReportDefinition(notebookDetails: NotebookDetails): String? {
         createIndex()
         val indexRequest = IndexRequest(NOTEBOOKS_INDEX_NAME)
-            .source(reportDefinitionDetails.toXContent())
+            .source(notebookDetails.toXContent())
             .create(true)
         val actionFuture = client.index(indexRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
@@ -129,7 +129,7 @@ internal object NotebooksIndex {
      * @param id the id for the document
      * @return Report definition details on success, null otherwise
      */
-    fun getReportDefinition(id: String): ReportDefinitionDetails? {
+    fun getReportDefinition(id: String): NotebookDetails? {
         createIndex()
         val getRequest = GetRequest(NOTEBOOKS_INDEX_NAME).id(id)
         val actionFuture = client.get(getRequest)
@@ -142,7 +142,7 @@ internal object NotebooksIndex {
                 LoggingDeprecationHandler.INSTANCE,
                 response.sourceAsString)
             parser.nextToken()
-            ReportDefinitionDetails.parse(parser, id)
+            NotebookDetails.parse(parser, id)
         }
     }
 
@@ -154,7 +154,7 @@ internal object NotebooksIndex {
      * @param maxItems the max items to query
      * @return search result of Report definition details
      */
-    fun getAllReportDefinitions(tenant: String, access: List<String>, from: Int, maxItems: Int): ReportDefinitionDetailsSearchResults {
+    fun getAllReportDefinitions(tenant: String, access: List<String>, from: Int, maxItems: Int): NotebookDetailsSearchResults {
         createIndex()
         val sourceBuilder = SearchSourceBuilder()
             .timeout(TimeValue(PluginSettings.operationTimeoutMs, TimeUnit.MILLISECONDS))
@@ -176,7 +176,7 @@ internal object NotebooksIndex {
             .source(sourceBuilder)
         val actionFuture = client.search(searchRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
-        val result = ReportDefinitionDetailsSearchResults(from.toLong(), response)
+        val result = NotebookDetailsSearchResults(from.toLong(), response)
         log.info("$LOG_PREFIX:getAllReportDefinitions from:$from, maxItems:$maxItems," +
             " retCount:${result.objectList.size}, totalCount:${result.totalHits}")
         return result
@@ -185,15 +185,15 @@ internal object NotebooksIndex {
     /**
      * update Report definition details for given id
      * @param id the id for the document
-     * @param reportDefinitionDetails the Report definition details data
+     * @param notebookDetails the Report definition details data
      * @return true if successful, false otherwise
      */
-    fun updateReportDefinition(id: String, reportDefinitionDetails: ReportDefinitionDetails): Boolean {
+    fun updateReportDefinition(id: String, notebookDetails: NotebookDetails): Boolean {
         createIndex()
         val updateRequest = UpdateRequest()
             .index(NOTEBOOKS_INDEX_NAME)
             .id(id)
-            .doc(reportDefinitionDetails.toXContent())
+            .doc(notebookDetails.toXContent())
             .fetchSource(true)
         val actionFuture = client.update(updateRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)

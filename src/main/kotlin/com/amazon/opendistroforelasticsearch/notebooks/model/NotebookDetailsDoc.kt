@@ -18,8 +18,8 @@ package com.amazon.opendistroforelasticsearch.notebooks.model
 
 import org.elasticsearch.index.seqno.SequenceNumbers
 
-internal data class ReportDefinitionDetailsDoc(
-    val reportDefinitionDetails: ReportDefinitionDetails,
+internal data class NotebookDetailsDoc(
+    val notebookDetails: NotebookDetails,
     val seqNo: Long = SequenceNumbers.UNASSIGNED_SEQ_NO,
     val primaryTerm: Long = SequenceNumbers.UNASSIGNED_PRIMARY_TERM
 )
