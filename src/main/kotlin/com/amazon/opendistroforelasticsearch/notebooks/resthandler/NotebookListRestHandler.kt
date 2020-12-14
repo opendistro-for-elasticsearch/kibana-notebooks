@@ -32,7 +32,7 @@ import org.elasticsearch.rest.RestRequest.Method.GET
 import org.elasticsearch.rest.RestStatus
 
 /**
- * Rest handler for getting list of report definitions.
+ * Rest handler for getting list of notebooks.
  * This handler uses [NotebookActions].
  */
 internal class NotebookListRestHandler : BaseRestHandler() {
@@ -54,8 +54,8 @@ internal class NotebookListRestHandler : BaseRestHandler() {
     override fun routes(): List<Route> {
         return listOf(
             /**
-             * Get all report definitions (from optional fromIndex)
-             * Request URL: GET LIST_REPORT_DEFINITIONS_URL[?[fromIndex=1000]&[maxItems=100]]
+             * Get all notebooks (from optional fromIndex)
+             * Request URL: GET LIST_NOTEBOOKS_URL[?[fromIndex=1000]&[maxItems=100]]
              * Request body: None
              * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.GetAllNotebooksResponse]
              */

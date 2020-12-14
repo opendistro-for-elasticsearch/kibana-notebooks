@@ -40,7 +40,7 @@ import org.elasticsearch.rest.RestRequest.Method.PUT
 import org.elasticsearch.rest.RestStatus
 
 /**
- * Rest handler for report definitions lifecycle management.
+ * Rest handler for notebooks lifecycle management.
  * This handler uses [NotebookActions].
  */
 internal class NotebookRestHandler : BaseRestHandler() {
@@ -62,29 +62,29 @@ internal class NotebookRestHandler : BaseRestHandler() {
     override fun routes(): List<Route> {
         return listOf(
             /**
-             * Create a new report definition
-             * Request URL: POST REPORT_DEFINITION_URL
+             * Create a new notebook
+             * Request URL: POST NOTEBOOKS_URL
              * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.CreateNotebookRequest]
              * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.CreateNotebookResponse]
              */
             Route(POST, NOTEBOOKS_URL),
             /**
-             * Update report definition
-             * Request URL: PUT REPORT_DEFINITION_URL/{reportDefinitionId}
+             * Update notebook
+             * Request URL: PUT NOTEBOOKS_URL/{notebookId}
              * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.UpdateNotebookRequest]
              * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.UpdateNotebookResponse]
              */
             Route(PUT, "$NOTEBOOKS_URL/{$NOTEBOOK_ID_FIELD}"),
             /**
-             * Get a report definition
-             * Request URL: GET REPORT_DEFINITION_URL/{reportDefinitionId}
+             * Get a notebook
+             * Request URL: GET NOTEBOOKS_URL/{notebookId}
              * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.GetNotebookRequest]
              * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.GetNotebookResponse]
              */
             Route(GET, "$NOTEBOOKS_URL/{$NOTEBOOK_ID_FIELD}"),
             /**
-             * Delete report definition
-             * Request URL: DELETE REPORT_DEFINITION_URL/{reportDefinitionId}
+             * Delete notebook
+             * Request URL: DELETE NOTEBOOKS_URL/{notebookId}
              * Request body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.DeleteNotebookRequest]
              * Response body: Ref [com.amazon.opendistroforelasticsearch.notebooks.model.DeleteNotebookResponse]
              */

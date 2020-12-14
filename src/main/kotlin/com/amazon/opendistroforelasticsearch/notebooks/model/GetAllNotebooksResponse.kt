@@ -26,15 +26,15 @@ import org.elasticsearch.common.xcontent.XContentParser
 import java.io.IOException
 
 /**
- * Get all report definitions response.
+ * Get all notebooks response.
  * <pre> JSON format
  * {@code
  * {
  *   "startIndex":"0",
  *   "totalHits":"100",
  *   "totalHitRelation":"eq",
- *   "reportDefinitionDetailsList":[
- *      // refer [com.amazon.opendistroforelasticsearch.notebooks.model.ReportDefinitionDetails]
+ *   "notebookDetailsList":[
+ *      // refer [com.amazon.opendistroforelasticsearch.notebooks.model.notebookDetails]
  *   ]
  * }
  * }</pre>

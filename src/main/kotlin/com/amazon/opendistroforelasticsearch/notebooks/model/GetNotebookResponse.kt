@@ -30,12 +30,12 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Get report Definition info response.
+ * Get Notebook info response.
  * <pre> JSON format
  * {@code
  * {
- *   "reportDefinitionDetails":{
- *      // refer [com.amazon.opendistroforelasticsearch.notebooks.model.ReportDefinitionDetails]
+ *   "notebookDetails":{
+ *      // refer [com.amazon.opendistroforelasticsearch.notebooks.model.NotebookDetails]
  *   }
  * }
  * }</pre>
@@ -67,7 +67,7 @@ internal class GetNotebookResponse : BaseResponse {
             val fieldName = parser.currentName()
             parser.nextToken()
             when (fieldName) {
-                RestTag.REPORT_DEFINITION_DETAILS_FIELD -> notebook = NotebookDetails.parse(parser)
+                RestTag.NOTEBOOK_DETAILS_FIELD -> notebook = NotebookDetails.parse(parser)
                 else -> {
                     parser.skipChildren()
                     log.info("$LOG_PREFIX:Skipping Unknown field $fieldName")
@@ -97,7 +97,7 @@ internal class GetNotebookResponse : BaseResponse {
             RestTag.REST_OUTPUT_PARAMS
         }
         builder!!.startObject()
-            .field(RestTag.REPORT_DEFINITION_DETAILS_FIELD)
+            .field(RestTag.NOTEBOOK_DETAILS_FIELD)
         notebookDetails.toXContent(builder, xContentParams)
         return builder.endObject()
     }

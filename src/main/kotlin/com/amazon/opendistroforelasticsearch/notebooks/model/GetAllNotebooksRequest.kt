@@ -35,7 +35,7 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Get All report definitions info request
+ * Get All notebooks info request
  * Data object created from GET request query params
  * <pre> JSON format
  * {@code

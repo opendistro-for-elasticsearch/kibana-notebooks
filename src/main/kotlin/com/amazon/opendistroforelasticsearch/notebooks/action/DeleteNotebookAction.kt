@@ -27,7 +27,7 @@ import org.elasticsearch.common.xcontent.NamedXContentRegistry
 import org.elasticsearch.transport.TransportService
 
 /**
- * Delete reportDefinition transport action
+ * Delete notebook transport action
  */
 internal class DeleteNotebookAction @Inject constructor(
     transportService: TransportService,

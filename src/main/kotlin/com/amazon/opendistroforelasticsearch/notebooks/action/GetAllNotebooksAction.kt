@@ -27,7 +27,7 @@ import org.elasticsearch.common.xcontent.NamedXContentRegistry
 import org.elasticsearch.transport.TransportService
 
 /**
- * Get all reportDefinitions transport action
+ * Get all notebooks transport action
  */
 internal class GetAllNotebooksAction @Inject constructor(
     transportService: TransportService,

@@ -24,7 +24,6 @@ import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.NOTEBOOK_FI
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.TENANT_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.UPDATED_TIME_FIELD
 import com.amazon.opendistroforelasticsearch.notebooks.security.UserAccessManager.DEFAULT_TENANT
-import com.amazon.opendistroforelasticsearch.notebooks.settings.PluginSettings
 import com.amazon.opendistroforelasticsearch.notebooks.util.logger
 import com.amazon.opendistroforelasticsearch.notebooks.util.stringList
 import org.elasticsearch.common.xcontent.ToXContent
@@ -37,7 +36,7 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.time.Instant
 
 /**
- * Wrapper data class over ReportDefinition to add metadata
+ * Wrapper data class over Notebook to add metadata
  * <pre> JSON format
  * {@code
  * {
@@ -46,8 +45,8 @@ import java.time.Instant
  *   "createdTimeMs":1603506908773,
  *   "tenant":"__user__",
  *   "access":["User:user", "Role:sample_role", "BERole:sample_backend_role"]
- *   "reportDefinition":{
- *      // refer [com.amazon.opendistroforelasticsearch.notebooks.model.ReportDefinition]
+ *   "notebook":{
+ *      // refer [com.amazon.opendistroforelasticsearch.notebooks.model.Notebook]
  *   }
  * }
  * }</pre>
@@ -64,10 +63,10 @@ internal data class NotebookDetails(
         private val log by logger(NotebookDetails::class.java)
 
         /**
-         * Parse the data from parser and create ReportDefinitionDetails object
+         * Parse the data from parser and create NotebookDetails object
          * @param parser data referenced at parser
          * @param useId use this id if not available in the json
-         * @return created ReportDefinitionDetails object
+         * @return created NotebookDetails object
          */
         fun parse(parser: XContentParser, useId: String? = null): NotebookDetails {
             var id: String? = useId
@@ -89,7 +88,7 @@ internal data class NotebookDetails(
                     NOTEBOOK_FIELD -> notebook = Notebook.parse(parser)
                     else -> {
                         parser.skipChildren()
-                        log.info("$LOG_PREFIX:ReportDefinitionDetails Skipping Unknown field $fieldName")
+                        log.info("$LOG_PREFIX:NotebookDetails Skipping Unknown field $fieldName")
                     }
                 }
             }
@@ -98,12 +97,14 @@ internal data class NotebookDetails(
             createdTime ?: throw IllegalArgumentException("$CREATED_TIME_FIELD field absent")
             tenant = tenant ?: DEFAULT_TENANT
             notebook ?: throw IllegalArgumentException("$NOTEBOOK_FIELD field absent")
-            return NotebookDetails(id,
+            return NotebookDetails(
+                id,
                 updatedTime,
                 createdTime,
                 tenant,
                 access,
-                notebook)
+                notebook
+            )
         }
     }
 
@@ -136,44 +137,4 @@ internal data class NotebookDetails(
         builder.endObject()
         return builder
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    fun getName(): String {
-        return notebook.name
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    fun getLastUpdateTime(): Instant {
-        return updatedTime
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    fun getEnabledTime(): Instant {
-        return createdTime
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    fun getLockDurationSeconds(): Long? {
-        return PluginSettings.jobLockDurationSeconds.toLong()
-    }
-
-//    fun getSchedule() {
-//        return reportDefinition.trigger.schedule!!
-//    }
-//
-//    fun isEnabled(): Boolean {
-//        val trigger = reportDefinition.trigger
-//        return (reportDefinition.isEnabled &&
-//            (reportDefinition.trigger.schedule != null) &&
-//            (trigger.triggerType == TriggerType.IntervalSchedule || trigger.triggerType == TriggerType.CronSchedule))
-//        return true;
-//    }
 }

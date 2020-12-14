@@ -44,7 +44,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder
 import java.util.concurrent.TimeUnit
 
 /**
- * Class for doing ES index operation to maintain report definitions in cluster.
+ * Class for doing ES index operation to maintain notebooks in cluster.
  */
 internal object NotebooksIndex {
     private val log by logger(NotebooksIndex::class.java)
@@ -104,12 +104,12 @@ internal object NotebooksIndex {
     }
 
     /**
-     * create a new doc for reportDefinitionDetails
-     * @param notebookDetails the Report definition details
-     * @return ReportDefinition.id if successful, null otherwise
+     * create a new doc for notebookDetails
+     * @param notebookDetails the Notebook details
+     * @return notebook.id if successful, null otherwise
      * @throws java.util.concurrent.ExecutionException with a cause
      */
-    fun createReportDefinition(notebookDetails: NotebookDetails): String? {
+    fun createNotebook(notebookDetails: NotebookDetails): String? {
         createIndex()
         val indexRequest = IndexRequest(NOTEBOOKS_INDEX_NAME)
             .source(notebookDetails.toXContent())
@@ -117,7 +117,7 @@ internal object NotebooksIndex {
         val actionFuture = client.index(indexRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
         return if (response.result != DocWriteResponse.Result.CREATED) {
-            log.warn("$LOG_PREFIX:createReportDefinition - response:$response")
+            log.warn("$LOG_PREFIX:createNotebook - response:$response")
             null
         } else {
             response.id
@@ -125,17 +125,17 @@ internal object NotebooksIndex {
     }
 
     /**
-     * Query index for report definition ID
+     * Query index for notebook ID
      * @param id the id for the document
-     * @return Report definition details on success, null otherwise
+     * @return Notebook details on success, null otherwise
      */
-    fun getReportDefinition(id: String): NotebookDetails? {
+    fun getNotebook(id: String): NotebookDetails? {
         createIndex()
         val getRequest = GetRequest(NOTEBOOKS_INDEX_NAME).id(id)
         val actionFuture = client.get(getRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
         return if (response.sourceAsString == null) {
-            log.warn("$LOG_PREFIX:getReportDefinition - $id not found; response:$response")
+            log.warn("$LOG_PREFIX:getNotebook - $id not found; response:$response")
             null
         } else {
             val parser = XContentType.JSON.xContent().createParser(NamedXContentRegistry.EMPTY,
@@ -147,14 +147,14 @@ internal object NotebooksIndex {
     }
 
     /**
-     * Query index for report definition for given access details
+     * Query index for notebook for given access details
      * @param tenant the tenant of the user
-     * @param access the list of access details to search reports for.
+     * @param access the list of access details to search notebooks for.
      * @param from the paginated start index
      * @param maxItems the max items to query
-     * @return search result of Report definition details
+     * @return search result of Notebook details
      */
-    fun getAllReportDefinitions(tenant: String, access: List<String>, from: Int, maxItems: Int): NotebookDetailsSearchResults {
+    fun getAllNotebooks(tenant: String, access: List<String>, from: Int, maxItems: Int): NotebookDetailsSearchResults {
         createIndex()
         val sourceBuilder = SearchSourceBuilder()
             .timeout(TimeValue(PluginSettings.operationTimeoutMs, TimeUnit.MILLISECONDS))
@@ -177,18 +177,18 @@ internal object NotebooksIndex {
         val actionFuture = client.search(searchRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
         val result = NotebookDetailsSearchResults(from.toLong(), response)
-        log.info("$LOG_PREFIX:getAllReportDefinitions from:$from, maxItems:$maxItems," +
+        log.info("$LOG_PREFIX:getAllNotebooks from:$from, maxItems:$maxItems," +
             " retCount:${result.objectList.size}, totalCount:${result.totalHits}")
         return result
     }
 
     /**
-     * update Report definition details for given id
+     * update Notebook details for given id
      * @param id the id for the document
-     * @param notebookDetails the Report definition details data
+     * @param notebookDetails the Notebook details data
      * @return true if successful, false otherwise
      */
-    fun updateReportDefinition(id: String, notebookDetails: NotebookDetails): Boolean {
+    fun updateNotebook(id: String, notebookDetails: NotebookDetails): Boolean {
         createIndex()
         val updateRequest = UpdateRequest()
             .index(NOTEBOOKS_INDEX_NAME)
@@ -198,17 +198,17 @@ internal object NotebooksIndex {
         val actionFuture = client.update(updateRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
         if (response.result != DocWriteResponse.Result.UPDATED) {
-            log.warn("$LOG_PREFIX:updateReportDefinition failed for $id; response:$response")
+            log.warn("$LOG_PREFIX:updateNotebook failed for $id; response:$response")
         }
         return response.result == DocWriteResponse.Result.UPDATED
     }
 
     /**
-     * delete Report definition details for given id
+     * delete Notebook details for given id
      * @param id the id for the document
      * @return true if successful, false otherwise
      */
-    fun deleteReportDefinition(id: String): Boolean {
+    fun deleteNotebook(id: String): Boolean {
         createIndex()
         val deleteRequest = DeleteRequest()
             .index(NOTEBOOKS_INDEX_NAME)
@@ -216,7 +216,7 @@ internal object NotebooksIndex {
         val actionFuture = client.delete(deleteRequest)
         val response = actionFuture.actionGet(PluginSettings.operationTimeoutMs)
         if (response.result != DocWriteResponse.Result.DELETED) {
-            log.warn("$LOG_PREFIX:deleteReportDefinition failed for $id; response:$response")
+            log.warn("$LOG_PREFIX:deleteNotebook failed for $id; response:$response")
         }
         return response.result == DocWriteResponse.Result.DELETED
     }

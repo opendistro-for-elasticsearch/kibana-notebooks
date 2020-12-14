@@ -15,7 +15,7 @@
 #
 ##
 
-# Settings file for the report definitions index
+# Settings file for the notebooks index
 index:
   number_of_shards: "1"
   auto_expand_replicas: "0-1"

@@ -16,17 +16,17 @@
 
 package com.amazon.opendistroforelasticsearch.notebooks.model
 
-import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.REPORT_DEFINITION_LIST_FIELD
+import com.amazon.opendistroforelasticsearch.notebooks.model.RestTag.NOTEBOOK_LIST_FIELD
 import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.common.xcontent.XContentParser
 
 /**
- * ReportDefinitions search results
+ * Notebooks search results
  */
 internal class NotebookDetailsSearchResults : SearchResults<NotebookDetails> {
-    constructor(parser: XContentParser) : super(parser, REPORT_DEFINITION_LIST_FIELD)
+    constructor(parser: XContentParser) : super(parser, NOTEBOOK_LIST_FIELD)
 
-    constructor(from: Long, response: SearchResponse) : super(from, response, REPORT_DEFINITION_LIST_FIELD)
+    constructor(from: Long, response: SearchResponse) : super(from, response, NOTEBOOK_LIST_FIELD)
 
     /**
      * {@inheritDoc}

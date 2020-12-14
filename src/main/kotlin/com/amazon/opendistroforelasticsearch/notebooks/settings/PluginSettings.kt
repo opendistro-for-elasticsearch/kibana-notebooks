@@ -256,7 +256,7 @@ internal object PluginSettings {
         var settings: Settings? = null
         val configDirName = BootstrapInfo.getSystemProperties()?.get("es.path.conf")?.toString()
         if (configDirName != null) {
-            val defaultSettingYmlFile = Path.of(configDirName, PLUGIN_NAME, "reports-scheduler.yml")
+            val defaultSettingYmlFile = Path.of(configDirName, PLUGIN_NAME, "notebooks.yml")
             try {
                 settings = Settings.builder().loadFromPath(defaultSettingYmlFile).build()
             } catch (exception: IOException) {

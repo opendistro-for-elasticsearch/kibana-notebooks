@@ -29,21 +29,21 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Report Definition-update response.
+ * Notebook-update response.
  * <pre> JSON format
  * {@code
  * {
- *   "reportDefinitionId":"reportDefinitionId"
+ *   "notebookId":"notebookId"
  * }
  * }</pre>
  */
 internal class UpdateNotebookResponse(
-    val reportDefinitionId: String?
+    val notebookId: String?
 ) : BaseResponse() {
 
     @Throws(IOException::class)
     constructor(input: StreamInput) : this(
-        reportDefinitionId = input.readString()
+        notebookId = input.readString()
     )
 
     companion object {
@@ -55,21 +55,21 @@ internal class UpdateNotebookResponse(
          * @return created [UpdateNotebookResponse] object
          */
         fun parse(parser: XContentParser): UpdateNotebookResponse {
-            var reportDefinitionId: String? = null
+            var notebookId: String? = null
             XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser)
             while (Token.END_OBJECT != parser.nextToken()) {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    NOTEBOOK_ID_FIELD -> reportDefinitionId = parser.text()
+                    NOTEBOOK_ID_FIELD -> notebookId = parser.text()
                     else -> {
                         parser.skipChildren()
                         log.info("$LOG_PREFIX:Skipping Unknown field $fieldName")
                     }
                 }
             }
-            reportDefinitionId ?: throw IllegalArgumentException("$NOTEBOOK_ID_FIELD field absent")
-            return UpdateNotebookResponse(reportDefinitionId)
+            notebookId ?: throw IllegalArgumentException("$NOTEBOOK_ID_FIELD field absent")
+            return UpdateNotebookResponse(notebookId)
         }
     }
 
@@ -78,7 +78,7 @@ internal class UpdateNotebookResponse(
      */
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
-        output.writeString(reportDefinitionId)
+        output.writeString(notebookId)
     }
 
     /**
@@ -86,7 +86,7 @@ internal class UpdateNotebookResponse(
      */
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         return builder!!.startObject()
-            .field(NOTEBOOK_ID_FIELD, reportDefinitionId)
+            .field(NOTEBOOK_ID_FIELD, notebookId)
             .endObject()
     }
 }

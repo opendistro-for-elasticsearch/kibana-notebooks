@@ -35,28 +35,28 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Report Definition-update request.
- * reportDefinitionId is from request query params
+ * Notebook-update request.
+ * notebookId is from request query params
  * <pre> JSON format
  * {@code
  * {
- *   "reportDefinitionId":"reportDefinitionId",
- *   "reportDefinition":{
- *      // refer [com.amazon.opendistroforelasticsearch.notebooks.model.ReportDefinition]
+ *   "notebookId":"notebookId",
+ *   "notebook":{
+ *      // refer [com.amazon.opendistroforelasticsearch.notebooks.model.Notebook]
  *   }
  * }
  * }</pre>
  */
 internal class UpdateNotebookRequest : ActionRequest, ToXContentObject {
-    val reportDefinitionId: String
+    val notebookId: String
     val notebook: Notebook
 
     companion object {
         private val log by logger(CreateNotebookRequest::class.java)
     }
 
-    constructor(reportDefinitionId: String, notebook: Notebook) : super() {
-        this.reportDefinitionId = reportDefinitionId
+    constructor(notebookId: String, notebook: Notebook) : super() {
+        this.notebookId = notebookId
         this.notebook = notebook
     }
 
@@ -67,15 +67,15 @@ internal class UpdateNotebookRequest : ActionRequest, ToXContentObject {
      * Parse the data from parser and create [UpdateNotebookRequest] object
      * @param parser data referenced at parser
      */
-    constructor(parser: XContentParser, useReportDefinitionId: String? = null) : super() {
-        var reportDefinitionId: String? = useReportDefinitionId
+    constructor(parser: XContentParser, useNotebookId: String? = null) : super() {
+        var notebookId: String? = useNotebookId
         var notebook: Notebook? = null
         XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser)
         while (Token.END_OBJECT != parser.nextToken()) {
             val fieldName = parser.currentName()
             parser.nextToken()
             when (fieldName) {
-                NOTEBOOK_ID_FIELD -> reportDefinitionId = parser.text()
+                NOTEBOOK_ID_FIELD -> notebookId = parser.text()
                 NOTEBOOK_FIELD -> notebook = Notebook.parse(parser)
                 else -> {
                     parser.skipChildren()
@@ -83,9 +83,9 @@ internal class UpdateNotebookRequest : ActionRequest, ToXContentObject {
                 }
             }
         }
-        reportDefinitionId ?: throw IllegalArgumentException("$NOTEBOOK_ID_FIELD field absent")
+        notebookId ?: throw IllegalArgumentException("$NOTEBOOK_ID_FIELD field absent")
         notebook ?: throw IllegalArgumentException("$NOTEBOOK_FIELD field absent")
-        this.reportDefinitionId = reportDefinitionId
+        this.notebookId = notebookId
         this.notebook = notebook
     }
 
@@ -111,7 +111,7 @@ internal class UpdateNotebookRequest : ActionRequest, ToXContentObject {
      */
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         return builder!!.startObject()
-            .field(NOTEBOOK_ID_FIELD, reportDefinitionId)
+            .field(NOTEBOOK_ID_FIELD, notebookId)
             .field(NOTEBOOK_FIELD, notebook)
             .endObject()
     }

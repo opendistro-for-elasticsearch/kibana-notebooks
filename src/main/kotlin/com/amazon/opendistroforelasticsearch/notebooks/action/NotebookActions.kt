@@ -37,110 +37,136 @@ import org.elasticsearch.rest.RestStatus
 import java.time.Instant
 
 /**
- * Report definitions index operation actions.
+ * Notebook index operation actions.
  */
 internal object NotebookActions {
     private val log by logger(NotebookActions::class.java)
 
     /**
-     * Create new ReportDefinition
+     * Create new notebook
      * @param request [CreateNotebookRequest] object
      * @return [CreateNotebookResponse]
      */
     fun create(request: CreateNotebookRequest, user: User?): CreateNotebookResponse {
-        log.info("$LOG_PREFIX:ReportDefinition-create")
+        log.info("$LOG_PREFIX:Notebook-create")
         UserAccessManager.validateUser(user)
         val currentTime = Instant.now()
-        val reportDefinitionDetails = NotebookDetails("ignore",
+        val notebookDetails = NotebookDetails(
+            "ignore",
             currentTime,
             currentTime,
             UserAccessManager.getUserTenant(user),
             UserAccessManager.getAllAccessInfo(user),
             request.notebook
         )
-        val docId = NotebooksIndex.createReportDefinition(reportDefinitionDetails)
-        docId ?: throw ElasticsearchStatusException("Report Definition Creation failed",
-            RestStatus.INTERNAL_SERVER_ERROR)
+        val docId = NotebooksIndex.createNotebook(notebookDetails)
+        docId ?: throw ElasticsearchStatusException(
+            "Notebook Creation failed",
+            RestStatus.INTERNAL_SERVER_ERROR
+        )
         return CreateNotebookResponse(docId)
     }
 
     /**
-     * Update ReportDefinition
+     * Update Notebook
      * @param request [UpdateNotebookRequest] object
      * @return [UpdateNotebookResponse]
      */
     fun update(request: UpdateNotebookRequest, user: User?): UpdateNotebookResponse {
-        log.info("$LOG_PREFIX:ReportDefinition-update ${request.reportDefinitionId}")
+        log.info("$LOG_PREFIX:Notebook-update ${request.notebookId}")
         UserAccessManager.validateUser(user)
-        val currentReportDefinitionDetails = NotebooksIndex.getReportDefinition(request.reportDefinitionId)
-        currentReportDefinitionDetails
-            ?: throw ElasticsearchStatusException("Report Definition ${request.reportDefinitionId} not found", RestStatus.NOT_FOUND)
-        if (!UserAccessManager.doesUserHasAccess(user, currentReportDefinitionDetails.tenant, currentReportDefinitionDetails.access)) {
-            throw ElasticsearchStatusException("Permission denied for Report Definition ${request.reportDefinitionId}", RestStatus.FORBIDDEN)
+        val currentNotebookDetails = NotebooksIndex.getNotebook(request.notebookId)
+        currentNotebookDetails
+            ?: throw ElasticsearchStatusException("Notebook ${request.notebookId} not found", RestStatus.NOT_FOUND)
+        if (!UserAccessManager.doesUserHasAccess(user, currentNotebookDetails.tenant, currentNotebookDetails.access)) {
+            throw ElasticsearchStatusException(
+                "Permission denied for Notebook ${request.notebookId}",
+                RestStatus.FORBIDDEN
+            )
         }
         val currentTime = Instant.now()
-        val reportDefinitionDetails = NotebookDetails(request.reportDefinitionId,
+        val notebookDetails = NotebookDetails(
+            request.notebookId,
             currentTime,
-            currentReportDefinitionDetails.createdTime,
+            currentNotebookDetails.createdTime,
             UserAccessManager.getUserTenant(user),
-            currentReportDefinitionDetails.access,
+            currentNotebookDetails.access,
             request.notebook
         )
-        if (!NotebooksIndex.updateReportDefinition(request.reportDefinitionId, reportDefinitionDetails)) {
-            throw ElasticsearchStatusException("Report Definition Update failed", RestStatus.INTERNAL_SERVER_ERROR)
+        if (!NotebooksIndex.updateNotebook(request.notebookId, notebookDetails)) {
+            throw ElasticsearchStatusException("Notebook Update failed", RestStatus.INTERNAL_SERVER_ERROR)
         }
-        return UpdateNotebookResponse(request.reportDefinitionId)
+        return UpdateNotebookResponse(request.notebookId)
     }
 
     /**
-     * Get ReportDefinition info
+     * Get Notebook info
      * @param request [GetNotebookRequest] object
      * @return [GetNotebookResponse]
      */
     fun info(request: GetNotebookRequest, user: User?): GetNotebookResponse {
-        log.info("$LOG_PREFIX:ReportDefinition-info ${request.reportDefinitionId}")
+        log.info("$LOG_PREFIX:Notebook-info ${request.notebookId}")
         UserAccessManager.validateUser(user)
-        val reportDefinitionDetails = NotebooksIndex.getReportDefinition(request.reportDefinitionId)
-        reportDefinitionDetails
-            ?: throw ElasticsearchStatusException("Report Definition ${request.reportDefinitionId} not found", RestStatus.NOT_FOUND)
-        if (!UserAccessManager.doesUserHasAccess(user, reportDefinitionDetails.tenant, reportDefinitionDetails.access)) {
-            throw ElasticsearchStatusException("Permission denied for Report Definition ${request.reportDefinitionId}", RestStatus.FORBIDDEN)
+        val notebookDetails = NotebooksIndex.getNotebook(request.notebookId)
+        notebookDetails
+            ?: throw ElasticsearchStatusException("Notebook ${request.notebookId} not found", RestStatus.NOT_FOUND)
+        if (!UserAccessManager.doesUserHasAccess(user, notebookDetails.tenant, notebookDetails.access)) {
+            throw ElasticsearchStatusException(
+                "Permission denied for Notebook ${request.notebookId}",
+                RestStatus.FORBIDDEN
+            )
         }
-        return GetNotebookResponse(reportDefinitionDetails, UserAccessManager.hasAllInfoAccess(user))
+        return GetNotebookResponse(notebookDetails, UserAccessManager.hasAllInfoAccess(user))
     }
 
     /**
-     * Delete ReportDefinition
+     * Delete Notebook
      * @param request [DeleteNotebookRequest] object
      * @return [DeleteNotebookResponse]
      */
     fun delete(request: DeleteNotebookRequest, user: User?): DeleteNotebookResponse {
-        log.info("$LOG_PREFIX:ReportDefinition-delete ${request.reportDefinitionId}")
+        log.info("$LOG_PREFIX:Notebook-delete ${request.notebookId}")
         UserAccessManager.validateUser(user)
-        val reportDefinitionDetails = NotebooksIndex.getReportDefinition(request.reportDefinitionId)
-        reportDefinitionDetails
-            ?: throw ElasticsearchStatusException("Report Definition ${request.reportDefinitionId} not found", RestStatus.NOT_FOUND)
-        if (!UserAccessManager.doesUserHasAccess(user, reportDefinitionDetails.tenant, reportDefinitionDetails.access)) {
-            throw ElasticsearchStatusException("Permission denied for Report Definition ${request.reportDefinitionId}", RestStatus.FORBIDDEN)
+        val notebookDetails = NotebooksIndex.getNotebook(request.notebookId)
+        notebookDetails
+            ?: throw ElasticsearchStatusException(
+                "Notebook ${request.notebookId} not found",
+                RestStatus.NOT_FOUND
+            )
+        if (!UserAccessManager.doesUserHasAccess(
+                user,
+                notebookDetails.tenant,
+                notebookDetails.access
+            )
+        ) {
+            throw ElasticsearchStatusException(
+                "Permission denied for Notebook ${request.notebookId}",
+                RestStatus.FORBIDDEN
+            )
         }
-        if (!NotebooksIndex.deleteReportDefinition(request.reportDefinitionId)) {
-            throw ElasticsearchStatusException("Report Definition ${request.reportDefinitionId} delete failed", RestStatus.REQUEST_TIMEOUT)
+        if (!NotebooksIndex.deleteNotebook(request.notebookId)) {
+            throw ElasticsearchStatusException(
+                "Notebook ${request.notebookId} delete failed",
+                RestStatus.REQUEST_TIMEOUT
+            )
         }
-        return DeleteNotebookResponse(request.reportDefinitionId)
+        return DeleteNotebookResponse(request.notebookId)
     }
 
     /**
-     * Get all ReportDefinitions
+     * Get all Notebooks
      * @param request [GetAllNotebooksRequest] object
      * @return [GetAllNotebooksResponse]
      */
     fun getAll(request: GetAllNotebooksRequest, user: User?): GetAllNotebooksResponse {
-        log.info("$LOG_PREFIX:ReportDefinition-getAll fromIndex:${request.fromIndex} maxItems:${request.maxItems}")
+        log.info("$LOG_PREFIX:Notebook-getAll fromIndex:${request.fromIndex} maxItems:${request.maxItems}")
         UserAccessManager.validateUser(user)
-        val reportDefinitionsList = NotebooksIndex.getAllReportDefinitions(UserAccessManager.getUserTenant(user),
+        val notebooksList = NotebooksIndex.getAllNotebooks(
+            UserAccessManager.getUserTenant(user),
             UserAccessManager.getSearchAccessInfo(user),
             request.fromIndex,
-            request.maxItems)
-        return GetAllNotebooksResponse(reportDefinitionsList, UserAccessManager.hasAllInfoAccess(user))
+            request.maxItems
+        )
+        return GetAllNotebooksResponse(notebooksList, UserAccessManager.hasAllInfoAccess(user))
     }
 }

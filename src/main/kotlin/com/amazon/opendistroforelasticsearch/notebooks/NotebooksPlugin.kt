@@ -50,7 +50,7 @@ import org.elasticsearch.watcher.ResourceWatcherService
 import java.util.function.Supplier
 
 /**
- * Entry point of the OpenDistro for Elasticsearch Reports scheduler plugin.
+ * Entry point of the OpenDistro for Elasticsearch Notebooks plugin.
  * This class initializes the rest handlers.
  */
 class NotebooksPlugin : Plugin(), ActionPlugin {

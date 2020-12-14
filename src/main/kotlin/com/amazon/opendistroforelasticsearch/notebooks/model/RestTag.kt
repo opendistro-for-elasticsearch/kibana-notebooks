@@ -27,10 +27,10 @@ internal object RestTag {
     const val CREATED_TIME_FIELD = "createdTimeMs"
     const val TENANT_FIELD = "tenant"
     const val ACCESS_LIST_FIELD = "access"
-    const val REPORT_DEFINITION_LIST_FIELD = "reportDefinitionDetailsList"
+    const val NOTEBOOK_LIST_FIELD = "notebookDetailsList"
     const val NOTEBOOK_FIELD = "notebook"
     const val NOTEBOOK_ID_FIELD = "notebookId"
-    const val REPORT_DEFINITION_DETAILS_FIELD = "reportDefinitionDetails"
+    const val NOTEBOOK_DETAILS_FIELD = "notebookDetails"
     const val FROM_INDEX_FIELD = "fromIndex"
     const val MAX_ITEMS_FIELD = "maxItems"
     private val INCLUDE_ID = Pair(ID_FIELD, "true")

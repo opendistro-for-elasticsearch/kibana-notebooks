@@ -33,22 +33,22 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Report Definition-delete request.
- * reportDefinitionId is from request query params
+ * Notebook-delete request.
+ * notebookId is from request query params
  * <pre> JSON format
  * {@code
  * {
- *   "reportDefinitionId":"reportDefinitionId"
+ *   "notebookId":"notebookId"
  * }
  * }</pre>
  */
 internal class DeleteNotebookRequest(
-    val reportDefinitionId: String
+    val notebookId: String
 ) : ActionRequest(), ToXContentObject {
 
     @Throws(IOException::class)
     constructor(input: StreamInput) : this(
-        reportDefinitionId = input.readString()
+        notebookId = input.readString()
     )
 
     companion object {
@@ -57,25 +57,25 @@ internal class DeleteNotebookRequest(
         /**
          * Parse the data from parser and create [DeleteNotebookRequest] object
          * @param parser data referenced at parser
-         * @param useReportDefinitionId use this id if not available in the json
+         * @param useNotebookId use this id if not available in the json
          * @return created [DeleteNotebookRequest] object
          */
-        fun parse(parser: XContentParser, useReportDefinitionId: String? = null): DeleteNotebookRequest {
-            var reportDefinitionId: String? = useReportDefinitionId
+        fun parse(parser: XContentParser, useNotebookId: String? = null): DeleteNotebookRequest {
+            var notebookId: String? = useNotebookId
             XContentParserUtils.ensureExpectedToken(Token.START_OBJECT, parser.currentToken(), parser)
             while (Token.END_OBJECT != parser.nextToken()) {
                 val fieldName = parser.currentName()
                 parser.nextToken()
                 when (fieldName) {
-                    NOTEBOOK_ID_FIELD -> reportDefinitionId = parser.text()
+                    NOTEBOOK_ID_FIELD -> notebookId = parser.text()
                     else -> {
                         parser.skipChildren()
                         log.info("$LOG_PREFIX:Skipping Unknown field $fieldName")
                     }
                 }
             }
-            reportDefinitionId ?: throw IllegalArgumentException("$NOTEBOOK_ID_FIELD field absent")
-            return DeleteNotebookRequest(reportDefinitionId)
+            notebookId ?: throw IllegalArgumentException("$NOTEBOOK_ID_FIELD field absent")
+            return DeleteNotebookRequest(notebookId)
         }
     }
 
@@ -84,7 +84,7 @@ internal class DeleteNotebookRequest(
      */
     @Throws(IOException::class)
     override fun writeTo(output: StreamOutput) {
-        output.writeString(reportDefinitionId)
+        output.writeString(notebookId)
     }
 
     /**
@@ -101,7 +101,7 @@ internal class DeleteNotebookRequest(
      */
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
         return builder!!.startObject()
-            .field(NOTEBOOK_ID_FIELD, reportDefinitionId)
+            .field(NOTEBOOK_ID_FIELD, notebookId)
             .endObject()
     }
 

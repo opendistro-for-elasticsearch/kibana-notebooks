@@ -34,12 +34,12 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 import java.io.IOException
 
 /**
- * Report Definition-create request.
+ * Notebook-create request.
  * <pre> JSON format
  * {@code
  * {
- *   "reportDefinition":{
- *      // refer [com.amazon.opendistroforelasticsearch.notebooks.model.ReportDefinition]
+ *   "Notebook":{
+ *      // refer [com.amazon.opendistroforelasticsearch.notebooks.model.Notebook]
  *   }
  * }
  * }</pre>

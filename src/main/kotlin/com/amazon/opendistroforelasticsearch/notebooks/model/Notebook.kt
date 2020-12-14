@@ -26,47 +26,34 @@ import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
 
 /**
- * Report definition main data class.
- * <pre> JSON format
+ * Notebook main data class.
+ *  * <pre> JSON format
  * {@code
  * {
- *   "name":"name",
- *   "isEnabled":true,
- *   "source":{
- *      "description":"description",
- *      "type":"Dashboard", // Dashboard, Visualization, SavedSearch
- *      "origin":"http://localhost:5601",
- *      "id":"id"
- *   },
- *   "format":{
- *       "duration":"PT1H",
- *       "fileFormat":"Pdf", // Pdf, Png, Csv
- *       "limit":1000, // optional
- *       "header":"optional header",
- *       "footer":"optional footer"
- *   },
- *   "trigger":{
- *       "triggerType":"OnDemand", // Download, OnDemand, CronSchedule, IntervalSchedule
- *       "schedule":{ // required when triggerType is CronSchedule or IntervalSchedule
- *           "cron":{ // required when triggerType is CronSchedule
- *               "expression":"0 * * * *",
- *               "timezone":"PST"
- *           },
- *           "interval":{ // required when triggerType is IntervalSchedule
- *               "start_time":1603506908773,
- *               "period":10",
- *               "unit":"Minutes"
- *           }
- *       }
- *   },
- *   "delivery":{ // optional
- *       "recipients":["banantha@amazon.com"],
- *       "deliveryFormat":"LinkOnly", // LinkOnly, Attachment, Embedded
- *       "title":"title",
- *       "textDescription":"textDescription",
- *       "htmlDescription":"optional htmlDescription",
- *       "channelIds":["optional_channelIds"]
- *   }
+ *   "id" : "note_992a6961-3d0d-44f3-b5a8-9b2bdad336ae",
+ *   "dateCreated" : "2020-12-11T20:51:15.509Z",
+ *   "name" : "test",
+ *   "dateModified" : "2020-12-11T21:04:55.336Z",
+ *   "pluginVersion" : "7.9.0",
+ *   "backend" : "Default",
+ *   "paragraphs" : [
+ *     {
+ *       "output" : [
+ *         {
+ *           "result" : "# This is a markdown paragraph",
+ *           "outputType" : "MARKDOWN",
+ *           "execution_time" : "0s"
+ *         }
+ *       ],
+ *       "input" : {
+ *         "inputText" : "# This is a markdown paragraph",
+ *         "inputType" : "MARKDOWN"
+ *       },
+ *       "dateCreated" : "2020-12-11T21:04:39.997Z",
+ *       "dateModified" : "2020-12-11T21:04:48.207Z",
+ *       "id" : "paragraph_61e96a10-af19-4c7d-ae4e-d2e449c65dff"
+ *     }
+ *   ]
  * }
  * }</pre>
  */
@@ -155,7 +142,7 @@ internal data class Notebook(
     }
 
     /**
-     * Report definition source data class
+     * Notebook source data class
      */
     internal data class Paragraph(
         val output: List<Output>,
@@ -250,7 +237,7 @@ internal data class Notebook(
     }
 
     /**
-     * Report definition format data class
+     * Notebook output data class
      */
     internal data class Output(
         val result: String?,
@@ -315,7 +302,7 @@ internal data class Notebook(
     }
 
     /**
-     * Report definition trigger data class
+     * Notebook input data class
      */
     internal data class Input(
         val inputText: String?,
