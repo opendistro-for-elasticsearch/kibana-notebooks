@@ -18,14 +18,12 @@ package com.amazon.opendistroforelasticsearch.notebooks.model
 
 import com.amazon.opendistroforelasticsearch.notebooks.NotebooksPlugin.Companion.LOG_PREFIX
 import com.amazon.opendistroforelasticsearch.notebooks.util.logger
-// import com.amazon.opendistroforelasticsearch.notebooks.util.stringList
 import org.elasticsearch.common.xcontent.ToXContent
 import org.elasticsearch.common.xcontent.ToXContentObject
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.common.xcontent.XContentFactory
 import org.elasticsearch.common.xcontent.XContentParser
 import org.elasticsearch.common.xcontent.XContentParserUtils
-// import java.time.Duration
 
 /**
  * Report definition main data class.
@@ -121,7 +119,6 @@ internal data class Notebook(
                         log.info("$LOG_PREFIX:Notebook Skipping Unknown field $fieldName")
                     }
                 }
-                println("paragraphs $paragraphs")
             }
             name ?: throw IllegalArgumentException("$NAME_TAG field absent")
             backend ?: throw IllegalArgumentException("$BACKEND_TAG field absent")
@@ -161,10 +158,32 @@ internal data class Notebook(
      * Report definition source data class
      */
     internal data class Paragraph(
-        val output: String
+        val output: List<Output>,
+        val input: Input,
+        val dateCreated: String,
+        val dateModified: String,
+        val id: String
     ) : ToXContentObject {
         internal companion object {
             private const val OUTPUT_TAG = "output"
+            private const val INPUT_TAG = "input"
+            private const val DATE_CREATED_TAG = "dateCreated"
+            private const val DATE_MODIFIED_TAG = "dateModified"
+            private const val ID_TAG = "id"
+
+            /**
+             * Parse the item list from parser
+             * @param parser data referenced at parser
+             * @return created list of items
+             */
+            private fun parseItemList(parser: XContentParser): List<Output> {
+                val retList: MutableList<Output> = mutableListOf()
+                XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, parser.currentToken(), parser)
+                while (parser.nextToken() != XContentParser.Token.END_ARRAY) {
+                    retList.add(Output.parse(parser))
+                }
+                return retList
+            }
 
             /**
              * Parse the data from parser and create Source object
@@ -172,7 +191,11 @@ internal data class Notebook(
              * @return created Source object
              */
             fun parse(parser: XContentParser): Paragraph {
-                var output: String? = null
+                var output: List<Output>? = null
+                var input: Input? = null
+                var dateCreated: String? = null
+                var dateModified: String? = null
+                var id: String? = null
                 XContentParserUtils.ensureExpectedToken(
                     XContentParser.Token.START_OBJECT,
                     parser.currentToken(),
@@ -182,7 +205,11 @@ internal data class Notebook(
                     val fieldName = parser.currentName()
                     parser.nextToken()
                     when (fieldName) {
-                        OUTPUT_TAG -> output = parser.text()
+                        OUTPUT_TAG -> output = parseItemList(parser)
+                        INPUT_TAG -> input = Input.parse(parser)
+                        DATE_CREATED_TAG -> dateCreated = parser.text()
+                        DATE_MODIFIED_TAG -> dateModified = parser.text()
+                        ID_TAG -> id = parser.text()
                         else -> {
                             parser.skipChildren()
                             log.info("$LOG_PREFIX:Source Skipping Unknown field $fieldName")
@@ -190,8 +217,85 @@ internal data class Notebook(
                     }
                 }
                 output ?: throw IllegalArgumentException("$OUTPUT_TAG field absent")
+                input ?: throw IllegalArgumentException("$INPUT_TAG field absent")
+                dateCreated ?: throw IllegalArgumentException("$DATE_CREATED_TAG field absent")
+                dateModified ?: throw IllegalArgumentException("$DATE_MODIFIED_TAG field absent")
+                id ?: throw IllegalArgumentException("$ID_TAG field absent")
                 return Paragraph(
-                    output
+                    output,
+                    input,
+                    dateCreated,
+                    dateModified,
+                    id
+                )
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
+            val xContentParams = params ?: RestTag.REST_OUTPUT_PARAMS
+            builder!!
+            builder.startObject()
+                .startArray(OUTPUT_TAG)
+            output.forEach { it.toXContent(builder, xContentParams) }
+            builder.endArray()
+                .field(INPUT_TAG, input)
+                .field(DATE_CREATED_TAG, dateCreated)
+                .field(DATE_MODIFIED_TAG, dateModified)
+                .field(ID_TAG, id)
+            return builder.endObject()
+        }
+    }
+
+    /**
+     * Report definition format data class
+     */
+    internal data class Output(
+        val result: String?,
+        val outputType: String?,
+        val executionTime: String?
+    ) : ToXContentObject {
+        internal companion object {
+            private const val RESULT_TAG = "result"
+            private const val OUTPUT_TYPE_TAG = "outputType"
+            private const val EXECUTION_TIME_TAG = "execution_time"
+
+            /**
+             * Parse the data from parser and create Format object
+             * @param parser data referenced at parser
+             * @return created Format object
+             */
+            fun parse(parser: XContentParser): Output {
+                var result: String? = null
+                var outputType: String? = null
+                var executionTime: String? = null
+                XContentParserUtils.ensureExpectedToken(
+                    XContentParser.Token.START_OBJECT,
+                    parser.currentToken(),
+                    parser
+                )
+                while (XContentParser.Token.END_OBJECT != parser.nextToken()) {
+                    val fieldName = parser.currentName()
+                    parser.nextToken()
+                    when (fieldName) {
+                        RESULT_TAG -> result = parser.text()
+                        OUTPUT_TYPE_TAG -> outputType = parser.text()
+                        EXECUTION_TIME_TAG -> executionTime = parser.text()
+                        else -> {
+                            parser.skipChildren()
+                            log.info("$LOG_PREFIX:Format Skipping Unknown field $fieldName")
+                        }
+                    }
+                }
+                result ?: throw IllegalArgumentException("$RESULT_TAG field absent")
+                outputType ?: throw IllegalArgumentException("$OUTPUT_TYPE_TAG field absent")
+                executionTime ?: throw IllegalArgumentException("$EXECUTION_TIME_TAG field absent")
+                return Output(
+                    result,
+                    outputType,
+                    executionTime
                 )
             }
         }
@@ -202,213 +306,63 @@ internal data class Notebook(
         override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
             builder!!
             builder.startObject()
-                .field(OUTPUT_TAG, output)
-                .endObject()
+                .field(RESULT_TAG, result)
+                .field(OUTPUT_TYPE_TAG, outputType)
+                .field(EXECUTION_TIME_TAG, executionTime)
+            builder.endObject()
             return builder
         }
     }
-//
-//    /**
-//     * Report definition format data class
-//     */
-//    internal data class Format(
-//        val duration: Duration,
-//        val fileFormat: FileFormat,
-//        val limit: Int?,
-//        val header: String?,
-//        val footer: String?
-//    ) : ToXContentObject {
-//        internal companion object {
-//            private const val DURATION_TAG = "duration"
-//            private const val FILE_FORMAT_TAG = "fileFormat"
-//            private const val LIMIT_TAG = "limit"
-//            private const val HEADER_TAG = "header"
-//            private const val FOOTER_TAG = "footer"
-//
-//            /**
-//             * Parse the data from parser and create Format object
-//             * @param parser data referenced at parser
-//             * @return created Format object
-//             */
-//            fun parse(parser: XContentParser): Format {
-//                var durationSeconds: Duration? = null
-//                var fileFormat: FileFormat? = null
-//                var limit: Int? = null
-//                var header: String? = null
-//                var footer: String? = null
-//                XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
-//                while (XContentParser.Token.END_OBJECT != parser.nextToken()) {
-//                    val fieldName = parser.currentName()
-//                    parser.nextToken()
-//                    when (fieldName) {
-//                        DURATION_TAG -> durationSeconds = Duration.parse(parser.text())
-//                        FILE_FORMAT_TAG -> fileFormat = FileFormat.valueOf(parser.text())
-//                        LIMIT_TAG -> limit = parser.intValue()
-//                        HEADER_TAG -> header = parser.textOrNull()
-//                        FOOTER_TAG -> footer = parser.textOrNull()
-//                        else -> {
-//                            parser.skipChildren()
-//                            log.info("$LOG_PREFIX:Format Skipping Unknown field $fieldName")
-//                        }
-//                    }
-//                }
-//                durationSeconds
-//                    ?: throw IllegalArgumentException("$DURATION_TAG field absent")
-//                fileFormat ?: throw IllegalArgumentException("$FILE_FORMAT_TAG field absent")
-//                return Format(durationSeconds,
-//                    fileFormat,
-//                    limit,
-//                    header,
-//                    footer)
-//            }
-//        }
-//
-//        /**
-//         * {@inheritDoc}
-//         */
-//        override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
-//            builder!!
-//            builder.startObject()
-//                .field(DURATION_TAG, duration.toString())
-//                .field(FILE_FORMAT_TAG, fileFormat.name)
-//            if (limit != null) builder.field(LIMIT_TAG, limit)
-//            if (header != null) builder.field(HEADER_TAG, header)
-//            if (footer != null) builder.field(FOOTER_TAG, footer)
-//            builder.endObject()
-//            return builder
-//        }
-//    }
-//
-//    /**
-//     * Report definition trigger data class
-//     */
-//    internal data class Trigger(
-//        val triggerType: TriggerType,
-//        val schedule: Any?
-//    ) : ToXContentObject {
-//        internal companion object {
-//            private const val TRIGGER_TYPE_TAG = "triggerType"
-//            private const val SCHEDULE_TAG = "schedule"
-//
-//            /**
-//             * Parse the data from parser and create Trigger object
-//             * @param parser data referenced at parser
-//             * @return created Trigger object
-//             */
-//            fun parse(parser: XContentParser): Trigger {
-//                var triggerType: TriggerType? = null
-//                var schedule: Any? = null
-//                XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
-//                while (XContentParser.Token.END_OBJECT != parser.nextToken()) {
-//                    val fieldName = parser.currentName()
-//                    parser.nextToken()
-//                    when (fieldName) {
-//                        TRIGGER_TYPE_TAG -> triggerType = TriggerType.valueOf(parser.text())
-//                        SCHEDULE_TAG -> schedule = ScheduleParser.parse(parser)
-//                        else -> log.info("$LOG_PREFIX: Trigger Skipping Unknown field $fieldName")
-//                    }
-//                }
-//                triggerType ?: throw IllegalArgumentException("$TRIGGER_TYPE_TAG field absent")
-//                if (isScheduleType(triggerType)) {
-//                    schedule ?: throw IllegalArgumentException("$SCHEDULE_TAG field absent")
-//                }
-//                return Trigger(triggerType, schedule)
-//            }
-//
-//            fun isScheduleType(triggerType: TriggerType): Boolean {
-//                return (triggerType == TriggerType.CronSchedule || triggerType == TriggerType.IntervalSchedule)
-//            }
-//        }
-//
-//        /**
-//         * {@inheritDoc}
-//         */
-//        override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
-//            builder!!
-//            builder.startObject()
-//                .field(TRIGGER_TYPE_TAG, triggerType)
-//            if (isScheduleType(triggerType)) {
-//                builder.field(SCHEDULE_TAG)
-//                schedule!!.toXContent(builder, ToXContent.EMPTY_PARAMS)
-//            }
-//            builder.endObject()
-//            return builder
-//        }
-//    }
-//
-//    /**
-//     * Report definition delivery data class
-//     */
-//    internal data class Delivery(
-//        val recipients: List<String>,
-//        val deliveryFormat: DeliveryFormat,
-//        val title: String,
-//        val textDescription: String,
-//        val htmlDescription: String?,
-//        val channelIds: List<String>
-//    ) : ToXContentObject {
-//        internal companion object {
-//            private const val RECIPIENTS_TAG = "recipients"
-//            private const val DELIVERY_FORMAT_TAG = "deliveryFormat"
-//            private const val TITLE_TAG = "title"
-//            private const val TEXT_DESCRIPTION_TAG = "textDescription"
-//            private const val HTML_DESCRIPTION_TAG = "htmlDescription"
-//            private const val CHANNEL_IDS_TAG = "channelIds"
-//
-//            /**
-//             * Parse the data from parser and create Delivery object
-//             * @param parser data referenced at parser
-//             * @return created Delivery object
-//             */
-//            fun parse(parser: XContentParser): Delivery {
-//                var recipients: List<String> = listOf()
-//                var deliveryFormat: DeliveryFormat? = null
-//                var title: String? = null
-//                var textDescription: String? = null
-//                var htmlDescription: String? = null
-//                var channelIds: List<String> = listOf()
-//                XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
-//                while (XContentParser.Token.END_OBJECT != parser.nextToken()) {
-//                    val fieldName = parser.currentName()
-//                    parser.nextToken()
-//                    when (fieldName) {
-//                        RECIPIENTS_TAG -> recipients = parser.stringList()
-//                        DELIVERY_FORMAT_TAG -> deliveryFormat = DeliveryFormat.valueOf(parser.text())
-//                        TITLE_TAG -> title = parser.text()
-//                        TEXT_DESCRIPTION_TAG -> textDescription = parser.text()
-//                        HTML_DESCRIPTION_TAG -> htmlDescription = parser.textOrNull()
-//                        CHANNEL_IDS_TAG -> channelIds = parser.stringList()
-//                        else -> log.info("$LOG_PREFIX: Delivery Unknown field $fieldName")
-//                    }
-//                }
-//                deliveryFormat ?: throw IllegalArgumentException("$DELIVERY_FORMAT_TAG field absent")
-//                title ?: throw IllegalArgumentException("$TITLE_TAG field absent")
-//                textDescription ?: throw IllegalArgumentException("$TEXT_DESCRIPTION_TAG field absent")
-//                return Delivery(recipients,
-//                    deliveryFormat,
-//                    title,
-//                    textDescription,
-//                    htmlDescription,
-//                    channelIds)
-//            }
-//        }
-//
-//        /**
-//         * {@inheritDoc}
-//         */
-//        override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
-//            builder!!
-//            builder.startObject()
-//                .field(RECIPIENTS_TAG, recipients)
-//                .field(DELIVERY_FORMAT_TAG, deliveryFormat)
-//                .field(TITLE_TAG, title)
-//                .field(TEXT_DESCRIPTION_TAG, textDescription)
-//            if (htmlDescription != null) {
-//                builder.field(HTML_DESCRIPTION_TAG, htmlDescription)
-//            }
-//            builder.field(CHANNEL_IDS_TAG, channelIds)
-//            builder.endObject()
-//            return builder
-//        }
-//    }
+
+    /**
+     * Report definition trigger data class
+     */
+    internal data class Input(
+        val inputText: String?,
+        val inputType: String?
+    ) : ToXContentObject {
+        internal companion object {
+            private const val INPUT_TEXT_TAG = "inputText"
+            private const val INPUT_TYPE_TAG = "inputType"
+
+            /**
+             * Parse the data from parser and create Trigger object
+             * @param parser data referenced at parser
+             * @return created Trigger object
+             */
+            fun parse(parser: XContentParser): Input {
+                var inputText: String? = null
+                var inputType: String? = null
+                XContentParserUtils.ensureExpectedToken(
+                    XContentParser.Token.START_OBJECT,
+                    parser.currentToken(),
+                    parser
+                )
+                while (XContentParser.Token.END_OBJECT != parser.nextToken()) {
+                    val fieldName = parser.currentName()
+                    parser.nextToken()
+                    when (fieldName) {
+                        INPUT_TEXT_TAG -> inputText = parser.text()
+                        INPUT_TYPE_TAG -> inputType = parser.text()
+                        else -> log.info("$LOG_PREFIX: Trigger Skipping Unknown field $fieldName")
+                    }
+                }
+                inputText ?: throw IllegalArgumentException("$INPUT_TEXT_TAG field absent")
+                inputType ?: throw IllegalArgumentException("$INPUT_TYPE_TAG field absent")
+                return Input(inputText, inputType)
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
+            builder!!
+            builder.startObject()
+                .field(INPUT_TEXT_TAG, inputText)
+                .field(INPUT_TYPE_TAG, inputType)
+            builder.endObject()
+            return builder
+        }
+    }
 }
