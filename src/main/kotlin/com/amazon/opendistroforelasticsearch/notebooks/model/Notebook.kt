@@ -79,16 +79,25 @@ internal data class Notebook(
     val paragraphs: List<Paragraph>
 ) : ToXContentObject {
 
-    internal enum class SourceType { Dashboard, Visualization, SavedSearch }
-    internal enum class TriggerType { Download, OnDemand, CronSchedule, IntervalSchedule }
-    internal enum class DeliveryFormat { LinkOnly, Attachment, Embedded }
-    internal enum class FileFormat { Pdf, Png, Csv }
-
     internal companion object {
         private val log by logger(Notebook::class.java)
         private const val NAME_TAG = "name"
         private const val BACKEND_TAG = "backend"
         private const val PARAGRAPHS_TAG = "paragraphs"
+
+        /**
+         * Parse the item list from parser
+         * @param parser data referenced at parser
+         * @return created list of items
+         */
+        private fun parseItemList(parser: XContentParser): List<Paragraph> {
+            val retList: MutableList<Paragraph> = mutableListOf()
+            XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, parser.currentToken(), parser)
+            while (parser.nextToken() != XContentParser.Token.END_ARRAY) {
+                retList.add(Paragraph.parse(parser))
+            }
+            return retList
+        }
 
         /**
          * Parse the data from parser and create Notebook object
@@ -106,7 +115,7 @@ internal data class Notebook(
                 when (fieldName) {
                     NAME_TAG -> name = parser.text()
                     BACKEND_TAG -> backend = parser.text()
-                    PARAGRAPHS_TAG -> paragraphs = Paragraph.parse(parser)
+                    PARAGRAPHS_TAG -> paragraphs = parseItemList(parser)
                     else -> {
                         parser.skipChildren()
                         log.info("$LOG_PREFIX:Notebook Skipping Unknown field $fieldName")
@@ -138,14 +147,14 @@ internal data class Notebook(
      * {@inheritDoc}
      */
     override fun toXContent(builder: XContentBuilder?, params: ToXContent.Params?): XContentBuilder {
+        val xContentParams = params ?: RestTag.REST_OUTPUT_PARAMS
         builder!!
         builder.startObject()
             .field(NAME_TAG, name)
             .field(BACKEND_TAG, backend)
-//        builder.field(PARAGRAPHS_TAG)
-//        paragraphs.toXContent(builder, ToXContent.EMPTY_PARAMS)
-        builder.endObject()
-        return builder
+            .startArray(PARAGRAPHS_TAG)
+        paragraphs.forEach { it.toXContent(builder, xContentParams) }
+        return builder.endArray().endObject()
     }
 
     /**
@@ -158,25 +167,11 @@ internal data class Notebook(
             private const val OUTPUT_TAG = "output"
 
             /**
-             * Parse the item list from parser
-             * @param parser data referenced at parser
-             * @return created list of items
-             */
-            private fun parseItemList(parser: XContentParser): List<ItemClass> {
-                val retList: MutableList<ItemClass> = mutableListOf()
-                XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_ARRAY, parser.currentToken(), parser)
-                while (parser.nextToken() != XContentParser.Token.END_ARRAY) {
-                    retList.add(parseItem(parser))
-                }
-                return retList
-            }
-
-            /**
              * Parse the data from parser and create Source object
              * @param parser data referenced at parser
              * @return created Source object
              */
-            fun parse(parser: XContentParser): List<Paragraph> {
+            fun parse(parser: XContentParser): Paragraph {
                 var output: String? = null
                 XContentParserUtils.ensureExpectedToken(
                     XContentParser.Token.START_OBJECT,
