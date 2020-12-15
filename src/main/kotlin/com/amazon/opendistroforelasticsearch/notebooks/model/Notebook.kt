@@ -30,11 +30,9 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
  *  * <pre> JSON format
  * {@code
  * {
- *   "id" : "note_992a6961-3d0d-44f3-b5a8-9b2bdad336ae",
  *   "dateCreated" : "2020-12-11T20:51:15.509Z",
  *   "name" : "test",
  *   "dateModified" : "2020-12-11T21:04:55.336Z",
- *   "pluginVersion" : "7.9.0",
  *   "backend" : "Default",
  *   "paragraphs" : [
  *     {
@@ -60,6 +58,8 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
 
 internal data class Notebook(
     val name: String,
+    val dateCreated: String,
+    val dateModified: String,
     val backend: String,
     val paragraphs: List<Paragraph>
 ) : ToXContentObject {
@@ -67,6 +67,8 @@ internal data class Notebook(
     internal companion object {
         private val log by logger(Notebook::class.java)
         private const val NAME_TAG = "name"
+        private const val DATE_CREATED_TAG = "dateCreated"
+        private const val DATE_MODIFIED_TAG = "dateModified"
         private const val BACKEND_TAG = "backend"
         private const val PARAGRAPHS_TAG = "paragraphs"
 
@@ -91,6 +93,8 @@ internal data class Notebook(
          */
         fun parse(parser: XContentParser): Notebook {
             var name: String? = null
+            var dateCreated: String? = null
+            var dateModified: String? = null
             var backend: String? = null
             var paragraphs: List<Paragraph>? = null
             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.currentToken(), parser)
@@ -99,6 +103,8 @@ internal data class Notebook(
                 parser.nextToken()
                 when (fieldName) {
                     NAME_TAG -> name = parser.text()
+                    DATE_CREATED_TAG -> dateCreated = parser.text()
+                    DATE_MODIFIED_TAG -> dateModified = parser.text()
                     BACKEND_TAG -> backend = parser.text()
                     PARAGRAPHS_TAG -> paragraphs = parseItemList(parser)
                     else -> {
@@ -108,10 +114,14 @@ internal data class Notebook(
                 }
             }
             name ?: throw IllegalArgumentException("$NAME_TAG field absent")
+            dateCreated ?: throw IllegalArgumentException("$DATE_CREATED_TAG field absent")
+            dateModified ?: throw IllegalArgumentException("$DATE_MODIFIED_TAG field absent")
             backend ?: throw IllegalArgumentException("$BACKEND_TAG field absent")
             paragraphs ?: throw IllegalArgumentException("$PARAGRAPHS_TAG field absent")
             return Notebook(
                 name,
+                dateCreated,
+                dateModified,
                 backend,
                 paragraphs
             )
@@ -135,6 +145,8 @@ internal data class Notebook(
         builder!!
         builder.startObject()
             .field(NAME_TAG, name)
+            .field(DATE_CREATED_TAG, dateCreated)
+            .field(DATE_MODIFIED_TAG, dateModified)
             .field(BACKEND_TAG, backend)
             .startArray(PARAGRAPHS_TAG)
         paragraphs.forEach { it.toXContent(builder, xContentParams) }
