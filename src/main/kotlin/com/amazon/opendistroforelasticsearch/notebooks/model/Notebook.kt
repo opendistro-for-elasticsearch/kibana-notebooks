@@ -57,11 +57,11 @@ import org.elasticsearch.common.xcontent.XContentParserUtils
  */
 
 internal data class Notebook(
-    val name: String,
-    val dateCreated: String,
-    val dateModified: String,
-    val backend: String,
-    val paragraphs: List<Paragraph>
+    val name: String?,
+    val dateCreated: String?,
+    val dateModified: String?,
+    val backend: String?,
+    val paragraphs: List<Paragraph>?
 ) : ToXContentObject {
 
     internal companion object {
@@ -113,11 +113,6 @@ internal data class Notebook(
                     }
                 }
             }
-            name ?: throw IllegalArgumentException("$NAME_TAG field absent")
-            dateCreated ?: throw IllegalArgumentException("$DATE_CREATED_TAG field absent")
-            dateModified ?: throw IllegalArgumentException("$DATE_MODIFIED_TAG field absent")
-            backend ?: throw IllegalArgumentException("$BACKEND_TAG field absent")
-            paragraphs ?: throw IllegalArgumentException("$PARAGRAPHS_TAG field absent")
             return Notebook(
                 name,
                 dateCreated,
@@ -144,13 +139,24 @@ internal data class Notebook(
         val xContentParams = params ?: RestTag.REST_OUTPUT_PARAMS
         builder!!
         builder.startObject()
-            .field(NAME_TAG, name)
-            .field(DATE_CREATED_TAG, dateCreated)
-            .field(DATE_MODIFIED_TAG, dateModified)
-            .field(BACKEND_TAG, backend)
-            .startArray(PARAGRAPHS_TAG)
-        paragraphs.forEach { it.toXContent(builder, xContentParams) }
-        return builder.endArray().endObject()
+        if (name != null) {
+            builder.field(NAME_TAG, name)
+        }
+        if (dateCreated != null) {
+            builder.field(DATE_CREATED_TAG, dateCreated)
+        }
+        if (dateModified != null) {
+            builder.field(DATE_MODIFIED_TAG, dateModified)
+        }
+        if (backend != null) {
+            builder.field(BACKEND_TAG, backend)
+        }
+        if (paragraphs != null) {
+            builder.startArray(PARAGRAPHS_TAG)
+            paragraphs.forEach { it.toXContent(builder, xContentParams) }
+            builder.endArray()
+        }
+        return builder.endObject()
     }
 
     /**
