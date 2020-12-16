@@ -179,13 +179,14 @@ export class Main extends React.Component<MainProps, MainState> {
         }));
         if (showToast)
           this.setToast(`Notebook "${notebookName}" successfully deleted!`);
+        return res;
       })
       .catch((err) => this.setToast('Issue in deleting the notebook ' + err.body.message, 'danger'));
   };
 
   render() {
     return (
-      <HashRouter basename={this.props.basename}>
+      <HashRouter>
         <>
           <EuiGlobalToastList
             toasts={this.state.toasts}

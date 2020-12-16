@@ -273,10 +273,13 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.setState({
       modalLayout: (
         <DeleteNotebookModal
-          onConfirm={() => {
-            this.props.deleteNotebook(this.props.openedNoteId, this.state.path);
-            this.setState({ isModalVisible: false });
-            window.location.replace(`${this.props.basename}#`);
+          onConfirm={async () => {
+            await this.props.deleteNotebook(this.props.openedNoteId, this.state.path);
+            this.setState({ isModalVisible: false }, () =>
+              setTimeout(() => {
+                window.location.replace(`${this.props.basename}#`);
+              }, 300)
+            );
           }}
           onCancel={() => this.setState({ isModalVisible: false })}
           title={`Delete notebook "${this.state.path}"`}
