@@ -64,7 +64,7 @@ export class DefaultBackend implements NotebookAdaptor {
   updateNote = async function (
     client: ILegacyScopedClusterClient,
     noteId: string,
-    updateBody: string
+    updateBody: Partial<DefaultNotebooks>
   ) {
     try {
       const response = await client.callAsCurrentUser('notebooks.updateNotebookById', {
@@ -180,7 +180,7 @@ export class DefaultBackend implements NotebookAdaptor {
       const noteObject = await this.getNote(client, params.noteId);
       const newNotebook = this.createNewNotebook(params.name);
       const cloneNotebook = { ...newNotebook.object };
-      cloneNotebook.paragraphs = noteObject.paragraphs;
+      cloneNotebook.paragraphs = noteObject.notebook.paragraphs;
       const esClientIndexResponse = await this.indexNote(client, cloneNotebook);
       return { status: 'OK', message: esClientIndexResponse, body: esClientIndexResponse._id };
     } catch (error) {
@@ -253,7 +253,7 @@ export class DefaultBackend implements NotebookAdaptor {
     paragraphInput: string
   ) {
     try {
-      const updatedParagraphs = [];
+      const updatedParagraphs: DefaultParagraph[] = [];
       paragraphs.map((paragraph: DefaultParagraph) => {
         const updatedParagraph = { ...paragraph };
         if (paragraph.id === paragraphId) {
@@ -352,7 +352,7 @@ export class DefaultBackend implements NotebookAdaptor {
     try {
       const esClientGetResponse = await this.getNote(client, params.noteId);
       const updatedInputParagraphs = this.updateParagraphInput(
-        esClientGetResponse.paragraphs,
+        esClientGetResponse.notebook.paragraphs,
         params.paragraphId,
         params.paragraphInput
       );
@@ -394,7 +394,7 @@ export class DefaultBackend implements NotebookAdaptor {
     try {
       const esClientGetResponse = await this.getNote(client, params.noteId);
       const updatedInputParagraphs = this.updateParagraphInput(
-        esClientGetResponse.paragraphs,
+        esClientGetResponse.notebook.paragraphs,
         params.paragraphId,
         params.paragraphInput
       );
@@ -430,7 +430,7 @@ export class DefaultBackend implements NotebookAdaptor {
   ) {
     try {
       const esClientGetResponse = await this.getNote(client, params.noteId);
-      const paragraphs = esClientGetResponse.paragraphs;
+      const paragraphs = esClientGetResponse.notebook.paragraphs;
       const newParagraph = this.createParagraph(params.paragraphInput, params.inputType);
       paragraphs.splice(params.paragraphIndex, 0, newParagraph);
       const updateNotebook = {
@@ -458,8 +458,8 @@ export class DefaultBackend implements NotebookAdaptor {
   ) {
     try {
       const esClientGetResponse = await this.getNote(client, params.noteId);
-      let updatedparagraphs = [];
-      esClientGetResponse.paragraphs.map((paragraph: DefaultParagraph, index: number) => {
+      const updatedparagraphs: DefaultParagraph[] = [];
+      esClientGetResponse.notebook.paragraphs.map((paragraph: DefaultParagraph, index: number) => {
         if (paragraph.id !== params.paragraphId) {
           updatedparagraphs.push(paragraph);
         }
@@ -473,6 +473,7 @@ export class DefaultBackend implements NotebookAdaptor {
 
       return { paragraphs: updatedparagraphs };
     } catch (error) {
+      console.log('error', error);
       throw new Error('Delete Paragraph Error:' + error);
     }
   };
@@ -489,8 +490,8 @@ export class DefaultBackend implements NotebookAdaptor {
   ) {
     try {
       const esClientGetResponse = await this.getNote(client, params.noteId);
-      let updatedparagraphs = [];
-      esClientGetResponse.paragraphs.map((paragraph: DefaultParagraph, index: number) => {
+      let updatedparagraphs: DefaultParagraph[] = [];
+      esClientGetResponse.notebook.paragraphs.map((paragraph: DefaultParagraph, index: number) => {
         let updatedParagraph = { ...paragraph };
         updatedParagraph.output = [];
         updatedparagraphs.push(updatedParagraph);
