@@ -30,31 +30,29 @@ export class DefaultBackend implements NotebookAdaptor {
 
   // Creates a new notebooks with sample markdown text
   createNewNotebook = (newNotebookName: string) => {
-    const noteId = 'note_' + uuid();
-
     const noteObject: DefaultNotebooks = {
-      id: noteId,
       dateCreated: new Date().toISOString(),
       name: newNotebookName,
       dateModified: new Date().toISOString(),
-      pluginVersion: '7.9.0',
       backend: 'Default',
       paragraphs: [],
     };
 
     return {
-      id: noteId,
       object: noteObject,
     };
   };
 
   // indexes a notebook with body provided
-  indexNote = async function (client: ILegacyScopedClusterClient, noteId: string, body: any) {
+  indexNote = async function (
+    client: ILegacyScopedClusterClient,
+    body: any
+  ): Promise<{ notebookId: string }> {
     try {
       const response = await client.callAsCurrentUser('notebooks.createNotebook', {
         body: {
-          notebook: body
-        }
+          notebook: body,
+        },
       });
       return response;
     } catch (error) {
@@ -63,21 +61,19 @@ export class DefaultBackend implements NotebookAdaptor {
   };
 
   // updates a notebook with updateBody provided as parameter
-  updateNote = async function (client: ILegacyScopedClusterClient, noteId: string, updateBody: string) {
+  updateNote = async function (
+    client: ILegacyScopedClusterClient,
+    noteId: string,
+    updateBody: string
+  ) {
     try {
-      const options: RequestParams.Update = {
-        index: '.notebooks',
-        refresh: 'true',
-        id: noteId,
+      const response = await client.callAsCurrentUser('notebooks.updateNotebookById', {
+        notebookId: noteId,
         body: {
-          doc: updateBody,
+          notebook: updateBody,
         },
-      };
-      const esClientResponse = await context.core.elasticsearch.legacy.client.callAsCurrentUser(
-        'update',
-        options
-      );
-      return esClientResponse;
+      });
+      return response;
     } catch (error) {
       throw new Error('Update Doc Error:' + error);
     }
@@ -86,14 +82,10 @@ export class DefaultBackend implements NotebookAdaptor {
   // fetched a notebook by Id
   getNote = async function (client: ILegacyScopedClusterClient, noteId: string) {
     try {
-      const esClientResponse = await context.core.elasticsearch.legacy.client.callAsCurrentUser(
-        'get',
-        {
-          index: '.notebooks',
-          id: noteId,
-        }
-      );
-      return esClientResponse._source;
+      const response = await client.callAsCurrentUser('notebooks.getNotebookById', {
+        notebookId: noteId,
+      });
+      return response.notebookDetails;
     } catch (error) {
       throw new Error('Get Doc Error:' + error);
     }
@@ -127,11 +119,11 @@ export class DefaultBackend implements NotebookAdaptor {
     try {
       const noteObject = await this.getNote(client, noteId);
       return {
-        path: noteObject.name,
-        dateCreated: noteObject.dateCreated,
-        dateModified: noteObject.dateModified,
-        paragraphs: noteObject.paragraphs,
-      }
+        path: noteObject.notebook.name,
+        dateCreated: noteObject.notebook.dateCreated,
+        dateModified: noteObject.notebook.dateModified,
+        paragraphs: noteObject.notebook.paragraphs,
+      };
     } catch (error) {
       throw new Error('Fetching Notebook Error:' + error);
     }
@@ -147,7 +139,7 @@ export class DefaultBackend implements NotebookAdaptor {
   ) {
     try {
       const newNotebook = this.createNewNotebook(params.name);
-      const esClientResponse = await this.indexNote(client, newNotebook.id, newNotebook.object);
+      const esClientResponse = await this.indexNote(client, newNotebook.object);
       return { status: 'OK', message: esClientResponse, body: esClientResponse._id };
     } catch (error) {
       throw new Error('Creating New Notebook Error:' + error);
@@ -189,7 +181,7 @@ export class DefaultBackend implements NotebookAdaptor {
       const newNotebook = this.createNewNotebook(params.name);
       const cloneNotebook = { ...newNotebook.object };
       cloneNotebook.paragraphs = noteObject.paragraphs;
-      const esClientIndexResponse = await this.indexNote(client, newNotebook.id, cloneNotebook);
+      const esClientIndexResponse = await this.indexNote(client, cloneNotebook);
       return { status: 'OK', message: esClientIndexResponse, body: esClientIndexResponse._id };
     } catch (error) {
       throw new Error('Cloning Notebook Error:' + error);
@@ -205,15 +197,10 @@ export class DefaultBackend implements NotebookAdaptor {
     _wreckOptions: optionsType
   ) {
     try {
-      const esClientResponse = await context.core.elasticsearch.legacy.client.callAsCurrentUser(
-        'delete',
-        {
-          index: '.notebooks',
-          id: noteId,
-          refresh: 'true',
-        }
-      );
-      return { status: 'OK', message: esClientResponse };
+      const response = await client.callAsCurrentUser('notebooks.deleteNotebookById', {
+        notebookId: noteId,
+      });
+      return { status: 'OK', message: response };
     } catch (error) {
       throw new Error('Deleting Notebook Error:' + error);
     }
@@ -248,7 +235,7 @@ export class DefaultBackend implements NotebookAdaptor {
       newNoteObject.id = 'note_' + uuid();
       newNoteObject.dateCreated = new Date().toISOString();
       newNoteObject.dateModified = new Date().toISOString();
-      const esClientIndexResponse = await this.indexNote(client, newNoteObject.id, newNoteObject);
+      const esClientIndexResponse = await this.indexNote(client, newNoteObject);
       return { status: 'OK', message: esClientIndexResponse, body: esClientIndexResponse._id };
     } catch (error) {
       throw new Error('Import Notebook Error:' + error);

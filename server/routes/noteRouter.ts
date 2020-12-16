@@ -63,8 +63,11 @@ export function NoteRouter(router: IRouter) {
       },
     },
     async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
+      const esNotebooksClient: ILegacyScopedClusterClient = context.notebooks_plugin.esNotebooksClient.asScoped(
+        request
+      );
       try {
-        const notebookinfo = await BACKEND.fetchNote(context, request.params.noteId, wreckOptions);
+        const notebookinfo = await BACKEND.fetchNote(esNotebooksClient, request.params.noteId, wreckOptions);
         return response.ok({
           body: notebookinfo,
         });
@@ -118,9 +121,11 @@ export function NoteRouter(router: IRouter) {
       },
     },
     async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
-      let renameResponse = {};
+      const esNotebooksClient: ILegacyScopedClusterClient = context.notebooks_plugin.esNotebooksClient.asScoped(
+        request
+      );
       try {
-        renameResponse = await BACKEND.renameNote(context, request.body, wreckOptions);
+        const renameResponse = await BACKEND.renameNote(esNotebooksClient, request.body, wreckOptions);
         return response.ok({
           body: renameResponse,
         });
@@ -145,9 +150,11 @@ export function NoteRouter(router: IRouter) {
       },
     },
     async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
-      let cloneResponse = {};
+      const esNotebooksClient: ILegacyScopedClusterClient = context.notebooks_plugin.esNotebooksClient.asScoped(
+        request
+      );
       try {
-        const cloneResponse = await BACKEND.cloneNote(context, request.body, wreckOptions);
+        const cloneResponse = await BACKEND.cloneNote(esNotebooksClient, request.body, wreckOptions);
         return response.ok({
           body: cloneResponse,
         });
@@ -171,8 +178,11 @@ export function NoteRouter(router: IRouter) {
       },
     },
     async (context, request, response): Promise<IKibanaResponse<any | ResponseError>> => {
+      const esNotebooksClient: ILegacyScopedClusterClient = context.notebooks_plugin.esNotebooksClient.asScoped(
+        request
+      );
       try {
-        const delResponse = await BACKEND.deleteNote(context, request.params.noteid, wreckOptions);
+        const delResponse = await BACKEND.deleteNote(esNotebooksClient, request.params.noteid, wreckOptions);
         return response.ok({
           body: delResponse,
         });
