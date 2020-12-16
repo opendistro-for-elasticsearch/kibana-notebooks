@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit
  */
 internal object NotebooksIndex {
     private val log by logger(NotebooksIndex::class.java)
-    const val NOTEBOOKS_INDEX_NAME = ".notebooks"
+    const val NOTEBOOKS_INDEX_NAME = ".opendistro-notebooks"
     private const val NOTEBOOKS_MAPPING_FILE_NAME = "notebooks-mapping.yml"
     private const val NOTEBOOKS_SETTINGS_FILE_NAME = "notebooks-settings.yml"
     private const val MAPPING_TYPE = "_doc"
