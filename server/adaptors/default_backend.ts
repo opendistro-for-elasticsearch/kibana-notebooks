@@ -140,7 +140,7 @@ export class DefaultBackend implements NotebookAdaptor {
     try {
       const newNotebook = this.createNewNotebook(params.name);
       const esClientResponse = await this.indexNote(client, newNotebook.object);
-      return { status: 'OK', message: esClientResponse, body: esClientResponse._id };
+      return { status: 'OK', message: esClientResponse, body: esClientResponse.notebookId };
     } catch (error) {
       throw new Error('Creating New Notebook Error:' + error);
     }
@@ -182,7 +182,7 @@ export class DefaultBackend implements NotebookAdaptor {
       const cloneNotebook = { ...newNotebook.object };
       cloneNotebook.paragraphs = noteObject.notebook.paragraphs;
       const esClientIndexResponse = await this.indexNote(client, cloneNotebook);
-      return { status: 'OK', message: esClientIndexResponse, body: esClientIndexResponse._id };
+      return { status: 'OK', body: { ...cloneNotebook, id: esClientIndexResponse.notebookId } };
     } catch (error) {
       throw new Error('Cloning Notebook Error:' + error);
     }
@@ -236,7 +236,7 @@ export class DefaultBackend implements NotebookAdaptor {
       newNoteObject.dateCreated = new Date().toISOString();
       newNoteObject.dateModified = new Date().toISOString();
       const esClientIndexResponse = await this.indexNote(client, newNoteObject);
-      return { status: 'OK', message: esClientIndexResponse, body: esClientIndexResponse._id };
+      return { status: 'OK', message: esClientIndexResponse, body: esClientIndexResponse.notebookId };
     } catch (error) {
       throw new Error('Import Notebook Error:' + error);
     }

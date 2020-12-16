@@ -254,7 +254,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
               window.location.assign(`${this.props.basename}#${id}`);
               setTimeout(() => {
                 this.loadNotebook()
-              }, 100);
+              }, 300);
             });
           this.setState({ isModalVisible: false });
         },
