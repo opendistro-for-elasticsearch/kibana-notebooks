@@ -124,8 +124,9 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         para.paraDivRef = React.createRef<HTMLDivElement>();
       });
       return parsedPara;
-    } catch (error) {
-      console.error('Parsing paragraph has some issue', error);
+    } catch (err) {
+      this.props.setToast('Error parsing paragraphs, please make sure you have the correct permission.', 'danger');
+      console.error(err);
       this.setState({ parsedPara: [] });
     }
   };
@@ -170,7 +171,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           parsedPara.splice(index, 1);
           this.setState({ paragraphs, parsedPara });
         })
-        .catch((err) => console.error('Delete paragraph issue: ', err.body.message));
+      .catch((err) => {
+        this.props.setToast('Error deleting paragraph, please make sure you have the correct permission.', 'danger');
+        console.error(err.body.message);
+      });
     }
   };
 
@@ -201,7 +205,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                 this.setState({ paragraphs: res.paragraphs });
                 this.parseAllParagraphs();
               })
-              .catch((err) => console.error('Delete paragraph issue: ', err.body.message));
+              .catch((err) => {
+                this.props.setToast('Error deleting paragraph, please make sure you have the correct permission.', 'danger');
+                console.error(err.body.message);
+              });
           });
           this.props.setToast('Paragraphs successfully deleted!');
         },
@@ -298,7 +305,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         this.setState({ paragraphs: res.paragraphs });
         this.parseAllParagraphs();
       })
-      .catch((err) => console.error('Delete vizualization issue: ', err.body.message));
+      .catch((err) => {
+        this.props.setToast('Error deleting visualization, please make sure you have the correct permission.', 'danger');
+        console.error(err.body.message);
+      });
   };
 
   // Backend call to add a paragraph
@@ -325,7 +335,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         this.setState({ paragraphs, parsedPara });
         this.paragraphSelector(index);
       })
-      .catch((err) => console.error('Add paragraph issue: ', err.body.message));
+      .catch((err) => {
+        this.props.setToast('Error adding paragraph, please make sure you have the correct permission.', 'danger');
+        console.error(err.body.message);
+      });
   };
 
   // Function to clone a paragraph
@@ -357,7 +370,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       })
       .then((res) => this.setState({ paragraphs, parsedPara }))
       .then((res) => this.scrollToPara(targetIndex))
-      .catch((err) => console.error('Move paragraph issue: ', err.body.message));
+      .catch((err) => {
+        this.props.setToast('Error moving paragraphs, please make sure you have the correct permission.', 'danger');
+        console.error(err.body.message);
+      });
   };
 
   scrollToPara(index: number) {
@@ -384,7 +400,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         this.setState({ paragraphs: res.paragraphs });
         this.parseAllParagraphs();
       })
-      .catch((err) => console.error('clear paragraph issue: ', err.body.message));
+      .catch((err) => {
+        this.props.setToast('Error clearing paragraphs, please make sure you have the correct permission.', 'danger');
+        console.error(err.body.message);
+      });
   };
 
   // Backend call to update and run contents of paragraph
@@ -411,7 +430,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         parsedPara[index] = this.parseParagraphs([res])[0];
         this.setState({ paragraphs, parsedPara });
       })
-      .catch((err) => console.error('run paragraph issue: ', err.body.message));
+      .catch((err) => {
+        this.props.setToast('Error running paragraph, please make sure you have the correct permission.', 'danger');
+        console.error(err.body.message);
+      });
   };
 
   runForAllParagraphs = (reducer: (para: ParaType, index: number) => Promise<any>) => {
@@ -458,7 +480,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         this.setBreadcrumbs(res.path);
         this.setState(res, this.parseAllParagraphs);
       })
-      .catch((err) => console.error('Fetching notebook issue: ', err.body.message));
+    .catch((err) => {
+      this.props.setToast('Error fetching notebooks, please make sure you have the correct permission.', 'danger');
+      console.error(err.body.message);
+    });
   };
 
   setPara = (para: ParaType, index: number) => {
@@ -481,6 +506,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   }
 
   componentDidMount() {
+    this.setBreadcrumbs('');
     this.loadNotebook();
   }
 

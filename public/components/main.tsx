@@ -47,7 +47,7 @@ type MainProps = {
 
 type MainState = {
   data: Array<NotebookType>;
-  openedNotebook: NotebookType;
+  openedNotebook: NotebookType | undefined;
   toasts: Toast[];
 };
 
@@ -140,11 +140,18 @@ export class Main extends React.Component<MainProps, MainState> {
         });
         this.setToast(`Notebook successfully renamed into "${editedNoteName}"`);
       })
-      .catch((err) => this.setToast('Issue in renaming the notebook ' + err.body.message, 'danger'));
+      .catch((err) => {
+        this.setToast('Error renaming notebook, please make sure you have the correct permission.', 'danger');
+        console.error(err.body.message);
+      });
   };
 
   // Clones an existing notebook, return new notebook's id
   cloneNotebook = (clonedNoteName: string, clonedNoteID: string): Promise<string> => {
+    if (clonedNoteName.length >= 50 || clonedNoteName.length === 0) {
+      this.setToast('Invalid notebook name', 'danger');
+      return Promise.reject();
+    }
     const cloneNoteObject = {
       name: clonedNoteName,
       noteId: clonedNoteID,
@@ -166,7 +173,10 @@ export class Main extends React.Component<MainProps, MainState> {
         this.setToast(`Notebook "${clonedNoteName}" successfully created!`);
         return res.body.id;
       })
-      .catch((err) => this.setToast('Issue in cloning the notebook ' + err.body.message, 'danger'));
+      .catch((err) => {
+        this.setToast('Error cloning notebook, please make sure you have the correct permission.', 'danger');
+        console.error(err.body.message);
+      });
   };
 
   // Deletes an existing notebook
@@ -181,7 +191,10 @@ export class Main extends React.Component<MainProps, MainState> {
           this.setToast(`Notebook "${notebookName}" successfully deleted!`);
         return res;
       })
-      .catch((err) => this.setToast('Issue in deleting the notebook ' + err.body.message, 'danger'));
+      .catch((err) => {
+        this.setToast('Error deleting notebook, please make sure you have the correct permission.', 'danger');
+        console.error(err.body.message);
+      });
   };
 
   render() {
