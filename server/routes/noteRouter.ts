@@ -100,7 +100,6 @@ export function NoteRouter(router: IRouter) {
           body: addResponse.message.notebookId,
         });
       } catch (error) {
-        console.log('error', error);
         return response.custom({
           statusCode: error.statusCode || 500,
           body: error.message,

@@ -41,6 +41,7 @@ export function NotebooksPlugin(Client: any, config: any, components: any) {
       fmt: ES_NOTEBOOKS_API.NOTEBOOK,
     },
     method: 'POST',
+    needBody: true,
   });
 
   notebooks.getNotebookById = clientAction({
@@ -67,6 +68,7 @@ export function NotebooksPlugin(Client: any, config: any, components: any) {
       },
     },
     method: 'PUT',
+    needBody: true,
   });
 
   notebooks.deleteNotebookById = clientAction({
