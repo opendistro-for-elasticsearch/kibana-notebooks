@@ -29,7 +29,7 @@ import java.io.IOException
 import java.nio.file.Path
 
 /**
- * settings specific to reports scheduler Plugin.
+ * settings specific to notebooks Plugin.
  */
 internal object PluginSettings {
 
@@ -161,7 +161,7 @@ internal object PluginSettings {
     /**
      * Default admin access method.
      */
-    private const val DEFAULT_ADMIN_ACCESS_METHOD = "AllReports"
+    private const val DEFAULT_ADMIN_ACCESS_METHOD = "AllNotebooks"
 
     /**
      * Default filter-by method.
@@ -173,9 +173,8 @@ internal object PluginSettings {
      */
     private val DEFAULT_IGNORED_ROLES = listOf("own_index",
         "kibana_user",
-        "reports_full_access",
-        "reports_read_access",
-        "reports_instances_read_access")
+        "notebooks_full_access",
+        "notebooks_read_access")
 
     /**
      * Operation timeout setting in ms for I/O operations
@@ -234,16 +233,16 @@ internal object PluginSettings {
     /**
      * Enum for types of admin access
      * "Standard" -> Admin user access follows standard user
-     * "AllReports" -> Admin user with "all_access" role can see all reports of all users.
+     * "AllNotebooks" -> Admin user with "all_access" role can see all notebooks of all users.
      */
-    internal enum class AdminAccess { Standard, AllReports }
+    internal enum class AdminAccess { Standard, AllNotebooks }
 
     /**
      * Enum for types of filterBy options
-     * NoFilter -> everyone see each other's reports
-     * User -> reports are visible to only themselves
-     * Roles -> reports are visible to users having any one of the role of creator
-     * BackendRoles -> reports are visible to users having any one of the backend role of creator
+     * NoFilter -> everyone see each other's notebooks
+     * User -> notebooks are visible to only themselves
+     * Roles -> notebooks are visible to users having any one of the role of creator
+     * BackendRoles -> notebooks are visible to users having any one of the backend role of creator
      */
     internal enum class FilterBy { NoFilter, User, Roles, BackendRoles }
 

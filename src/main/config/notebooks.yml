@@ -26,14 +26,14 @@ opendistro.notebooks:
     maxPollingDurationSeconds: 900 # 15 Minutes, Minimum 5 Minutes
     maxLockRetries: 1 # Max number of retries to retry locking
   access:
-    adminAccess: "AllReports"
+    adminAccess: "AllNotebooks"
     # adminAccess values:
     ## Standard -> Admin user access follows standard user
-    ## AllReports -> Admin user with "all_access" role can see all reports of all users.
+    ## AllNotebooks -> Admin user with "all_access" role can see all notebooks of all users.
     filterBy: "NoFilter" # Applied when tenant != __user__
     # filterBy values:
-    ## NoFilter -> everyone see each other's reports
-    ## User -> reports are visible to only themselves
-    ## Roles -> reports are visible to users having any one of the role of creator
-    ## BackendRoles -> reports are visible to users having any one of the backend role of creator
-    ignoreRoles: ["own_index", "kibana_user", "reports_full_access", "reports_read_access", "reports_instances_read_access"]
+    ## NoFilter -> everyone see each other's notebooks
+    ## User -> notebooks are visible to only themselves
+    ## Roles -> notebooks are visible to users having any one of the role of creator
+    ## BackendRoles -> notebooks are visible to users having any one of the backend role of creator
+    ignoreRoles: ["own_index", "kibana_user", "notebooks_full_access", "notebooks_read_access"]
