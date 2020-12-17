@@ -7,7 +7,7 @@ Dashboards offer a solution for a few selected use cases, and are great tools if
 Complete Kibana Notebooks is composed of 2 plugins.
 
 - [Kibana Notebooks plugin](./kibana-notebooks/README.md)
-- [Notebooks ES plugin](./notebooks-es/)（TODO）
+- [Notebooks ES plugin](./es-notebooks/)（TODO）
 
 ## Contributing to Open Distro for Elasticsearch Kibana Notebooks
 
