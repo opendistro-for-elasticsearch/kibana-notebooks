@@ -17,7 +17,7 @@ package com.amazon.opendistroforelasticsearch.notebooks
 
 import org.elasticsearch.test.ESTestCase
 
-class ReportSchedularPluginTests : ESTestCase() {
+class NotebooksPluginTests : ESTestCase() {
     fun testSample() {
     }
 }

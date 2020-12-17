@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="eb0b55da-75d7-418b-a70e-64b57c4b088e" name="Default Changelist" comment="" />
+    <list default="true" id="eb0b55da-75d7-418b-a70e-64b57c4b088e" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NOTICE" beforeDir="false" afterPath="$PROJECT_DIR$/NOTICE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/com/amazon/opendistroforelasticsearch/notebooks/ReportSchedularPluginTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/com/amazon/opendistroforelasticsearch/notebooks/NotebooksPluginTests.kt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -64,13 +69,15 @@
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
   <component name="RunManager">
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
           <option name="containerStateName" value="" />
         </value>
       </option>
-      <option name="TEST_OBJECT" value="class" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <properties />
+      <listeners />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -111,6 +118,7 @@
       <option name="presentableId" value="Default" />
       <updated>1608239388481</updated>
       <workItem from="1608239389708" duration="316000" />
+      <workItem from="1608246243684" duration="161000" />
     </task>
     <servers />
   </component>
