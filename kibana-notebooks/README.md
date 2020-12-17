@@ -14,8 +14,15 @@ Please see our technical [documentation](https://opendistro.github.io/for-elasti
    See the [Kibana contributing guide](https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md#setting-up-your-development-environment) for more instructions on setting up your development environment.
 
 1. Change your node version to the version specified in `.node-version` inside the Kibana root directory.
-1. cd into `plugins` directory in the Kibana source code directory.
+1. Create a `plugins` directory inside the Kibana source code directory, if `plugins` directory doesn't exist.
 1. Check out this package from version control into the `plugins` directory.
+   ```
+   git clone git@github.com:opendistro-for-elasticsearch/kibana-notebooks.git plugins --no-checkout
+   cd plugins
+   echo 'kibana-notebooks/*' >> .git/info/sparse-checkout
+   git config core.sparseCheckout true
+   git checkout dev
+   ```
 1. Run `yarn kbn bootstrap` inside `kibana/plugins/kibana-notebooks`.
 
 Ultimately, your directory structure should look like this:
@@ -31,7 +38,7 @@ Ultimately, your directory structure should look like this:
 
 To build the plugin's distributable zip simply run `yarn build`.
 
-Example output: `./build/opendistro-notebooks-kibana-*.zip`
+Example output: `./build/opendistroNotebooksKibana-*.zip`
 
 
 ## Run
@@ -46,7 +53,7 @@ Example output: `./build/opendistro-notebooks-kibana-*.zip`
 
 ## Contributing to Open Distro for Elasticsearch Kibana Notebooks
 
-We welcome you to get involved in development, documentation, testing the kibana reports plugin. See our [CONTRIBUTING.md](./CONTRIBUTING.md) and join in.
+We welcome you to get involved in development, documentation, testing the kibana notebooks plugin. See our [CONTRIBUTING.md](./../CONTRIBUTING.md) and join in.
 
 Since this is a Kibana plugin, it can be useful to review the [Kibana contributing guide](https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md) alongside the documentation around [Kibana plugins](https://www.elastic.co/guide/en/kibana/master/kibana-plugins.html) and [plugin development](https://www.elastic.co/guide/en/kibana/current/plugin-development.html).
 
