@@ -19,7 +19,7 @@ import java.util.concurrent.Callable
 buildscript {
     ext {
         es_group = "org.elasticsearch"
-        es_version = System.getProperty("es.version", "7.10.0")
+        es_version = System.getProperty("es.version", "7.10.2")
         kotlin_version = System.getProperty("kotlin.version", "1.4.0")
     }
 
