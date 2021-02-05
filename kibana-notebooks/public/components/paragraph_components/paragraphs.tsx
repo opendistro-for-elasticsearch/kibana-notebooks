@@ -44,6 +44,13 @@ import { CoreStart } from '../../../../../src/core/public';
 import { ParaOutput } from './para_output';
 import { ParaInput } from './para_input';
 import { API_PREFIX, ParaType, DATE_FORMAT } from '../../../common';
+// import CSS from 'csstype';
+
+// const styles: CSS.Properties = {
+//   float: 'left',
+//   width: '100%',
+//   maxWidth: '1600px',
+// };
 
 /*
  * "Paragraphs" component is used to render cells of the notebook open and "add para div" between paragraphs
@@ -424,7 +431,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
   return (
     <>
       <EuiPanel>
-        {renderParaHeader(para.isVizualisation ? 'Kibana visualization' : 'Markdown', index)}
+        {renderParaHeader(para.isVizualisation ? 'Kibana visualization' : 'Code block', index)}
         <Cell key={index} onClick={() => paragraphSelector(index)}>
           {para.isInputExpanded &&
             <>
@@ -450,7 +457,7 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
               <EuiSpacer size='m' />
               <EuiFlexGroup alignItems='center' gutterSize='s'>
                 <EuiFlexItem grow={false}>
-                  <EuiButton onClick={() => onRunPara()}>
+                  <EuiButton onClick={() => onRunPara()} fill>
                     {isOutputAvailable ? 'Refresh' : 'Run'}
                   </EuiButton>
                 </EuiFlexItem>

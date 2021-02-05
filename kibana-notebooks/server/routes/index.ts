@@ -16,10 +16,14 @@
 import { NoteRouter } from './noteRouter';
 import { ParaRouter } from './paraRouter';
 import { vizRouter } from './vizRouter';
-import { IRouter } from '../../../../src/core/server';
+import { sqlRouter } from './sqlRouter';
+import { ILegacyClusterClient, IRouter } from '../../../../src/core/server';
+import QueryService from '../services/queryService';
 
-export function serverRoute(router: IRouter) {
+export function serverRoute(router: IRouter, client: ILegacyClusterClient) {
+  const queryService = new QueryService(client);
   ParaRouter(router);
   NoteRouter(router);
   vizRouter(router);
+  sqlRouter(router, queryService);
 }

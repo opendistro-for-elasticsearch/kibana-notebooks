@@ -48,6 +48,21 @@ import { defaultParagraphParser } from './helpers/default_parser';
 import moment from 'moment';
 import { PanelWrapper } from './helpers/panel_wrapper';
 import { getDeleteModal, getCustomModal, DeleteNotebookModal } from './helpers/modal_containers';
+import CSS from 'csstype';
+
+const panelStyles: CSS.Properties = {
+  float: 'left',
+  width: '100%',
+  maxWidth: '1200px',
+  marginTop: '20px'
+};
+
+const pageStyles: CSS.Properties = {
+  float: 'left',
+  width: '100%',
+  maxWidth: '1570px',
+}
+
 
 /*
  * "Notebook" component is used to display an open notebook
@@ -443,9 +458,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
 
   // Handles text editor value and syncs with paragraph input
   textValueEditor = (evt: React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
+    console.log('evt is', evt.target.value);
     if (!(evt.key === 'Enter' && evt.shiftKey)) {
       let parsedPara = this.state.parsedPara;
-      parsedPara[index].inp = evt.target.value;
+      parsedPara[index].inp = evt.target.value; //target.value
       this.setState({ parsedPara });
     }
   };
@@ -511,6 +527,16 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   }
 
   render() {
+    const createdText = (
+      <div>
+        <p>Created <br/> {moment(this.state.dateCreated).format(DATE_FORMAT)}</p>
+      </div>
+    );
+    const updatedText = (
+      <div>
+        <p>Last updated <br/> [Sample time here]</p>
+      </div>
+    )
     const viewOptions: EuiButtonGroupOption[] = [
       {
         id: 'view_both',
@@ -528,10 +554,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     const addParaPanels: EuiContextMenuPanelDescriptor[] = [
       {
         id: 0,
-        title: 'Input type',
+        title: 'Type',
         items: [
           {
-            name: 'Markdown',
+            name: 'Code block',
             onClick: () => {
               this.setState({ isAddParaPopoverOpen: false });
               this.addPara(this.state.paragraphs.length, '', 'CODE');
@@ -663,7 +689,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     ];
 
     return (
-      <>
+      <div style={pageStyles}>
         <EuiPage>
           <EuiPageBody component="div">
             <EuiPageHeader>
@@ -674,18 +700,18 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
               </EuiPageHeaderSection>
               <EuiPageHeaderSection>
                 <EuiFlexGroup gutterSize='s'>
-                  {this.state.parsedPara.length > 0 &&
-                    <EuiFlexItem>
-                      <EuiButtonGroup
-                        buttonSize='m'
-                        options={viewOptions}
-                        idSelected={this.state.selectedViewId}
-                        onChange={(id) => {
-                          this.updateView(id);
-                        }}
-                      />
-                    </EuiFlexItem>
-                  }
+                  <EuiFlexItem>
+                    <EuiButtonGroup
+                      buttonSize='m'
+                      options={viewOptions}
+                      idSelected={this.state.selectedViewId}
+                      onChange={(id) => {
+                        this.updateView(id);
+                      }}
+                    />
+                  </EuiFlexItem>
+                  <EuiFlexItem />
+                  <EuiFlexItem />
                   <EuiFlexItem />
                   <EuiFlexItem>
                     <EuiPopover
@@ -696,7 +722,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           iconType='arrowDown'
                           iconSide='right'
                           onClick={() => this.setState({ isParaActionsPopoverOpen: true })}
-                        >Paragraph actions</EuiButton>
+                        >Actions</EuiButton>
                       }
                       isOpen={this.state.isParaActionsPopoverOpen}
                       closePopover={() => this.setState({ isParaActionsPopoverOpen: false })}>
@@ -712,7 +738,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           iconType='arrowDown'
                           iconSide='right'
                           onClick={() => this.setState({ isNoteActionsPopoverOpen: true })}
-                        >Notebook actions</EuiButton>
+                        >Run all paragraphs</EuiButton>
                       }
                       isOpen={this.state.isNoteActionsPopoverOpen}
                       closePopover={() => this.setState({ isNoteActionsPopoverOpen: false })}>
@@ -722,13 +748,20 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                 </EuiFlexGroup>
               </EuiPageHeaderSection>
             </EuiPageHeader>
-            <EuiText color="subdued">Created: {moment(this.state.dateCreated).format(DATE_FORMAT)}</EuiText>
+            <EuiFlexGroup alignItems={'flexStart'} gutterSize={'l'}>
+              <EuiFlexItem grow={false}>
+                <EuiText>{createdText}</EuiText>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiText>{updatedText}</EuiText>
+              </EuiFlexItem>
+            </EuiFlexGroup>
             {this.state.parsedPara.length > 0 ? (
               <>
                 <Cells>
                   <PanelWrapper shouldWrap={this.state.selectedViewId === 'output_only'}>
                     {this.state.parsedPara.map((para: ParaType, index: number) => (
-                      <div ref={this.state.parsedPara[index].paraDivRef} key={`para_div_${para.uniqueId}`}>
+                      <div ref={this.state.parsedPara[index].paraDivRef} key={`para_div_${para.uniqueId}`} style={panelStyles}>
                         <Paragraphs
                           ref={this.state.parsedPara[index].paraRef}
                           para={para}
@@ -773,7 +806,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
               </>
             ) : (
                 // show default paragraph if no paragraphs in this notebook
-                <div style={{ marginTop: 20 }}>
+                <div style={panelStyles}>
                   <EuiPanel>
                     <EuiSpacer size='xxl' />
                     <EuiText textAlign='center'>
@@ -788,11 +821,11 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                       <EuiFlexItem grow={3}>
                         <EuiCard
                           icon={<EuiIcon size="xxl" type="editorCodeBlock" />}
-                          title="Markdown"
-                          description="Create rich text with markup language"
+                          title="Code block"
+                          description="Write contents directly using markdown, SQL or PPL"
                           footer={
                             <EuiButton onClick={() => this.addPara(0, '', 'CODE')} style={{ marginBottom: 17 }}>
-                              Add markdown paragraph
+                              Add
                             </EuiButton>
                           }
                         />
@@ -804,7 +837,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           description="Import Kibana visualizations to the notes"
                           footer={
                             <EuiButton onClick={() => this.addPara(0, '', 'VISUALIZATION')} style={{ marginBottom: 17 }}>
-                              Add Kibana visualization paragraph
+                              Add
                             </EuiButton>
                           }
                         />
@@ -818,7 +851,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           </EuiPageBody>
         </EuiPage>
         {this.state.isModalVisible && this.state.modalLayout}
-      </>
+      </div>
     );
   }
 }

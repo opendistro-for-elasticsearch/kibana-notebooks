@@ -24,6 +24,7 @@ import {
   DefaultInput,
   DefaultOutput,
 } from '../helpers/default_notebook_schema';
+import QueryService from '../services/queryService';
 
 export class DefaultBackend implements NotebookAdaptor {
   backend = 'Default Backend';
@@ -350,16 +351,26 @@ export class DefaultBackend implements NotebookAdaptor {
     _wreckOptions: optionsType
   ) {
     try {
+      console.log('params is', params);
+      const queryService = new QueryService(client);
+      if (params.paragraphInput.substring(0, 4) === '%sql') {
+        const queryString = params.paragraphInput.split('\n')[1];
+        console.log('query String is', queryString);
+        // const retVal = queryService.describeSQLQuery(params.paragraphInput)
+      }
       const esClientGetResponse = await this.getNote(client, params.noteId);
       const updatedInputParagraphs = this.updateParagraphInput(
         esClientGetResponse.notebook.paragraphs,
         params.paragraphId,
         params.paragraphInput
       );
+
+      console.log('updatedInputParagraphs is', updatedInputParagraphs);
       const updatedOutputParagraphs = await this.runParagraph(
         updatedInputParagraphs,
         params.paragraphId
       );
+      console.log('updatedOutputParagraphs is', updatedOutputParagraphs);
 
       const updateNotebook = {
         paragraphs: updatedOutputParagraphs,
@@ -392,6 +403,7 @@ export class DefaultBackend implements NotebookAdaptor {
     _wreckOptions: optionsType
   ) {
     try {
+      console.log('in updateFetchParagraph');
       const esClientGetResponse = await this.getNote(client, params.noteId);
       const updatedInputParagraphs = this.updateParagraphInput(
         esClientGetResponse.notebook.paragraphs,
@@ -429,6 +441,7 @@ export class DefaultBackend implements NotebookAdaptor {
     _wreckOptions: optionsType
   ) {
     try {
+      console.log('in addFetchNewParagraph');
       const esClientGetResponse = await this.getNote(client, params.noteId);
       const paragraphs = esClientGetResponse.notebook.paragraphs;
       const newParagraph = this.createParagraph(params.paragraphInput, params.inputType);
