@@ -24,7 +24,6 @@ import {
   DefaultInput,
   DefaultOutput,
 } from '../helpers/default_notebook_schema';
-import QueryService from '../services/queryService';
 
 export class DefaultBackend implements NotebookAdaptor {
   backend = 'Default Backend';
@@ -352,12 +351,10 @@ export class DefaultBackend implements NotebookAdaptor {
   ) {
     try {
       console.log('params is', params);
-      const queryService = new QueryService(client);
-      if (params.paragraphInput.substring(0, 4) === '%sql') {
-        const queryString = params.paragraphInput.split('\n')[1];
-        console.log('query String is', queryString);
-        // const retVal = queryService.describeSQLQuery(params.paragraphInput)
-      }
+      // if (params.paragraphInput.substring(0, 4) === '%sql') {
+      //   // const queryString = params.paragraphInput.split('\n')[1];
+      //   // console.log('query String is', queryString);
+      // }
       const esClientGetResponse = await this.getNote(client, params.noteId);
       const updatedInputParagraphs = this.updateParagraphInput(
         esClientGetResponse.notebook.paragraphs,
@@ -376,7 +373,6 @@ export class DefaultBackend implements NotebookAdaptor {
         paragraphs: updatedOutputParagraphs,
         dateModified: new Date().toISOString(),
       };
-      const esClientResponse = await this.updateNote(client, params.noteId, updateNotebook);
 
       let resultParagraph = {};
       updatedOutputParagraphs.map((paragraph: DefaultParagraph) => {

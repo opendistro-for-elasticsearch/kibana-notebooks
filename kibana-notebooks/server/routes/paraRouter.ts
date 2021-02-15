@@ -45,6 +45,9 @@ export function ParaRouter(router: IRouter) {
           request.body,
           wreckOptions
         );
+        console.log('esNoteBooks client is', esNotebooksClient);
+        console.log('runResponse is', runResponse);
+        console.log('wreckOptions is', wreckOptions);
         return response.ok({
           body: runResponse,
         });

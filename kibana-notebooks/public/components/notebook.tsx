@@ -35,6 +35,7 @@ import {
   EuiPanel,
   EuiCard,
 } from '@elastic/eui';
+import _ from 'lodash';
 import { Cells } from '@nteract/presentational-components';
 
 import { CoreStart, ChromeBreadcrumb } from '../../../../src/core/public';
@@ -423,6 +424,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
 
   // Backend call to update and run contents of paragraph
   updateRunParagraph = (para: ParaType, index: number, vizObjectInput?: string) => {
+    console.log('calling updateRunParagraph');
     this.showParagraphRunning(index);
     if (vizObjectInput) {
       para.inp = this.state.vizPrefix + vizObjectInput; // "%sh check"
@@ -434,21 +436,49 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       paragraphInput: para.inp,
     };
 
-    return this.props.http
-      .post(`${API_PREFIX}/paragraph/update/run/`, {
-        body: JSON.stringify(paraUpdateObject),
-      })
-      .then((res) => {
-        const paragraphs = this.state.paragraphs;
-        paragraphs[index] = res;
-        const parsedPara = [...this.state.parsedPara];
-        parsedPara[index] = this.parseParagraphs([res])[0];
-        this.setState({ paragraphs, parsedPara });
-      })
-      .catch((err) => {
-        this.props.setToast('Error running paragraph, please make sure you have the correct permission.', 'danger');
-        console.error(err.body.message);
-      });
+    const inputType = para.inp.substr(0, 4);
+    if (inputType === '%sql' || inputType === '%ppl') {
+      const endpoint = '/api/sql/' + (_.isEqual(inputType, '%sql') ? 'sqlquery' : 'pplquery');
+      return this.props.http
+        .post(endpoint, { 
+          body: JSON.stringify(paraUpdateObject)
+        })
+        .then((response) => {
+          console.log('response is', response);
+          const results = response.data.resp;
+          const paragraphs = this.state.paragraphs;
+          paragraphs[index] = results;
+          const parsedPara = [...this.state.parsedPara];
+          console.log('paragraphs is', paragraphs);
+          console.log('parsed para is', parsedPara);
+          parsedPara[index] = this.parseParagraphs([results])[0];
+          this.setState({ paragraphs, parsedPara });
+        })
+        .catch((error) => {
+          console.log('error is', error);
+        });
+    }
+    else {
+      return this.props.http
+        .post(`${API_PREFIX}/paragraph/update/run/`, {
+          body: JSON.stringify(paraUpdateObject),
+        })
+        .then((res) => {
+          const paragraphs = this.state.paragraphs;
+          paragraphs[index] = res;
+          const parsedPara = [...this.state.parsedPara];
+          console.log('res is', res);
+          console.log('paragraphs is', paragraphs);
+          console.log('parsed para is', parsedPara);
+          parsedPara[index] = this.parseParagraphs([res])[0];
+          console.log('para after setting [index] is', parsedPara);
+          this.setState({ paragraphs, parsedPara });
+        })
+        .catch((err) => {
+          this.props.setToast('Error running paragraph, please make sure you have the correct permission.', 'danger');
+          console.error(err.body.message);
+        });
+    }
   };
 
   runForAllParagraphs = (reducer: (para: ParaType, index: number) => Promise<any>) => {
@@ -489,6 +519,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   };
 
   loadNotebook = () => {
+    console.log('load notebook called');
     this.showParagraphRunning('queue');
     this.props.http
       .get(`${API_PREFIX}/note/` + this.props.openedNoteId)
