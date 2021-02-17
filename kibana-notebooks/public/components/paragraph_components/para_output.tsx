@@ -13,11 +13,11 @@
  * permissions and limitations under the License.
  */
 
-import React, { useContext, useEffect, useMemo, createContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Outputs } from '@nteract/presentational-components';
 import { Media } from '@nteract/outputs';
 import MarkdownRender from '@nteract/markdown';
-import { EuiDataGrid, EuiText } from '@elastic/eui';
+import { EuiText, EuiSpacer, EuiCodeBlock } from '@elastic/eui';
 
 import { DATE_FORMAT, ParaType } from '../../../common';
 import { DashboardContainerInput, DashboardStart } from '../../../../../src/plugins/dashboard/public';
@@ -84,21 +84,36 @@ export const ParaOutput = (props: {
     if (typeOut !== undefined) {
       switch (typeOut) {
         case 'QUERY':
+          const inputQuery = para.inp.substring(4, para.inp.length);
           const queryObject = JSON.parse(val);
-          const columns = createQueryColumns(queryObject.schema);
-          const data = getQueryOutputData(queryObject);
-          const [visibleColumns, setVisibleColumns] = useState(() =>
-            columns.map(({ id }) => id)
-          );
-          return (
-            <QueryDataGrid
-              rowCount={queryObject.datarows.length}
-              queryColumns={columns}
-              visibleColumns={visibleColumns}
-              setVisibleColumns={setVisibleColumns}
-              dataValues={data}
-            /> 
-          );
+          if (queryObject.hasOwnProperty('error')) {
+            return (
+              <EuiCodeBlock key={key}>
+                {val}
+              </EuiCodeBlock>
+            )
+          }
+          else {
+            const columns = createQueryColumns(queryObject.schema);
+            const data = getQueryOutputData(queryObject);
+            const [visibleColumns, setVisibleColumns] = useState(() =>
+              columns.map(({ id }) => id)
+            );
+            return (
+              <div>
+                <EuiText key={'query-input-key'}><b>{inputQuery}</b></EuiText>
+                <EuiSpacer/>
+                <QueryDataGrid
+                  key={key}
+                  rowCount={queryObject.datarows.length}
+                  queryColumns={columns}
+                  visibleColumns={visibleColumns}
+                  setVisibleColumns={setVisibleColumns}
+                  dataValues={data}
+                /> 
+              </div>
+            );            
+          }
         case 'MARKDOWN':
           return (
             <EuiText key={key} className='markdown-output-text'>

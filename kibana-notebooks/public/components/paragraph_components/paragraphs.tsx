@@ -44,13 +44,7 @@ import { CoreStart } from '../../../../../src/core/public';
 import { ParaOutput } from './para_output';
 import { ParaInput } from './para_input';
 import { API_PREFIX, ParaType, DATE_FORMAT } from '../../../common';
-// import CSS from 'csstype';
 
-// const styles: CSS.Properties = {
-//   float: 'left',
-//   width: '100%',
-//   maxWidth: '1600px',
-// };
 
 /*
  * "Paragraphs" component is used to render cells of the notebook open and "add para div" between paragraphs

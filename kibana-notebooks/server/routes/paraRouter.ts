@@ -41,13 +41,10 @@ export function ParaRouter(router: IRouter) {
       );
       try {
         const runResponse = await BACKEND.updateRunFetchParagraph(
-          esNotebooksClient,
-          request.body,
+          context.notebooks_plugin.esNotebooksClient,
+          request,
           wreckOptions
         );
-        console.log('esNoteBooks client is', esNotebooksClient);
-        console.log('runResponse is', runResponse);
-        console.log('wreckOptions is', wreckOptions);
         return response.ok({
           body: runResponse,
         });

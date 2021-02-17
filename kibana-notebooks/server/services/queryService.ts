@@ -21,42 +21,21 @@ export default class QueryService {
   private client: any;
   constructor(client: any) {
     this.client = client;
-  }
+  }    
 
   describeQueryInternal = async (request: any, format: string, responseFormat: string) => {
     try {
       const queryRequest = {
-        query: request.body.paragraphInput.substring(4, request.body.paragraphInput.length),
+        query: request.substring(4, request.length),
       };
       const params = {
         body: JSON.stringify(queryRequest),
       };
-      // console.log('request is', request);
-      // console.log('queryRequest is', queryRequest);
-      // console.log('params is', params);
-      console.log('request body paragraph input is', request.body.paragraphInput);
       const queryResponse = await this.client.asScoped(request).callAsCurrentUser(format, params);
-      let responseObject = {
-        output: [
-          {
-            outputType: 'QUERY',
-            result: _.isEqual(responseFormat, 'json') ? JSON.stringify(queryResponse) : queryResponse,
-            execution_time: '0s'
-          }
-        ],
-        input: {
-          inputText: queryRequest.query,
-          inputType: 'QUERY'
-        },
-        dateCreated: new Date().toISOString(),
-        dateModified: new Date().toISOString(),
-        id: request.body.paragraphId
-      }
-      
       return {
         data: {
           ok: true,
-          resp: responseObject
+          resp: _.isEqual(responseFormat, 'json') ? JSON.stringify(queryResponse) : queryResponse,
         },
       };
     } catch (err) {
@@ -64,7 +43,7 @@ export default class QueryService {
       return {
         data: {
           ok: false,
-          resp: err.message,
+          resp: err.response,
           body: err.body
         },
       };
@@ -73,9 +52,9 @@ export default class QueryService {
 
   describeSQLQuery = async (request: any) => {
     return this.describeQueryInternal(request, 'sql.sqlQuery', 'json');
-  };
+  }
 
   describePPLQuery = async (request: any) => {
     return this.describeQueryInternal(request, 'sql.pplQuery', 'json');
-  };
+  }
 }

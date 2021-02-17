@@ -13,8 +13,8 @@
  * permissions and limitations under the License.
  */
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { EuiDataGrid, EuiText } from '@elastic/eui';
+import React, { useCallback, useMemo, useState } from 'react';
+import { EuiDataGrid } from '@elastic/eui';
 
 type QueryDataGridProps = {
   rowCount: number,
@@ -61,16 +61,11 @@ export function QueryDataGrid(props: QueryDataGridProps) {
 
   const renderCellValue = useMemo(() => {
     return ({ rowIndex, columnId }) => {
-      // Because inMemory is not set for pagination, we need to manage it
-      // The row index must be adjusted as `data` has already been pruned to the page size
-      const adjustedRowIndex =
-        rowIndex - pagination.pageIndex * pagination.pageSize;
-
-      return dataValues.hasOwnProperty(adjustedRowIndex)
-        ? dataValues[adjustedRowIndex][columnId]
+      return dataValues.hasOwnProperty(rowIndex)
+        ? dataValues[rowIndex][columnId]
         : null;
     };
-  }, [dataValues, pagination.pageIndex, pagination.pageSize]);
+  }, []);
 
   return (
     <div>
@@ -80,11 +75,11 @@ export function QueryDataGrid(props: QueryDataGridProps) {
         columnVisibility={{ visibleColumns, setVisibleColumns }}
         rowCount={rowCount}
         renderCellValue={renderCellValue}
-        inMemory={{ level: 'enhancements' }}
+        inMemory={{ level: 'sorting' }}
         sorting={{ columns: sortingColumns, onSort }}
         pagination={{
           ...pagination,
-          pageSizeOptions: [10, 50, 100],
+          pageSizeOptions: [10, 20, 50],
           onChangeItemsPerPage: onChangeItemsPerPage,
           onChangePage: onChangePage,
         }}
