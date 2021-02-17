@@ -68,8 +68,6 @@ export function NoteRouter(router: IRouter) {
       );
       try {
         const notebookinfo = await BACKEND.fetchNote(esNotebooksClient, request.params.noteId, wreckOptions);
-        // console.log('in getNotes, notebook info is', notebookinfo);
-        // console.log(notebookinfo.paragraphs[0].input);
         return response.ok({
           body: notebookinfo,
         });
