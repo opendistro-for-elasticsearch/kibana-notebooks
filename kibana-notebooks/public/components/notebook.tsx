@@ -532,11 +532,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
         <p>Created <br/> {moment(this.state.dateCreated).format(DATE_FORMAT)}</p>
       </div>
     );
-    const updatedText = (
-      <div>
-        <p>Last updated <br/> [Sample time here]</p>
-      </div>
-    )
     const viewOptions: EuiButtonGroupOption[] = [
       {
         id: 'view_both',
@@ -700,16 +695,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
               </EuiPageHeaderSection>
               <EuiPageHeaderSection>
                 <EuiFlexGroup gutterSize='s'>
-                  {/* <EuiFlexItem>
-                    <EuiButtonGroup
-                      buttonSize='m'
-                      options={viewOptions}
-                      idSelected={this.state.selectedViewId}
-                      onChange={(id) => {
-                        this.updateView(id);
-                      }}
-                    />
-                  </EuiFlexItem> */}
                   {this.state.parsedPara.length > 0 &&
                     <EuiFlexItem>
                       <EuiButtonGroup
@@ -734,7 +719,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           iconType='arrowDown'
                           iconSide='right'
                           onClick={() => this.setState({ isParaActionsPopoverOpen: true })}
-                        >Actions</EuiButton>
+                        >Paragraph actions</EuiButton>
                       }
                       isOpen={this.state.isParaActionsPopoverOpen}
                       closePopover={() => this.setState({ isParaActionsPopoverOpen: false })}>
@@ -750,7 +735,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           iconType='arrowDown'
                           iconSide='right'
                           onClick={() => this.setState({ isNoteActionsPopoverOpen: true })}
-                        >Run all paragraphs</EuiButton>
+                        >Notebook actions</EuiButton>
                       }
                       isOpen={this.state.isNoteActionsPopoverOpen}
                       closePopover={() => this.setState({ isNoteActionsPopoverOpen: false })}>
@@ -763,9 +748,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             <EuiFlexGroup alignItems={'flexStart'} gutterSize={'l'}>
               <EuiFlexItem grow={false}>
                 <EuiText>{createdText}</EuiText>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiText>{updatedText}</EuiText>
               </EuiFlexItem>
             </EuiFlexGroup>
             {this.state.parsedPara.length > 0 ? (
@@ -837,7 +819,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           description="Write contents directly using markdown, SQL or PPL"
                           footer={
                             <EuiButton onClick={() => this.addPara(0, '', 'CODE')} style={{ marginBottom: 17 }}>
-                              Add
+                              Add markdown paragraph
                             </EuiButton>
                           }
                         />
@@ -849,7 +831,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           description="Import Kibana visualizations to the notes"
                           footer={
                             <EuiButton onClick={() => this.addPara(0, '', 'VISUALIZATION')} style={{ marginBottom: 17 }}>
-                              Add
+                              Add Kibana visualization paragraph
                             </EuiButton>
                           }
                         />
