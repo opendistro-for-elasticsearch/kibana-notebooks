@@ -819,7 +819,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           description="Write contents directly using markdown, SQL or PPL"
                           footer={
                             <EuiButton onClick={() => this.addPara(0, '', 'CODE')} style={{ marginBottom: 17 }}>
-                              Add code paragraph
+                              Add
                             </EuiButton>
                           }
                         />
