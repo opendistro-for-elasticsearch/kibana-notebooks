@@ -23,8 +23,7 @@ import {
   DefaultInput,
   DefaultOutput,
 } from '../helpers/default_notebook_schema';
-import QueryService from '../services/queryService';
-import { formatNotRecognized, getQueryOutput, inputIsQuery } from '../helpers/query_helpers';
+import { formatNotRecognized, inputIsQuery } from '../helpers/query_helpers';
 
 export class DefaultBackend implements NotebookAdaptor {
   backend = 'Default Backend';
@@ -317,12 +316,15 @@ export class DefaultBackend implements NotebookAdaptor {
         if (paragraphs[index].input.inputType === 'MARKDOWN' && paragraphs[index].id === paragraphId) {
           updatedParagraph.dateModified = new Date().toISOString();
           if (inputIsQuery(paragraphs[index].input.inputText)) {
-            const queryService = new QueryService(client);
-            let output = await getQueryOutput(paragraphs[index].input.inputText, queryService);
+            const queryOutputObject = {
+              visibleColumns: [],
+              sortingColumns: [],
+              query: paragraphs[index].input.inputText.substring(4, paragraphs[index].input.inputText.length)
+            }
             updatedParagraph.output = [
               {
                 outputType: 'QUERY',
-                result: output.data.resp,
+                result: paragraphs[index].input.inputText.substring(4, paragraphs[index].input.inputText.length),
                 execution_time: '0s',
               },
             ];
@@ -383,7 +385,6 @@ export class DefaultBackend implements NotebookAdaptor {
         params.paragraphId,
         params.paragraphInput
       );
-
       const updatedOutputParagraphs = await this.runParagraph(
         updatedInputParagraphs,
         params.paragraphId,
@@ -394,7 +395,6 @@ export class DefaultBackend implements NotebookAdaptor {
         dateModified: new Date().toISOString(),
       };
       const esClientResponse = await this.updateNote(scopedClient, params.noteId, updateNotebook);
-
       let resultParagraph = {};
       let index = 0;
 

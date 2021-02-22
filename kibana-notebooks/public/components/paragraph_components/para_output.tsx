@@ -76,6 +76,15 @@ export const ParaOutput = (props: {
     return data;
   }
 
+  const isJson = (val: string) => {
+    try {
+      JSON.parse(val);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
   const outputBody = (key: string, typeOut: string, val: string) => {
     /* Returns a component to render paragraph outputs using the para.typeOut property
      * Currently supports HTML, TABLE, IMG

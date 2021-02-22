@@ -189,7 +189,6 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
       setRunParaError(true);
       return;
     }
-
     let newVisObjectInput = undefined;
     if (para.isVizualisation) {
       const inputTemp = createNewVizObject(selectedVisOption[0].key);

@@ -26,7 +26,7 @@ export default class QueryService {
   describeQueryInternal = async (request: any, format: string, responseFormat: string) => {
     try {
       const queryRequest = {
-        query: request.substring(4, request.length),
+        query: request.body
       };
       const params = {
         body: JSON.stringify(queryRequest),

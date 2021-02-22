@@ -439,7 +439,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       .post(`${API_PREFIX}/paragraph/update/run/`, {
         body: JSON.stringify(paraUpdateObject),
       })
-      .then((res) => {
+      .then(async (res) => {
+        if (res.output[0].outputType === 'QUERY') {
+          await this.loadQueryResultsFromInput(res);
+        }
         const paragraphs = this.state.paragraphs;
         paragraphs[index] = res;
         const parsedPara = [...this.state.parsedPara];
@@ -492,8 +495,15 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.showParagraphRunning('queue');
     this.props.http
       .get(`${API_PREFIX}/note/` + this.props.openedNoteId)
-      .then((res) => {
+      .then(async (res) => {
         this.setBreadcrumbs(res.path);
+        let index = 0;
+        for (index = 0; index < res.paragraphs.length; ++index) {
+          // if the paragraph is a query, load the query output
+          if (res.paragraphs[index].output[0].outputType === 'QUERY') {
+            await this.loadQueryResultsFromInput(res.paragraphs[index]);
+          }
+        }
         this.setState(res, this.parseAllParagraphs);
       })
     .catch((err) => {
@@ -501,6 +511,23 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       console.error(err.body.message);
     });
   };
+
+  loadQueryResultsFromInput = async (paragraph: any) => {
+    const queryType = (paragraph.input.inputText.substring(0, 4) === '%sql') 
+    ? 'sqlquery' : 'pplquery';
+      await this.props.http.post(
+        `/api/sql/${queryType}`, {
+          body: JSON.stringify(paragraph.output[0].result)
+        })
+        .then((response) => {
+          paragraph.output[0].result = response.data.resp;
+          return paragraph;
+        })
+        .catch((err) => {
+          this.props.setToast('Error getting query output', 'danger');
+          console.error(err);
+        });      
+  }
 
   setPara = (para: ParaType, index: number) => {
     const parsedPara = [...this.state.parsedPara];

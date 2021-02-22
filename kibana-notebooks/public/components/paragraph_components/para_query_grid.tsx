@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { EuiDataGrid } from '@elastic/eui';
 
 type QueryDataGridProps = {
@@ -66,6 +66,9 @@ export function QueryDataGrid(props: QueryDataGridProps) {
         : null;
     };
   }, []);
+
+  useEffect(() => {
+  }, [visibleColumns, sortingColumns]);
 
   return (
     <div>
