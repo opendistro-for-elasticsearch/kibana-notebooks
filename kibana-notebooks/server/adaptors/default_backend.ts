@@ -316,11 +316,6 @@ export class DefaultBackend implements NotebookAdaptor {
         if (paragraphs[index].input.inputType === 'MARKDOWN' && paragraphs[index].id === paragraphId) {
           updatedParagraph.dateModified = new Date().toISOString();
           if (inputIsQuery(paragraphs[index].input.inputText)) {
-            const queryOutputObject = {
-              visibleColumns: [],
-              sortingColumns: [],
-              query: paragraphs[index].input.inputText.substring(4, paragraphs[index].input.inputText.length)
-            }
             updatedParagraph.output = [
               {
                 outputType: 'QUERY',
