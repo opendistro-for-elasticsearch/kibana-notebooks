@@ -30,6 +30,7 @@ import {
   EuiContextMenuPanelDescriptor,
   EuiIcon,
   EuiLink,
+  EuiFormRow,
 } from '@elastic/eui';
 import { htmlIdGenerator } from '@elastic/eui/lib/services';
 import _ from 'lodash';
@@ -421,6 +422,8 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     }
   };
 
+  const paragraphLabel = "Specify the input language on the first line using %[language type]. Supported languages include markdown, SQL and PPL"
+
   return (
     <>
       <EuiPanel>
@@ -429,21 +432,23 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
           {para.isInputExpanded &&
             <>
               <EuiSpacer size='s' />
-              <ParaInput
-                para={para}
-                index={index}
-                runParaError={runParaError}
-                textValueEditor={textValueEditor}
-                handleKeyPress={handleKeyPress}
-                startTime={para.visStartTime}
-                setStartTime={setStartTime}
-                endTime={para.visEndTime}
-                setEndTime={setEndTime}
-                setIsOutputStale={setIsOutputStale}
-                visOptions={visOptions}
-                selectedVisOption={selectedVisOption}
-                setSelectedVisOption={setSelectedVisOption}
-              />
+              <EuiFormRow fullWidth={true} helpText={paragraphLabel}>
+                <ParaInput
+                  para={para}
+                  index={index}
+                  runParaError={runParaError}
+                  textValueEditor={textValueEditor}
+                  handleKeyPress={handleKeyPress}
+                  startTime={para.visStartTime}
+                  setStartTime={setStartTime}
+                  endTime={para.visEndTime}
+                  setEndTime={setEndTime}
+                  setIsOutputStale={setIsOutputStale}
+                  visOptions={visOptions}
+                  selectedVisOption={selectedVisOption}
+                  setSelectedVisOption={setSelectedVisOption}
+                />
+              </EuiFormRow>
               {runParaError &&
                 <EuiText color="danger" size="s">{`${para.isVizualisation ? 'Visualization' : 'Input'} is required.`}</EuiText>
               }

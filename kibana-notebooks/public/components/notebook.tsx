@@ -54,14 +54,14 @@ import CSS from 'csstype';
 const panelStyles: CSS.Properties = {
   float: 'left',
   width: '100%',
-  maxWidth: '1200px',
+  maxWidth: '1130px',
   marginTop: '20px'
 };
 
 const pageStyles: CSS.Properties = {
   float: 'left',
   width: '100%',
-  maxWidth: '1570px',
+  maxWidth: '1500px',
 }
 
 
@@ -598,7 +598,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     const paraActionsPanels: EuiContextMenuPanelDescriptor[] = [
       {
         id: 0,
-        title: 'Paragraph actions',
+        title: 'Actions',
         items: [
           {
             name: 'Add paragraph to top',
@@ -746,7 +746,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
                           iconType='arrowDown'
                           iconSide='right'
                           onClick={() => this.setState({ isParaActionsPopoverOpen: true })}
-                        >Paragraph actions</EuiButton>
+                        >Actions</EuiButton>
                       }
                       isOpen={this.state.isParaActionsPopoverOpen}
                       closePopover={() => this.setState({ isParaActionsPopoverOpen: false })}>
