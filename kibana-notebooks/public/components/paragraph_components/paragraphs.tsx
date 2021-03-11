@@ -90,6 +90,8 @@ type ParagraphProps = {
   runPara: (para: ParaType, index: number, vizObjectInput?: string) => void;
   clonePara: (para: ParaType, index: number) => void;
   movePara: (index: number, targetIndex: number) => void;
+  showQueryParagraphError: boolean;
+  queryParagraphErrorMessage: string;
 };
 
 export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
@@ -102,7 +104,9 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
     addPara,
     DashboardContainerByValueRenderer,
     deleteVizualization,
-    http,
+    showQueryParagraphError,
+    queryParagraphErrorMessage,
+    http
   } = props;
 
   const [visOptions, setVisOptions] = useState([]); // options for loading saved visualizations
@@ -432,7 +436,12 @@ export const Paragraphs = forwardRef((props: ParagraphProps, ref) => {
           {para.isInputExpanded &&
             <>
               <EuiSpacer size='s' />
-              <EuiFormRow fullWidth={true} helpText={paragraphLabel}>
+              <EuiFormRow 
+                fullWidth={true} 
+                helpText={paragraphLabel} 
+                isInvalid={showQueryParagraphError}
+                error={queryParagraphErrorMessage}
+              >
                 <ParaInput
                   para={para}
                   index={index}
