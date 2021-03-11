@@ -467,9 +467,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     // if query output has error output
     if (checkErrorJSON.hasOwnProperty('error')) {
       this.setState({
-        showQueryParagraphError: true
-      });
-      this.setState({
+        showQueryParagraphError: true,
         queryParagraphErrorMessage: checkErrorJSON.error.reason
       });
       return true;
@@ -477,9 +475,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     // query ran successfully, reset error variables if currently set to true
     else if (this.state.showQueryParagraphError) {
       this.setState({
-        showQueryParagraphError: false
-      });
-      this.setState({
+        showQueryParagraphError: false,
         queryParagraphErrorMessage: ''
       });
       return false;
