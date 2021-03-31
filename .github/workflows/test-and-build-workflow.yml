@@ -5,7 +5,7 @@ on: [pull_request, push]
 
 env:
   PLUGIN_NAME: opendistroNotebooksKibana
-  OD_VERSION: 1.13.0.0
+  OD_VERSION: 1.13.2.0
 
 jobs:
 
