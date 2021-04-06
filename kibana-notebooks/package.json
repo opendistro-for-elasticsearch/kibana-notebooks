@@ -1,6 +1,6 @@
 {
   "name": "opendistro-notebooks-kibana",
-  "version": "1.13.0.0",
+  "version": "1.13.2.0",
   "description": "Kibana Notebooks",
   "main": "index.ts",
   "license": "Apache-2.0",
